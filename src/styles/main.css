@@ -1,0 +1,40 @@
+:root {
+  --primary: #00c800;
+  --text: #111;
+  --bg: #fff;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.container {
+  width: min(1100px, 92vw);
+  margin: 24px auto;
+}
+
+.title { margin: 16px 0 8px; }
+
+.card {
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn:focus { outline: 2px solid black; outline-offset: 2px; } /* 접근성 */
