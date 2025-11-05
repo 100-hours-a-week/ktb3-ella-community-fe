@@ -1,0 +1,86 @@
+/* reset, 폰트, 전역 body 스타일 */
+
+:root {
+  /* 폰트 패밀리 토큰 */
+  --font-ui: "PretendardRegularUI", sans-serif;
+  --font-ui-bold: "PretendardBoldUI", sans-serif;
+
+  /* 색상 */
+  --color-text: #000;
+
+  /* 기본 폰트 크기 시스템 */
+  --fs-title-xl: 32px; /* 페이지 주요 제목 */
+  --fs-title-modal: 24px; /* 모달 제목 */
+  --fs-body: 14px; /* 일반 본문 */
+  --fs-modal-body: 20px; /* 모달 설명 */
+}
+
+
+/* 웹폰트 */
+@font-face {
+  font-family: "PretendardBoldUI";
+  src: url("/public/fonts/Pretendard-Bold.subset.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "PretendardRegularUI";
+  src: url("/public/fonts/Pretendard-Regular.subset.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "PretendardBoldUI";
+  src: url("/public/fonts/Pretendard-Bold.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "PretendardRegularUI";
+  src: url("/public/fonts/Pretendard-Regular.woff2") format("woff2");
+  font-display: swap;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-ui);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  font-size: var(--fs-body);
+  line-height: 1.45;
+}
+
+/* 제목 스타일 */
+h1, .title-xl {
+  font-family: var(--font-ui-bold);
+  font-size: var(--fs-title-xl);
+  font-weight: 700;
+}
+
+/* 본문 스타일 */
+p, .body {
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+/* 본문 강조 텍스트 */
+strong, .bold {
+  font-family: var(--font-ui-bold);
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+/* 모달 제목 스타일 */
+.modal-title {
+  font-family: var(--font-ui-bold);
+  font-size: var(--fs-title-modal);
+  font-weight: 700;
+}
+
+/* 모달 설명, 버튼 스타일 */
+.modal-body,
+.modal-btn {
+  font-family: var(--font-ui);
+  font-size: var(--fs-modal-body);
+  font-weight: 400;
+}
