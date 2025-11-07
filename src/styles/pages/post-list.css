@@ -1,0 +1,125 @@
+:root {
+  --auth-card-width: auto;
+  --primary: #aca0eb;
+}
+
+.header-block {
+  width: 592px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-img {
+  border: 1px solid #000;
+  border-radius: 50%;
+  padding: 2px;
+  width: 36px;
+  height: 36px;
+  background-color: #000;
+}
+
+.profile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.spacer-lg {
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.post-list {
+  width: 592px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-list > p {
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 24px;
+  margin: 0;
+  margin-top: 40px;
+}
+
+.post-list p span {
+  font-family: var(--font-ui-bold);
+}
+
+.btn-post-div {
+  width: 100%;
+  padding: 26px 0;
+  text-align: end;
+}
+
+.btn-post-create {
+  padding: 7px 32px;
+  text-align: center;
+  justify-content: center;
+  font-family: var(--font-ui-bold);
+  line-height: 157%;
+  font-size: 16px;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 16px;
+}
+
+.post-list-content {
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 3px 4px 4px 0px rgba(204, 204, 204, 0.25);
+  border-radius: 16px;
+}
+
+.post-list-content-container {
+  padding: 18px 24px;
+}
+
+.post-title {
+  font-family: var(--font-ui-bold);
+  font-size: var(--fs-title-modal);
+}
+
+.post-info {
+  display: flex;
+  margin: 10px 10px 6px 0;
+  justify-content: space-between;
+}
+
+.post-count {
+  display: flex;
+  gap: 8px;
+}
+
+.post-created-at {
+  align-items: end;
+}
+
+hr {
+  border: 1px solid rgba(0, 0, 0, 0.16);
+}
+
+.author-profile {
+  display: flex;
+  padding: 18px 24px;
+  align-items: center;
+}
+
+.author-profile-image {
+  border: 1px solid #000;
+  border-radius: 50%;
+  padding: 2px;
+  width: 36px;
+  height: 36px;
+  background-color: #000;
+  margin-right: 10px;
+}

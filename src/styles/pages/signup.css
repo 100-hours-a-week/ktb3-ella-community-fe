@@ -5,17 +5,16 @@
   --fs-body: 14px;
 }
 
-.header-back {
+.header-block {
   width: 355px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.header-back a {
+.header-block a {
   color: #000;
 }
-
 
 .page-signup {
   height: 100vh;
@@ -30,7 +29,6 @@
   justify-content: center;
   align-items: center;
   display: flex;
-  flex-direction: column;
 }
 
 .auth {
@@ -43,7 +41,7 @@
 
 .auth-title {
   text-align: center;
-  margin: 0 0 10px;
+  margin: 0 0 10px 0;
 }
 
 .auth-profile {
