@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../src/styles/header.css" />
     <link rel="stylesheet" href="../src/styles/components/post-form.css" />
     <link rel="stylesheet" href="../src/styles/pages/post-create.css" />
+    <script type="module" src="../src/js/post-create.js"></script>
     <title>게시글</title>
   </head>
   <body class="page-post-detail">
@@ -43,15 +44,17 @@
       </div>
     </header>
     <div class="spacer-lg">
-      <form class="post-create" action="/posts" method="post">
+      <form class="post-create" action="/posts" method="post" novalidate>
         <h1 class="post-create-text">게시글 작성</h1>
         <div class="post-label">
           <h2 class="post-label-text">제목*</h2>
         </div>
         <hr />
         <input
+          id="post-title"
           type="text"
           class="post-title-input"
+          maxlength="26"
           placeholder="제목을 입력해주세요. (최대26글자)"
           required
         />
@@ -61,11 +64,13 @@
         </div>
         <hr />
         <textarea
+          id="post-content"
           class="post-content-input"
           placeholder="내용을 입력해주세요."
           required
         ></textarea>
         <hr />
+        <p class="error-text" id="post-content-error"></p>
         <div class="post-label">
           <h2 class="post-label-text">이미지</h2>
         </div>

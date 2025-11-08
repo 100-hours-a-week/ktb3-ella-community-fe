@@ -90,4 +90,22 @@
   font-size: 14px;
   border: none;
   border-radius: 4px;
+  background-color: #aca0eb;
+  cursor: not-allowed;
+  transition: background-color 0.2s ease;
+}
+
+.post-create .btn-post-submit.active,
+.post-update .btn-post-submit.active {
+  cursor: pointer;
+}
+
+.post-create .btn-post-submit:is(.active),
+.post-update .btn-post-submit:is(.active) {
+  background-color: #7f6aee;
+}
+
+.post-create .btn-post-submit:disabled,
+.post-update .btn-post-submit:disabled {
+  opacity: 0.6;
 }
