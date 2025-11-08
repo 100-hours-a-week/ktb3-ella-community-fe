@@ -1,10 +1,3 @@
-:root {
-  --auth-card-width: auto;
-  --auth-radius: 4px;
-  --primary: #aca0eb;
-  --fs-body: 14px;
-}
-
 .header-block {
   width: min(355px, 100%);
   display: flex;
@@ -23,24 +16,11 @@
   flex-direction: column;
 }
 
-.spacer-lg {
-  height: 100%;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.auth {
-  width: 355px;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
+.page-signup .auth {
+  width: min(355px, 100%);
 }
 
 .auth-title {
-  text-align: center;
   margin: 0 0 10px 0;
 }
 
@@ -64,46 +44,16 @@
 }
 
 .auth-form {
-  width: 100%;
   margin-top: 30px;
   padding: 6px 18px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 16px;
 }
 
 .field_label {
   margin-bottom: 4px;
 }
 
-.field_input {
-  outline: none;
-  width: 100%;
-  padding: 8px 0 8px 10px;
-  font-size: var(--fs-body);
-  border-radius: var(--auth-radius);
-  border: 1px solid #000;
-  color: #000;
-  background: transparent;
-}
-
-.btn-login {
-  font-family: var(--font-ui-bold);
-  font-size: var(--fs-body);
-  justify-content: center;
-  border-radius: var(--auth-radius);
-  align-items: center;
-  display: flex;
+.page-signup .btn-form-primary {
   margin-top: 20px;
-  flex-direction: column;
-  width: 100%;
-  padding: 8px 0;
-  color: #fff;
-  background: var(--primary);
-  border: none;
 }
 
 .link-login {

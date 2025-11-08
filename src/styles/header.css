@@ -14,15 +14,16 @@
   align-items: center;
 }
 
-.header-back {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-}
-
 .header-block a {
   color: #000;
+}
+
+.header-back {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 hr {

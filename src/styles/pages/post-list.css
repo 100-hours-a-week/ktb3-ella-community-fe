@@ -3,14 +3,6 @@
   --primary: #aca0eb;
 }
 
-.spacer-lg {
-  height: 100%;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
 .post-list {
   width: min(592px, 100%);
   justify-content: center;

@@ -16,6 +16,12 @@
   /* 색상 */
   --color-text: #000;
   --color-bg: #f4f5f7;
+  --primary: #aca0eb;
+
+  /* 컴포넌트 토큰 */
+  --auth-card-width: 392px;
+  --auth-radius: 4px;
+
   /* 기본 폰트 크기 시스템 */
   --fs-title-xl: 32px; /* 페이지 주요 제목 */
   --fs-title-modal: 24px; /* 모달 제목 */
@@ -96,4 +102,70 @@ label {
   font-family: var(--font-ui);
   font-size: var(--fs-modal-body);
   font-weight: 400;
+}
+
+/* 공통 레이아웃 유틸 */
+.spacer-lg {
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 인증 카드 영역 */
+.auth {
+  width: min(var(--auth-card-width), 100%);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-title {
+  text-align: center;
+}
+
+.auth-form {
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.field_label {
+  margin-bottom: 6px;
+}
+
+.field_input {
+  width: 100%;
+  padding: 8px 0 8px 10px;
+  font-size: var(--fs-body);
+  border-radius: var(--auth-radius);
+  border: 1px solid #000;
+  color: #000;
+  background: transparent;
+}
+
+.field_input:focus-visible {
+  outline: none;
+}
+
+.btn-form-primary {
+  font-family: var(--font-ui-bold);
+  font-size: var(--fs-body);
+  justify-content: center;
+  border-radius: var(--auth-radius);
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px 0;
+  color: #fff;
+  background: var(--primary);
+  border: none;
 }
