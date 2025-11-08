@@ -50,6 +50,7 @@
 }
 
 .field_input {
+  outline: none;
   width: 100%;
   padding: 8px 0 8px 10px;
   font-size: var(--fs-body);
