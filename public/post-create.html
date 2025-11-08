@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../styles/global.css" />
-    <link rel="stylesheet" href="../styles/header.css" />
-    <link rel="stylesheet" href="../styles/components/post-form.css" />
-    <link rel="stylesheet" href="../styles/pages/post-update.css" />
-    <title>게시글 수정</title>
+    <link rel="stylesheet" href="../src/styles/global.css" />
+    <link rel="stylesheet" href="../src/styles/header.css" />
+    <link rel="stylesheet" href="../src/styles/components/post-form.css" />
+    <link rel="stylesheet" href="../src/styles/pages/post-create.css" />
+    <title>게시글</title>
   </head>
   <body class="page-post-detail">
     <header class="header">
@@ -43,8 +43,8 @@
       </div>
     </header>
     <div class="spacer-lg">
-      <form class="post-update" action="/posts" method="post">
-        <h1 class="post-update-text">게시글 수정</h1>
+      <form class="post-create" action="/posts" method="post">
+        <h1 class="post-create-text">게시글 작성</h1>
         <div class="post-label">
           <h2 class="post-label-text">제목*</h2>
         </div>
@@ -74,10 +74,10 @@
             파일 선택
             <input type="file" name="image" accept="image/*" hidden />
           </label>
-          <p class="post-image-input-text">기존 파일 명</p>
+          <p class="post-image-input-text">파일을 선택해주세요.</p>
         </div>
         <div class="btn-post-submit-div">
-          <button type="submit" class="btn-post-submit">수정하기</button>
+          <button type="submit" class="btn-post-submit">완료</button>
         </div>
       </form>
     </div>
