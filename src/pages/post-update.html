@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles/global.css" />
+    <link rel="stylesheet" href="../styles/header.css" />
+    <link rel="stylesheet" href="../styles/pages/post-update.css" />
+    <title>게시글 수정</title>
+  </head>
+  <body class="page-post-detail">
+    <header class="header">
+      <div class="header-block">
+        <a href="./post-list.html">
+          <svg
+            width="34"
+            height="34"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M15 6L9 12L15 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="butt"
+              stroke-linejoin="miter"
+            />
+          </svg>
+        </a>
+        <h1 class="title-xl">아무 말 대잔치</h1>
+        <div class="profile-img">
+          <a href="./login.html">
+            <img
+              src="/public/images/userProfile.png"
+              width="30"
+              height="30"
+              alt="로그인 아이콘"
+            />
+          </a>
+        </div>
+      </div>
+    </header>
+    <div class="spacer-lg">
+      <div class="post-update">
+        <h1 class="post-update-text">게시글 수정</h1>
+        <div class="post-label">
+          <h2 class="post-label-text">제목*</h2>
+        </div>
+        <hr />
+        <input
+          type="text"
+          class="post-title-input"
+          placeholder="제목을 입력해주세요. (최대26글자)"
+          required
+        />
+        <hr />
+        <div class="post-label">
+          <h2 class="post-label-text">내용*</h2>
+        </div>
+        <hr />
+        <textarea
+          class="post-content-input"
+          placeholder="내용을 입력해주세요."
+          required
+        ></textarea>
+        <hr />
+        <div class="post-label">
+          <h2 class="post-label-text">이미지</h2>
+        </div>
+        <div class="post-image-input-container">
+          <button type="submit" class="btn-image-upload">파일 선택</button>
+          <p class="post-image-input-text">기존 파일 명</p>
+        </div>
+        <div class="btn-post-submit-div">
+          <button type="submit" class="btn-post-submit">수정하기</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
