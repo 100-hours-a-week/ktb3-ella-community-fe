@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles/global.css" />
+    <link rel="stylesheet" href="../styles/header.css" />
+    <link rel="stylesheet" href="../styles/pages/post-detail.css" />
+    <title>게시글 상세조회</title>
+  </head>
+  <body class="page-post-detail">
+    <header class="header">
+      <div class="header-block">
+        <a href="./post-list.html">
+          <svg
+            width="34"
+            height="34"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M15 6L9 12L15 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="butt"
+              stroke-linejoin="miter"
+            />
+          </svg>
+        </a>
+        <h1 class="title-xl">아무 말 대잔치</h1>
+        <div class="profile-img">
+          <a href="./login.html">
+            <img
+              src="/public/images/userProfile.png"
+              width="30"
+              height="30"
+              alt="로그인 아이콘"
+            />
+          </a>
+        </div>
+      </div>
+    </header>
+    <div class="spacer-lg">
+      <div class="post-detail">
+        <h1 class="post-detail-title">제목 1</h1>
+        <div class="post-detail-title-container">
+          <div class="post-detail-title-info">
+            <div class="profile-img">
+              <img
+                src="/public/images/userProfile.png"
+                width="30"
+                height="30"
+                alt="작성자 아이콘"
+              />
+            </div>
+            <div class="post-author-name-date">
+              <p class="post-author-name">더미 작성자 1</p>
+              <p class="post-created-at">2021-01-01 00:00:00</p>
+            </div>
+          </div>
+          <div class="post-update-delete-btns">
+            <button type="submit" class="btn-update">수정</button>
+            <button type="submit" class="btn-delete">삭제</button>
+          </div>
+        </div>
+        <hr />
+        <div class="post-detail-content-container">
+          <div class="post-img">
+            <img
+              src="/public/images/postImage.jpeg"
+              width="30"
+              height="30"
+              alt="게시글 이미지"
+            />
+          </div>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat. Duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+            culpa qui officia deserunt mollit anim id est laborum.
+          </p>
+          <div class="post-detail-content-like-comment-count">
+            <div class="post-count">
+              <p class="post-count-value">123</p>
+              <p class="post-count-label">좋아요수</p>
+            </div>
+            <div class="post-count">
+              <p class="post-count-value">123</p>
+              <p class="post-count-label">조회수</p>
+            </div>
+            <div class="post-count">
+              <p class="post-count-value">123</p>
+              <p class="post-count-label">댓글</p>
+            </div>
+          </div>
+          <hr />
+          <div class="post-comments-section">
+            <div class="post-comment-input-container">
+              <div class="post-comment-input-box">
+                <textarea
+                  class="post-comment-input"
+                  placeholder="댓글을 남겨주세요!"
+                ></textarea>
+              </div>
+              <hr />
+              <div class="post-comment-btn">
+                <button type="submit" class="btn-comment-submit">
+                  댓글 등록
+                </button>
+              </div>
+            </div>
+            <div class="post-comments-list-container">
+              <div class="post-comment-list">
+                <div class="post-comment-list-info">
+                  <div class="post-comment-info-container">
+                    <div class="profile-img">
+                      <img
+                        src="/public/images/userProfile.png"
+                        width="30"
+                        height="30"
+                        alt="작성자 아이콘"
+                      />
+                    </div>
+                    <div class="post-author-name-date">
+                      <p class="post-author-name">댓글 작성자 1</p>
+                      <p class="post-created-at">2021-01-01 00:00:00</p>
+                    </div>
+                  </div>
+                  <div class="post-comment-text-container">
+                    <p class="post-comment-text">
+                      이것은 더미 댓글입니다. 댓글 내용이 여기에 표시됩니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="post-comment-update-delete-btns">
+                <button type="submit" class="btn-update">수정</button>
+                <button type="submit" class="btn-delete">삭제</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
