@@ -99,7 +99,11 @@
           </div>
           <hr />
           <div class="post-comments-section">
-            <div class="post-comment-input-container">
+            <form
+              class="post-comment-input-container"
+              action="/comments"
+              method="post"
+            >
               <div class="post-comment-input-box">
                 <textarea
                   class="post-comment-input"
@@ -112,7 +116,7 @@
                   댓글 등록
                 </button>
               </div>
-            </div>
+            </form>
             <div class="post-comments-list-container">
               <div class="post-comment-list">
                 <div class="post-comment-list-info">

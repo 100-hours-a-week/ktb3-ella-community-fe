@@ -42,7 +42,7 @@
       </div>
     </header>
     <div class="spacer-lg">
-      <div class="post-update">
+      <form class="post-update" action="/posts" method="post">
         <h1 class="post-update-text">게시글 수정</h1>
         <div class="post-label">
           <h2 class="post-label-text">제목*</h2>
@@ -69,13 +69,16 @@
           <h2 class="post-label-text">이미지</h2>
         </div>
         <div class="post-image-input-container">
-          <button type="submit" class="btn-image-upload">파일 선택</button>
+          <label class="btn-image-upload">
+            파일 선택
+            <input type="file" name="image" accept="image/*" hidden />
+          </label>
           <p class="post-image-input-text">기존 파일 명</p>
         </div>
         <div class="btn-post-submit-div">
           <button type="submit" class="btn-post-submit">수정하기</button>
         </div>
-      </div>
+      </form>
     </div>
   </body>
 </html>

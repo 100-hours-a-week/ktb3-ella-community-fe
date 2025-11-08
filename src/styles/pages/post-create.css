@@ -16,7 +16,7 @@
 
 .post-create-text {
   display: flex;
-  padding: 24px 241px;
+  padding: 24px 0;
   font-size: var(--fs-title-modal);
   align-items: center;
   justify-content: center;
@@ -63,9 +63,14 @@
 
 .btn-image-upload {
   padding: 6px 8px;
-  border: 1px solid #000;
-  background-color: #d9d9d9;
+  display: inline-block;
+  border: solid 1px #000;
   border-radius: 4px;
+  background-color: #d9d9d9;
+  color: #000;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 14px;
 }
 
 .btn-post-submit-div {
