@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles/global.css" />
+    <link rel="stylesheet" href="../styles/header.css" />
+    <link rel="stylesheet" href="../styles/pages/user-info-update.css" />
+    <title>회원정보 수정</title>
+  </head>
+  <body class="page-user-info">
+    <header class="header">
+      <div class="header-block">
+        <div class="header-back"></div>
+        <h1 class="title-xl">아무 말 대잔치</h1>
+        <div class="profile-img">
+          <a href="./login.html">
+            <img
+              src="/public/images/userProfile.png"
+              width="30"
+              height="30"
+              alt="로그인 아이콘"
+            />
+          </a>
+        </div>
+      </div>
+    </header>
+    <div class="spacer-lg">
+      <div class="auth">
+        <h1 class="auth-title">회원정보 수정</h1>
+        <div class="field-profile-image">
+          <p class="field_label_profile_image">프로필 사진*</p>
+        </div>
+        <div class="spacer-sm">
+          <div class="profile-img-update">
+            <a href="./login.html">
+              <img
+                src="/public/images/userProfile.png"
+                width="50"
+                height="50"
+                alt="로그인 아이콘"
+              />
+            </a>
+          </div>
+        </div>
+        <form class="auth-form">
+          <div class="field">
+            <label for="email" class="field_label">이메일</label>
+            <p class="field_value">startup@gmail.com</p>
+          </div>
+          <div class="field">
+            <label for="nickname" class="field_label">닉네임</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              class="field_input"
+              placeholder="스타트업 코드"
+              required
+            />
+          </div>
+          <button type="submit" class="btn-update">수정하기</button>
+        </form>
+        <a href="./withdraw.html" class="link-withdraw">회원탈퇴</a>
+      </div>
+    </div>
+  </body>
+</html>
