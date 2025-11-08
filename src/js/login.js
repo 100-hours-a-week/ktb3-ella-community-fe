@@ -1,6 +1,7 @@
 "use strict";
 
 const LOGIN_ENDPOINT = "/api/auth/login";
+const USER_STORAGE_KEY = "ktb3-community:user";
 
 const EMAIL_PATTERN =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -33,17 +34,17 @@ if (
 
 // 이메일 검증 함수
 const validateEmail = (value) => {
-  if (!value.trim()) return "올바른 이메일 주소 형식을 입력해주세요.";
+  if (!value.trim()) return "*이메일을 입력해주세요.";
   if (!EMAIL_PATTERN.test(value))
-    return "올바른 이메일 주소 형식을 입력해주세요.";
+    return "*올바른 이메일 주소 형식을 입력해주세요. (예:example@example.com)";
   return "";
 };
 
 // 비밀번호 검증 함수
 const validatePassword = (value) => {
-  if (!value.trim()) return "비밀번호를 입력해주세요.";
+  if (!value.trim()) return "*비밀번호를 입력해주세요.";
   if (!PASSWORD_PATTERN.test(value))
-    return "비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다.";
+    return "*비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다.";
   return "";
 };
 
@@ -59,25 +60,28 @@ const checkValidation = () => {
   }
 };
 
-// 이메일 입력 시 2초간 멈출 때 자동 검사
-emailInput.addEventListener("input", () => {
-  clearTimeout(emailTimer);
-  emailTimer = setTimeout(() => {
-    const message = validateEmail(emailInput.value);
-    emailError.textContent = message;
-    checkValidation();
-  }, 2000);
+// 이메일 포커스 아웃 자동 검사
+emailInput.addEventListener("blur", () => {
+  const message = validateEmail(emailInput.value);
+  emailError.textContent = message;
+  checkValidation();
 });
 
-// 비밀번호 입력 시 2초간 멈출 때 자동 검사
-passwordInput.addEventListener("input", () => {
-  clearTimeout(passwordTimer);
-  passwordTimer = setTimeout(() => {
-    const message = validatePassword(passwordInput.value);
-    passwordError.textContent = message;
-    checkValidation();
-  }, 2000);
+// 비밀번호 포커스 아웃 자동 검사
+passwordInput.addEventListener("blur", () => {
+  const message = validatePassword(passwordInput.value);
+  passwordError.textContent = message;
+  checkValidation();
 });
+
+const persistUser = (user) => {
+  if (!user) return;
+  try {
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+  } catch (error) {
+    console.warn("사용자 정보를 저장하지 못했습니다.", error);
+  }
+};
 
 // 실제 서버로 로그인 요청 보내는 함수
 const requestLogin = async ({ email, password }) => {
@@ -94,12 +98,12 @@ const requestLogin = async ({ email, password }) => {
   if (!response.ok) {
     if (result.code === "USER_NOT_FOUND") {
       // 존재하지 않는 사용자
-      throw new Error("아이디 또는 비밀번호를 확인해주세요.");
+      throw new Error("*아이디 또는 비밀번호를 확인해주세요.");
     } else if (result.message) {
       // 서버에서 message 내려주면 그대로 표시
       throw new Error(result.message);
     } else {
-      throw new Error("로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      throw new Error("*로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   }
   return result;
@@ -125,10 +129,12 @@ form.addEventListener("submit", async (event) => {
   submitButton.classList.add("is-loading");
 
   try {
-    await requestLogin({
+    const { data } = await requestLogin({
       email: emailInput.value.trim(),
       password: passwordInput.value.trim(),
     });
+
+    persistUser(data);
 
     // 로그인 성공 시 이동할 페이지
     window.location.href = "./post-list.html";

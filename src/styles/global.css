@@ -169,3 +169,15 @@ label {
   background: var(--primary);
   border: none;
 }
+
+.error-text {
+  font-size: var(--fs-body);
+  color: red;
+  font-size: 12px;
+  margin-top: 2px;
+  min-height: 16px;
+}
+
+.btn-login.btn-form-primary.active {
+  background: #7f6aee;
+}
