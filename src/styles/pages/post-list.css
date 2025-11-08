@@ -5,18 +5,17 @@
 
 .post-list {
   width: min(592px, 100%);
-  justify-content: center;
-  align-items: center;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .post-list > p {
   text-align: center;
   font-family: var(--font-ui);
   font-size: 24px;
-  margin: 0;
-  margin-top: 40px;
+  margin: 40px 0 0;
 }
 
 .post-list p span {
@@ -32,7 +31,6 @@
 .btn-post-create {
   padding: 7px 32px;
   text-align: center;
-  justify-content: center;
   font-family: var(--font-ui-bold);
   line-height: 157%;
   font-size: 16px;
@@ -40,6 +38,14 @@
   background: var(--primary);
   border: none;
   border-radius: 16px;
+  cursor: pointer;
+}
+
+.post-list-content-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .post-list-content {
@@ -47,6 +53,7 @@
   background-color: #fff;
   box-shadow: 3px 4px 4px 0px rgba(204, 204, 204, 0.25);
   border-radius: 16px;
+  cursor: pointer;
 }
 
 .post-list-content-container {
@@ -56,31 +63,39 @@
 .post-title {
   font-family: var(--font-ui-bold);
   font-size: var(--fs-title-modal);
+  margin: 0;
 }
 
 .post-info {
   display: flex;
-  margin: 10px 10px 6px 0;
   justify-content: space-between;
+  margin: 10px 10px 6px 0;
 }
 
 .post-count {
   display: flex;
   gap: 8px;
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
 }
 
-.post-created-at {
-  align-items: end;
+.post-created-at p {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  color: #666;
 }
 
-hr {
+.post-list-content hr {
   border: 1px solid rgba(0, 0, 0, 0.16);
+  margin: 0;
 }
 
 .author-profile {
   display: flex;
-  padding: 18px 24px;
   align-items: center;
+  padding: 18px 24px;
+  gap: 10px;
 }
 
 .author-profile-image {
@@ -90,5 +105,19 @@ hr {
   width: 36px;
   height: 36px;
   background-color: #000;
-  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.author-profile-image img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.author-profile strong {
+  font-family: var(--font-ui-bold);
+  font-size: var(--fs-body);
 }
