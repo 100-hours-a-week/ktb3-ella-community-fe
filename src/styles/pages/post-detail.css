@@ -1,4 +1,4 @@
-root {
+:root {
   --auth-card-width: auto;
   --primary: #aca0eb;
 }
@@ -13,7 +13,7 @@ root {
 }
 
 .post-detail {
-  width: 592px;
+  width: min(592px, 100%);
   justify-content: center;
   display: flex;
   flex-direction: column;
