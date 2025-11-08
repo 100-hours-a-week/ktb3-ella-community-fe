@@ -1,8 +1,39 @@
 .header {
   width: 100%;
-  height: 104px; 
+  height: 104px;
   display: flex;
   justify-content: center; /* 가운데 정렬(가로) */
-  align-items: center;      /* 가운데 정렬(세로) */
+  align-items: center; /* 가운데 정렬(세로) */
   border-bottom: 1px solid #000;
+}
+
+.header-block {
+  width: 592px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-block a {
+  color: #000;
+}
+
+hr {
+  border: 1px solid rgba(0, 0, 0, 0.16);
+}
+
+.profile-img {
+  border: 1px solid #000;
+  border-radius: 50%;
+  padding: 2px;
+  width: 36px;
+  height: 36px;
+  background-color: #000;
+}
+
+.profile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
