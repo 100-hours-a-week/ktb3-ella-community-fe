@@ -69,7 +69,7 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     },
     body: JSON.stringify({
       nickname: nickname.trim(),
-      profileImageUrl: profileImageUrl || DEFAULT_PROFILE_IMAGE,
+      profileImageUrl: DEFAULT_PROFILE_IMAGE,
     }),
   });
 
@@ -86,7 +86,7 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     ...user,
     email: updated.email,
     nickname: updated.nickname,
-    profileImageUrl: profileImageUrl || DEFAULT_PROFILE_IMAGE,
+    profileImageUrl: DEFAULT_PROFILE_IMAGE,
   };
   localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
 
@@ -94,7 +94,7 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
 
   return {
     ...updated,
-    profileImageUrl: profileImageUrl || DEFAULT_PROFILE_IMAGE,
+    profileImageUrl: DEFAULT_PROFILE_IMAGE,
   };
 };
 
@@ -149,15 +149,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (emailValueEl) emailValueEl.textContent = user.email || "";
   profileImageEl.src = DEFAULT_PROFILE_IMAGE;
 
-  if (profileImageBtn && profileImageInput) {
-    profileImageBtn.addEventListener("click", () => profileImageInput.click());
-    profileImageInput.addEventListener("change", () => {
-      const file = profileImageInput.files?.[0];
-      if (!file) return;
-      const previewUrl = URL.createObjectURL(file);
-      profileImageEl.src = previewUrl;
-    });
-  }
+  profileImageBtn?.addEventListener("click", () =>
+    profileImageInput?.click(),
+  );
+  profileImageInput?.addEventListener("change", () => {
+    const file = profileImageInput.files?.[0];
+    if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    profileImageEl.src = previewUrl;
+  });
 
   originalNickname = user.nickname || "";
   nicknameInput.value = originalNickname;

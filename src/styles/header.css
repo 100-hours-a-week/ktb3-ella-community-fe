@@ -31,12 +31,11 @@ hr {
 }
 
 .profile-img {
-  border: none;
+  border: solid 1px #000;
   border-radius: 50%;
   padding: 2px;
   width: 36px;
   height: 36px;
-  background-color: #000;
 }
 
 .profile-img img {
@@ -44,4 +43,51 @@ hr {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-dropdown-toggle {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-dropdown-toggle img {
+  object-fit: cover;
+}
+
+.profile-dropdown-menu {
+  position: absolute;
+  top: 115%;
+  right: 0;
+  width: 115px;
+  background: #fff;
+  display: none;
+  flex-direction: column;
+  z-index: 1200;
+}
+
+.profile-dropdown.open .profile-dropdown-menu {
+  display: flex;
+}
+
+.profile-dropdown-item {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  padding: 10px 24px;
+  color: #000;
+  text-decoration: none;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  text-align: left;
+  background: #d9d9d9;
+  border: none;
 }

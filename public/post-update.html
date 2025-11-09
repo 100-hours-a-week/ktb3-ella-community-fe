@@ -30,15 +30,20 @@
           </svg>
         </a>
         <h1 class="title-xl">아무 말 대잔치</h1>
-        <div class="profile-img">
-          <a href="./login.html">
+        <div class="profile-dropdown">
+          <button type="button" class="profile-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
             <img
               src="/public/images/userProfile.png"
               width="30"
               height="30"
-              alt="로그인 아이콘"
+              alt="프로필 메뉴"
             />
-          </a>
+          </button>
+          <div class="profile-dropdown-menu" role="menu">
+            <a href="./user-info-update.html" class="profile-dropdown-item" role="menuitem">회원정보 수정</a>
+            <a href="./user-password-update.html" class="profile-dropdown-item" role="menuitem">비밀번호 수정</a>
+            <button type="button" class="profile-dropdown-item profile-dropdown-logout" role="menuitem">로그아웃</button>
+          </div>
         </div>
       </div>
     </header>
@@ -88,6 +93,7 @@
       </form>
     </div>
 
+    <script type="module" src="../src/js/header.js"></script>
     <script type="module" src="../src/js/post-update.js"></script>
   </body>
 </html>
