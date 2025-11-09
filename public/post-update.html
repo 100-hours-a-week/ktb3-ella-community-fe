@@ -43,16 +43,19 @@
       </div>
     </header>
     <div class="spacer-lg">
-      <form class="post-update" action="/posts" method="post">
+      <form class="post-update" novalidate>
         <h1 class="post-update-text">게시글 수정</h1>
+
         <div class="post-label">
           <h2 class="post-label-text">제목*</h2>
         </div>
         <hr />
         <input
+          id="post-title"
           type="text"
           class="post-title-input"
           placeholder="제목을 입력해주세요. (최대26글자)"
+          maxlength="26"
           required
         />
         <hr />
@@ -60,12 +63,15 @@
           <h2 class="post-label-text">내용*</h2>
         </div>
         <hr />
+        <p class="error-text" id="post-content-error"></p>
         <textarea
+          id="post-content"
           class="post-content-input"
           placeholder="내용을 입력해주세요."
           required
         ></textarea>
         <hr />
+        <!-- 이미지 서버에서 추가하면 수정하기 -->
         <div class="post-label">
           <h2 class="post-label-text">이미지</h2>
         </div>
@@ -81,5 +87,7 @@
         </div>
       </form>
     </div>
+
+    <script type="module" src="../src/js/post-update.js"></script>
   </body>
 </html>

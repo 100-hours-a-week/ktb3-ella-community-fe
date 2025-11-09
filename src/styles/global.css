@@ -181,3 +181,71 @@ label {
 .btn-login.btn-form-primary.active {
   background: #7f6aee;
 }
+
+/* 모달 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal {
+  width: min(408px, 100%);
+  max-width: 90%;
+  padding: 48px 70px;
+  background: #fff;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  animation: modal-pop-in 0.18s ease-out;
+}
+
+/* 메시지 */
+.modal-message {
+  font-size: var(--fs-title-modal);
+  font-family: var(--font-ui-bold);
+}
+
+.modal-submessage {
+  font-family: var(--font-ui);
+  font-size: var(--fs-modal-body);
+}
+
+/* 버튼 영역 */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* 버튼 공통 */
+.modal-actions button {
+  min-width: 127px;
+  padding: 10px 46px;
+  border-radius: 12px;
+  font-size: 20px;
+  font-family: var(--font-ui);
+  border: none;
+}
+
+/* 취소 버튼 */
+.modal-cancel {
+  background-color: #000;
+  color: #fff;
+}
+
+/* 확인 버튼 */
+.modal-confirm {
+  background-color: #c4a5fa;
+  color: #000;
+}
