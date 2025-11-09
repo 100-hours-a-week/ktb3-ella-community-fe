@@ -251,22 +251,44 @@ const renderPostDetail = (post) => {
     likeBtn.dataset.liked = post.liked ? "true" : "false";
     if (post.liked) likeBtn.classList.add("active");
 
-    likeBtn.addEventListener("click", () => {
+    likeBtn.addEventListener("click", async () => {
+      const currentUser = requireAuthUser();
+      if (!currentUser) return;
+
+      const postId = post.postId;
+      const userId = currentUser.id;
       const liked = likeBtn.dataset.liked === "true";
       const current = Number(likeValueEl.dataset.rawCount || "0");
 
-      if (!liked) {
-        const next = current + 1;
-        likeBtn.dataset.liked = "true";
-        likeBtn.classList.add("active");
-        likeValueEl.dataset.rawCount = String(next);
-        likeValueEl.textContent = formatCount(next);
-      } else {
-        const next = Math.max(current - 1, 0);
-        likeBtn.dataset.liked = "false";
-        likeBtn.classList.remove("active");
-        likeValueEl.dataset.rawCount = String(next);
-        likeValueEl.textContent = formatCount(next);
+      try {
+        if (!liked) {
+          const res = await fetch(`/api/posts/${postId}/likes/${userId}`, {
+            method: "POST",
+            headers: { Accept: "*/*" },
+          });
+          if (!res.ok) throw new Error("좋아요 요청 실패");
+
+          const next = current + 1;
+          likeBtn.dataset.liked = "true";
+          likeBtn.classList.add("active");
+          likeValueEl.dataset.rawCount = String(next);
+          likeValueEl.textContent = formatCount(next);
+        } else {
+          const res = await fetch(`/api/posts/${postId}/likes/${userId}`, {
+            method: "DELETE",
+            headers: { Accept: "*/*" },
+          });
+          if (!res.ok && res.status !== 204)
+            throw new Error("좋아요 취소 실패");
+
+          const next = Math.max(current - 1, 0);
+          likeBtn.dataset.liked = "false";
+          likeBtn.classList.remove("active");
+          likeValueEl.dataset.rawCount = String(next);
+          likeValueEl.textContent = formatCount(next);
+        }
+      } catch (err) {
+        alert(err.message || "좋아요 처리 중 오류가 발생했습니다.");
       }
     });
   }
