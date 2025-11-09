@@ -33,20 +33,31 @@
         </div>
         <div class="spacer-sm">
           <div class="profile-img-update">
-            <a href="./login.html">
-              <img
-                src="/public/images/userProfile.png"
-                width="50"
-                height="50"
-                alt="로그인 아이콘"
-              />
-            </a>
+            <button
+              type="button"
+              class="profile-img-change"
+              aria-label="프로필 이미지 변경"
+            >
+              변경
+            </button>
+            <input
+              type="file"
+              id="profile-image-input"
+              accept="image/*"
+              hidden
+            />
+            <img
+              id="profile-image"
+              src="/public/images/userProfile.png"
+              alt="프로필 이미지"
+            />
           </div>
         </div>
+
         <form class="auth-form">
           <div class="field">
-            <label for="email" class="field_label">이메일</label>
-            <p class="field_value">startup@gmail.com</p>
+            <p class="field_label">이메일</p>
+            <p class="field_value" id="email-value"></p>
           </div>
           <div class="field">
             <label for="nickname" class="field_label">닉네임</label>
@@ -55,14 +66,30 @@
               name="nickname"
               type="text"
               class="field_input"
-              placeholder="스타트업 코드"
+              placeholder="닉네임을 입력해주세요"
               required
             />
+            <p class="error-text" id="user-nickname-error"></p>
           </div>
-          <button type="submit" class="btn-update btn-form-primary">수정하기</button>
+
+          <button type="submit" class="btn-update btn-form-primary" disabled>
+            수정하기
+          </button>
         </form>
-        <a href="./withdraw.html" class="link-withdraw">회원탈퇴</a>
+        <button type="button" class="link-withdraw">회원탈퇴</button>
       </div>
     </div>
+    <div class="modal-backdrop" id="user-delete-modal">
+      <div class="modal">
+        <p class="modal-message">회원 탈퇴하시겠습니까?</p>
+        <p class="modal-submessage">작성된 게시글과 댓글은 삭제됩니다.</p>
+        <div class="modal-actions">
+          <button type="button" class="modal-cancel">취소</button>
+          <button type="button" class="modal-confirm">확인</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" id="update-toast">수정 완료</div>
+    <script type="module" src="../src/js/user-info-update.js"></script>
   </body>
 </html>

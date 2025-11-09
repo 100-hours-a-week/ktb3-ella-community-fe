@@ -26,12 +26,19 @@
 }
 
 .profile-img-update {
-  border: none;
-  border-radius: 50%;
-  padding: 4px;
+  position: relative;
   width: 149px;
   height: 149px;
-  background-color: #000;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-img-update::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(70, 70, 70, 0.55);
+  pointer-events: none;
 }
 
 .profile-img-update img {
@@ -39,6 +46,23 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  display: block;
+}
+
+.profile-img-change {
+  padding: 5px 13px;
+  border-radius: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  color: #fff;
+  font-family: var(--font-ui-bold);
+  font-size: 15px;
+  cursor: pointer;
+  z-index: 1;
+  border: solid 1px #fff;
 }
 
 .auth-form {
@@ -57,4 +81,6 @@
   color: #000;
   padding: 12px 0px;
   text-decoration: none;
+  border: none;
+  background-color: transparent;
 }

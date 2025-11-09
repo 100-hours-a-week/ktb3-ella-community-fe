@@ -200,7 +200,7 @@ label {
 .modal {
   width: min(408px, 100%);
   max-width: 90%;
-  padding: 48px 70px;
+  padding: 48px 0;
   background: #fff;
   border-radius: 12px;
   display: flex;
@@ -248,4 +248,26 @@ label {
 .modal-confirm {
   background-color: #c4a5fa;
   color: #000;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%) translateY(10px);
+  padding: 12px 20px;
+  background: #aca0eb;
+  color: #fff;
+  border-radius: 30px;
+  font-size: 18px;
+  font-family: var(--font-ui);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1100;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
