@@ -31,7 +31,12 @@
         </a>
         <h1 class="title-xl">아무 말 대잔치</h1>
         <div class="profile-dropdown">
-          <button type="button" class="profile-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          <button
+            type="button"
+            class="profile-dropdown-toggle"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
             <img
               src="/public/images/userProfile.png"
               width="30"
@@ -40,9 +45,25 @@
             />
           </button>
           <div class="profile-dropdown-menu" role="menu">
-            <a href="./user-info-update.html" class="profile-dropdown-item" role="menuitem">회원정보 수정</a>
-            <a href="./user-password-update.html" class="profile-dropdown-item" role="menuitem">비밀번호 수정</a>
-            <button type="button" class="profile-dropdown-item profile-dropdown-logout" role="menuitem">로그아웃</button>
+            <a
+              href="./user-info-update.html"
+              class="profile-dropdown-item"
+              role="menuitem"
+              >회원정보 수정</a
+            >
+            <a
+              href="./user-password-update.html"
+              class="profile-dropdown-item"
+              role="menuitem"
+              >비밀번호 수정</a
+            >
+            <button
+              type="button"
+              class="profile-dropdown-item profile-dropdown-logout"
+              role="menuitem"
+            >
+              로그아웃
+            </button>
           </div>
         </div>
       </div>
@@ -68,7 +89,6 @@
           <h2 class="post-label-text">내용*</h2>
         </div>
         <hr />
-        <p class="error-text" id="post-content-error"></p>
         <textarea
           id="post-content"
           class="post-content-input"
@@ -76,6 +96,7 @@
           required
         ></textarea>
         <hr />
+        <p class="error-text" id="post-content-error"></p>
         <!-- 이미지 서버에서 추가하면 수정하기 -->
         <div class="post-label">
           <h2 class="post-label-text">이미지</h2>

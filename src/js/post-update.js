@@ -136,7 +136,6 @@ const setupForm = (postId) => {
 
     const errorMsg = validateForm();
 
-    if (titleError) titleError.textContent = errorMsg;
     if (contentError) contentError.textContent = errorMsg;
 
     updateButtonState();
