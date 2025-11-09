@@ -69,7 +69,7 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     },
     body: JSON.stringify({
       nickname: nickname.trim(),
-      profileImageUrl: DEFAULT_PROFILE_IMAGE,
+      profileImageUrl: DEFAULT_PROFILE_IMAGE, // 현재는 기본 이미지 고정
     }),
   });
 
@@ -96,6 +96,30 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     ...updated,
     profileImageUrl: DEFAULT_PROFILE_IMAGE,
   };
+};
+
+/** 회원탈퇴 DELETE /api/users/me/{userId} */
+const requestUserDelete = async () => {
+  const user = getCurrentUser();
+  if (!user || !user.id) {
+    throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
+  }
+
+  const res = await fetch(`${USER_API_BASE}/me/${user.id}`, {
+    method: "DELETE",
+    headers: { Accept: "*/*" },
+  });
+
+  if (!res.ok) {
+    let msg = "회원 탈퇴에 실패했습니다.";
+    try {
+      const data = await res.json();
+      if (data?.message) msg = data.message;
+    } catch (e) {
+      // 204 등이면 body 없음
+    }
+    throw new Error(msg);
+  }
 };
 
 /** 회원탈퇴 모달 열기/닫기 */
@@ -149,9 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (emailValueEl) emailValueEl.textContent = user.email || "";
   profileImageEl.src = DEFAULT_PROFILE_IMAGE;
 
-  profileImageBtn?.addEventListener("click", () =>
-    profileImageInput?.click(),
-  );
+  profileImageBtn?.addEventListener("click", () => profileImageInput?.click());
   profileImageInput?.addEventListener("change", () => {
     const file = profileImageInput.files?.[0];
     if (!file) return;
@@ -167,15 +189,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (nicknameErrorEl) nicknameErrorEl.textContent = "";
 
   // ===== 닉네임 입력 이벤트 =====
-
-  // input: 메시지 초기화 & 다시 검증 필요 상태로
   nicknameInput.addEventListener("input", () => {
     if (nicknameErrorEl) nicknameErrorEl.textContent = "";
     nicknameInput.dataset.valid = "false";
     updateSubmitButtonState({ nicknameInput, submitBtn });
   });
 
-  // blur
   nicknameInput.addEventListener("blur", async () => {
     const value = nicknameInput.value;
     const basicMsg = validateNickname(value);
@@ -184,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (nicknameErrorEl) nicknameErrorEl.textContent = basicMsg;
 
-    // 기본 검증 실패 시: 중복 체크 안 하고 끝
     if (basicMsg) {
       updateSubmitButtonState({ nicknameInput, submitBtn });
       return;
@@ -192,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const trimmed = value.trim();
 
-    // 기존 닉네임과 같으면 중복 체크 안 하고 통과
+    // 기존 닉네임과 같으면 중복 체크 스킵
     if (trimmed === originalNickname) {
       if (nicknameErrorEl) nicknameErrorEl.textContent = "";
       nicknameInput.dataset.valid = "true";
@@ -220,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSubmitButtonState({ nicknameInput, submitBtn });
   });
 
-  // ===== 폼 제출 =====
+  // ===== 회원정보 수정 제출 =====
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -235,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 아직 중복 검사를 안 했거나(valid != true) 기존 닉네임에서 변경된 경우 한 번 더 확인
+    // 기존 닉네임에서 바뀌었는데 아직 valid 아님 → 한 번 더 중복체크
     if (
       value.trim() !== originalNickname &&
       nicknameInput.dataset.valid !== "true"
@@ -302,10 +320,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    confirmBtn?.addEventListener("click", () => {
-      localStorage.removeItem(USER_STORAGE_KEY);
-      closeUserDeleteModal(userDeleteModal);
-      window.location.href = "./login.html";
+    // 🔹 여기서 실제 탈퇴 API 호출
+    confirmBtn?.addEventListener("click", async () => {
+      try {
+        await requestUserDelete(); // DELETE /api/users/me/{userId}
+        localStorage.removeItem(USER_STORAGE_KEY);
+        closeUserDeleteModal(userDeleteModal);
+        window.location.href = "./login.html";
+      } catch (err) {
+        alert(err.message || "회원 탈퇴 중 오류가 발생했습니다.");
+      }
     });
   }
 });

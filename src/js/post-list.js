@@ -12,6 +12,14 @@ const sort = "NEW";
 let isLoading = false;
 let hasNextPage = true;
 
+const formatCount = (n) => {
+  const num = Number(n) || 0;
+  if (num >= 100000) return "100k";
+  if (num >= 10000) return "10k";
+  if (num >= 1000) return "1k";
+  return String(num);
+};
+
 // 날짜 포맷 (YYYY-MM-DD HH:mm:ss)
 const formatDateTime = (isoString) => {
   if (!isoString) return "";
@@ -57,13 +65,13 @@ const createPostElement = (post) => {
   countBox.className = "post-count";
 
   const likeEl = document.createElement("p");
-  likeEl.textContent = `좋아요 ${likeCount}`;
+  likeEl.textContent = `좋아요 ${formatCount(likeCount)}`;
 
   const commentEl = document.createElement("p");
-  commentEl.textContent = `댓글 ${commentCount}`;
+  commentEl.textContent = `댓글 ${formatCount(commentCount)}`;
 
   const viewEl = document.createElement("p");
-  viewEl.textContent = `조회수 ${viewCount}`;
+  viewEl.textContent = `조회수 ${formatCount(viewCount)}`;
 
   countBox.append(likeEl, commentEl, viewEl);
 

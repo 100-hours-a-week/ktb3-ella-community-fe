@@ -43,9 +43,10 @@ const formatDateTime = (isoString) => {
 /** 카운트 포맷: 1k / 10k / 100k... */
 const formatCount = (n) => {
   const num = Number(n) || 0;
-  if (num < 1000) return String(num);
-  const k = Math.floor(num / 1000);
-  return `${k}k`;
+  if (num >= 100000) return "100k";
+  if (num >= 10000) return "10k";
+  if (num >= 1000) return "1k";
+  return String(num);
 };
 
 /** 상세 조회 */
