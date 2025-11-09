@@ -362,7 +362,7 @@ const setupCommentForm = (postId) => {
           }
         );
 
-        if (res.code === AUTH_FORBIDDEN) {
+        if (res.status === 403) {
           alert("댓글 수정 권한이 없습니다.");
           resetEditMode();
           return;
@@ -501,7 +501,7 @@ const setupCommentDeleteModal = () => {
         }
       );
 
-      if (res.code === AUTH_FORBIDDEN) {
+      if (res.status === 403) {
         alert("댓글 삭제 권한이 없습니다.");
         closeCommentDeleteModal();
         return;
@@ -576,7 +576,7 @@ const setupPostDeleteModal = () => {
         }
       );
 
-      if (res.code === AUTH_FORBIDDEN) {
+      if (res.status === 403) {
         alert("게시글 삭제 권한이 없습니다.");
         closePostDeleteModal();
         return;

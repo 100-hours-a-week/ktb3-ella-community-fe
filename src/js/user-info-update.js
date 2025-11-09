@@ -36,19 +36,26 @@ const validateNickname = (value) => {
 
 /** 중복 체크 공통 함수*/
 const checkAvailability = async (params) => {
-  const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${AVAILABILITY_ENDPOINT}?${query}`, {
-    method: "GET",
-    headers: { Accept: "*/*" },
-  });
+  try {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${AVAILABILITY_ENDPOINT}?${query}`, {
+      method: "GET",
+      headers: { Accept: "*/*" },
+    });
 
-  const result = await response.json().catch(() => ({}));
+    const result = await response.json();
 
-  if (!response.ok || !result.data) {
-    throw new Error("중복 확인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    if (!response.ok || !result.data) {
+      throw new Error("중복 확인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
+
+    return result.data;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("중복 확인 응답을 처리할 수 없습니다.");
+    }
+    throw error;
   }
-
-  return result.data;
 };
 
 /** PATCH /api/users/me/{userId} 요청 */
@@ -58,41 +65,47 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
-  const response = await fetch(`${USER_API_BASE}/me/${user.id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "*/*",
-    },
-    body: JSON.stringify({
-      nickname: nickname.trim(),
-      profileImageUrl: DEFAULT_PROFILE_IMAGE, // 현재는 기본 이미지 고정
-    }),
-  });
+  try {
+    const response = await fetch(`${USER_API_BASE}/me/${user.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "*/*",
+      },
+      body: JSON.stringify({
+        nickname: nickname.trim(),
+        profileImageUrl: DEFAULT_PROFILE_IMAGE,
+      }),
+    });
 
-  const result = await response.json().catch(() => ({}));
+    const result = await response.json();
 
-  if (!response.ok) {
-    throw new Error(result.message || "회원정보 수정에 실패했습니다.");
+    if (!response.ok) {
+      throw new Error(result.message || "회원정보 수정에 실패했습니다.");
+    }
+
+    const updated = result.data;
+
+    const newUser = {
+      ...user,
+      email: updated.email,
+      nickname: updated.nickname,
+      profileImageUrl: DEFAULT_PROFILE_IMAGE,
+    };
+    saveStoredUser(newUser);
+
+    originalNickname = updated.nickname;
+
+    return {
+      ...updated,
+      profileImageUrl: DEFAULT_PROFILE_IMAGE,
+    };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("회원정보 수정 응답을 처리할 수 없습니다.");
+    }
+    throw error;
   }
-
-  const updated = result.data;
-
-  // 로컬스토리지 갱신
-  const newUser = {
-    ...user,
-    email: updated.email,
-    nickname: updated.nickname,
-    profileImageUrl: DEFAULT_PROFILE_IMAGE,
-  };
-  saveStoredUser(newUser);
-
-  originalNickname = updated.nickname;
-
-  return {
-    ...updated,
-    profileImageUrl: DEFAULT_PROFILE_IMAGE,
-  };
 };
 
 /** 회원탈퇴 DELETE /api/users/me/{userId} */

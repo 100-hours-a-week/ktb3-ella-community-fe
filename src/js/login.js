@@ -53,28 +53,33 @@ passwordInput.addEventListener("blur", () => {
 
 // 실제 서버로 로그인 요청 보내는 함수
 const requestLogin = async ({ email, password }) => {
-  const response = await fetch(LOGIN_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    const response = await fetch(LOGIN_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  const result = await response.json().catch(() => ({}));
+    const result = await response.json();
 
-  if (!response.ok) {
-    if (result.code === "USER_NOT_FOUND") {
-      // 존재하지 않는 사용자
-      throw new Error("*아이디 또는 비밀번호를 확인해주세요.");
-    } else if (result.message) {
-      // 서버에서 message 내려주면 그대로 표시
-      throw new Error(result.message);
-    } else {
-      throw new Error("*로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    if (!response.ok) {
+      if (result.code === "USER_NOT_FOUND") {
+        throw new Error("*아이디 또는 비밀번호를 확인해주세요.");
+      } else if (result.message) {
+        throw new Error(result.message);
+      } else {
+        throw new Error("*로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
     }
+    return result;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("서버 응답을 처리할 수 없습니다.");
+    }
+    throw error;
   }
-  return result;
 };
 
 // 폼 제출 이벤트 핸들러

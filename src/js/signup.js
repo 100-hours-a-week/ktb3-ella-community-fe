@@ -50,17 +50,24 @@ const validateNickname = (value) => {
 
 // 중복 체크 공통 함수 
 const checkAvailability = async (params) => {
-  const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${AVAILABILITY_ENDPOINT}?${query}`, {
-    method: "GET",
-  });
+  try {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${AVAILABILITY_ENDPOINT}?${query}`, {
+      method: "GET",
+    });
 
-  const result = await response.json().catch(() => ({}));
+    const result = await response.json();
 
-  if (!response.ok || !result.data) {
-    throw new Error("중복 확인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    if (!response.ok || !result.data) {
+      throw new Error("중복 확인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
+    return result.data;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("중복 확인 응답을 처리할 수 없습니다.");
+    }
+    throw error;
   }
-  return result.data; // { emailAvailable, nicknameAvailable }
 };
 
 // 전체 검증 & 버튼 활성화 
@@ -163,21 +170,33 @@ passwordConfirmInput.addEventListener("blur", () => {
 });
 
 // ====== 회원가입 요청 ======
-const requestSignup = async ({ email, password, nickname, profileImageUrl }) => {
-  const response = await fetch(SIGNUP_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password, nickname, profileImageUrl }),
-  });
+const requestSignup = async ({
+  email,
+  password,
+  nickname,
+  profileImageUrl,
+}) => {
+  try {
+    const response = await fetch(SIGNUP_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password, nickname, profileImageUrl }),
+    });
 
-  const result = await response.json().catch(() => ({}));
+    const result = await response.json();
 
-  if (!response.ok) {
-    throw new Error(result.message || "회원가입에 실패했습니다.");
+    if (!response.ok) {
+      throw new Error(result.message || "회원가입에 실패했습니다.");
+    }
+    return result;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("회원가입 응답을 처리할 수 없습니다.");
+    }
+    throw error;
   }
-  return result;
 };
 
 //  폼 제출 

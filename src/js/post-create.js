@@ -58,18 +58,25 @@ const handleSubmit = async ({ title, content }) => {
     imageUrl: DEFAULT_IMAGE_URL,
   };
 
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(result.message || "*게시글 생성에 실패했습니다.");
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || "*게시글 생성에 실패했습니다.");
+    }
+
+    return result;
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error("서버 응답을 처리할 수 없습니다.");
+    }
+    throw error;
   }
-
-  return result;
 };
 
 form?.addEventListener("submit", async (event) => {
