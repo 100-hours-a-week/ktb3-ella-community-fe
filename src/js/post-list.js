@@ -11,6 +11,7 @@ const pageSize = 10;
 const sort = "NEW";
 let isLoading = false;
 let hasNextPage = true;
+let scrollThrottle;
 
 const formatCount = (n) => {
   const num = Number(n) || 0;
@@ -169,15 +170,20 @@ const fetchPosts = async (page) => {
 
 // 스크롤 80% 도달 시 다음 페이지 로드
 const handleScroll = () => {
-  if (!hasNextPage || isLoading) return;
+  if (scrollThrottle) return;
+  scrollThrottle = window.requestAnimationFrame(() => {
+    scrollThrottle = null;
+    if (!hasNextPage || isLoading) return;
 
-  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-  const scrollPosition = scrollTop + clientHeight;
-  const threshold = scrollHeight * 0.8;
+    const { scrollTop, scrollHeight, clientHeight } =
+      document.documentElement;
+    const scrollPosition = scrollTop + clientHeight;
+    const threshold = scrollHeight * 0.8;
 
-  if (scrollPosition >= threshold) {
-    fetchPosts(currentPage + 1);
-  }
+    if (scrollPosition >= threshold) {
+      fetchPosts(currentPage + 1);
+    }
+  });
 };
 
 const setupCreateButton = () => {
