@@ -1,5 +1,3 @@
-"use strict";
-
 const USER_STORAGE_KEY = "ktb3-community:user";
 
 export const getStoredUser = () => {

@@ -1,24 +1,9 @@
-"use strict";
-
+import {
+  validatePassword,
+  validateConfirmPassword,
+} from "./utils/validation.js";
 import { requireAuthUser } from "./utils/user.js";
 const PASSWORD_UPDATE_ENDPOINT = "/api/users/me/password";
-
-// 회원가입과 동일: 8~20자, 대/소문자/숫자/특수문자 1개 이상
-const PASSWORD_PATTERN =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,20}$/;
-
-const validatePassword = (value) => {
-  if (!value.trim()) return "*비밀번호를 입력해주세요.";
-  if (!PASSWORD_PATTERN.test(value))
-    return "*비밀번호는 8~20자, 대문자/소문자/숫자/특수문자를 각각 최소 1개 포함해야 합니다.";
-  return "";
-};
-
-const validateConfirmPassword = (password, confirm) => {
-  if (!confirm.trim()) return "*비밀번호를 한번 더 입력해주세요.";
-  if (password !== confirm) return "*비밀번호가 일치하지 않습니다.";
-  return "";
-};
 
 const showToast = (toastEl) => {
   if (!toastEl) return;
@@ -54,15 +39,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 초기 상태: 비활성
   submitButton.disabled = true;
   submitButton.classList.remove("active");
 
   const updateSubmitState = () => {
     const pwMsg = validatePassword(passwordInput.value);
     const cfMsg = validateConfirmPassword(
+      passwordCheckInput.value,
       passwordInput.value,
-      passwordCheckInput.value
     );
 
     const isValid = !pwMsg && !cfMsg;
@@ -86,14 +70,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // 비밀번호 확인 blur
   passwordCheckInput.addEventListener("blur", () => {
     const msg = validateConfirmPassword(
+      passwordCheckInput.value,
       passwordInput.value,
-      passwordCheckInput.value
     );
     passwordConfirmError.textContent = msg;
     updateSubmitState();
   });
 
-  // 입력 중에는 에러 줄이면서 실시간 상태 체크
   passwordInput.addEventListener("input", () => {
     if (passwordError.textContent) {
       passwordError.textContent = "";
@@ -124,14 +107,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     );
 
-    // 204 expected
     if (!res.ok) {
       let msg = "비밀번호 수정에 실패했습니다.";
       try {
         const data = await res.json();
         if (data?.message) msg = data.message;
       } catch (_) {
-        // no body
       }
       throw new Error(msg);
     }
@@ -143,8 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const pwMsg = validatePassword(passwordInput.value);
     const cfMsg = validateConfirmPassword(
+      passwordCheckInput.value,
       passwordInput.value,
-      passwordCheckInput.value
     );
 
     passwordError.textContent = pwMsg;
@@ -159,10 +140,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       await requestPasswordUpdate(passwordInput.value);
-      // 성공 시 토스트
       showToast(toastEl);
 
-      // 입력값 초기화 + 버튼 비활성화
       passwordInput.value = "";
       passwordCheckInput.value = "";
       passwordError.textContent = "";
@@ -171,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       alert(err.message || "비밀번호 수정 중 오류가 발생했습니다.");
     } finally {
-      submitButton.disabled = true; // 유효성 다시 채우기 전까지 비활성
+      submitButton.disabled = true;
       submitButton.classList.remove("active");
     }
   });

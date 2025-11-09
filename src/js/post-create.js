@@ -1,9 +1,9 @@
-"use strict";
-
-import { requireAuthUser } from "./utils/user.js";
+import { getStoredUser } from "./utils/user.js";
 
 const POST_CREATE_BASE_ENDPOINT = "/api/posts";
 const DEFAULT_IMAGE_URL = "/public/images/postImage.jpeg";
+
+const getCurrentUser = () => getStoredUser();
 
 const form = document.querySelector(".post-create");
 const titleInput = document.querySelector("#post-title");
@@ -44,11 +44,11 @@ const attachFieldEvents = () => {
   });
 };
 
-requireAuthUser();
-
 const handleSubmit = async ({ title, content }) => {
-  const user = requireAuthUser();
-  if (!user) return;
+  const user = getCurrentUser();
+  if (!user || !user.id) {
+    throw new Error("*로그인 정보가 없습니다. 다시 로그인해주세요.");
+  }
 
   const endpoint = `${POST_CREATE_BASE_ENDPOINT}/${user.id}`;
 

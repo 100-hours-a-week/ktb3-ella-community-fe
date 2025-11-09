@@ -1,4 +1,4 @@
-"use strict";
+import { formatDateTime, formatCount } from "./utils/format.js";
 
 const POST_LIST_ENDPOINT = "/api/posts";
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
@@ -13,31 +13,7 @@ let isLoading = false;
 let hasNextPage = true;
 let scrollThrottle;
 
-const formatCount = (n) => {
-  const num = Number(n) || 0;
-  if (num >= 100000) return "100k";
-  if (num >= 10000) return "10k";
-  if (num >= 1000) return "1k";
-  return String(num);
-};
-
-// 날짜 포맷 (YYYY-MM-DD HH:mm:ss)
-const formatDateTime = (isoString) => {
-  if (!isoString) return "";
-  const date = new Date(isoString);
-  const pad = (n) => String(n).padStart(2, "0");
-
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  const hour = pad(date.getHours());
-  const minute = pad(date.getMinutes());
-  const second = pad(date.getSeconds());
-
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-};
-
-// 게시글 카드 생성
+// 게시글 생성
 const createPostElement = (post) => {
   const {
     postId,
@@ -111,7 +87,7 @@ const createPostElement = (post) => {
 
   wrapper.append(contentContainer, divider, authorBox);
 
-  // 카드 클릭 시 상세 페이지 이동
+  // 클릭 시 상세 페이지 이동
   wrapper.addEventListener("click", () => {
     window.location.href = `./post-detail.html?postId=${postId}`;
   });

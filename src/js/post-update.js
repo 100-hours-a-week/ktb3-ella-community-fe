@@ -1,6 +1,4 @@
-"use strict";
-
-import { requireAuthUser, getStoredUser } from "./utils/user.js";
+import { getStoredUser } from "./utils/user.js";
 const POST_BASE_URL = "/api/posts";
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
 
@@ -10,28 +8,22 @@ const contentInput = document.querySelector("#post-content");
 const contentError = document.querySelector("#post-content-error");
 const submitButton = document.querySelector(".btn-post-submit");
 
-/** 현재 로그인 유저 조회 */
-requireAuthUser();
-
 /** URL 쿼리에서 postId 추출 */
 const getPostIdFromQuery = () => {
   const params = new URLSearchParams(window.location.search);
   return params.get("postId");
 };
 
-/** 제목/내용 둘 다 채워졌는지 */
 const isFilled = () => {
   const title = (titleInput?.value || "").trim();
   const content = (contentInput?.value || "").trim();
   return !!title && !!content;
 };
 
-/** 폼 전체 유효성 (공통 메시지) */
 const validateForm = () => {
   return isFilled() ? "" : ERROR_MSG;
 };
 
-/** 버튼 활성화 상태 업데이트 */
 const updateButtonState = () => {
   if (!submitButton) return;
   if (isFilled()) {
@@ -72,8 +64,10 @@ const loadPostData = async (postId) => {
 
 /** 수정 요청: PUT /api/posts/{postId}/{userId} */
 const submitUpdate = async ({ postId, title, content }) => {
-  const currentUser = requireAuthUser();
-  if (!currentUser) return;
+  const currentUser = getStoredUser();
+  if (!currentUser || !currentUser.id) {
+    throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
+  }
 
   const endpoint = `${POST_BASE_URL}/${postId}/${currentUser.id}`;
   const payload = {
@@ -104,11 +98,9 @@ const submitUpdate = async ({ postId, title, content }) => {
   return result.data;
 };
 
-/** 이벤트 바인딩 */
 const setupForm = (postId) => {
   if (!form || !titleInput || !contentInput || !submitButton) return;
 
-  // 입력 시 에러 제거 + 버튼 상태 업데이트
   titleInput.addEventListener("input", () => {
     if (contentError) contentError.textContent = "";
     updateButtonState();
@@ -119,7 +111,6 @@ const setupForm = (postId) => {
     updateButtonState();
   });
 
-  // 제출 시 검증 + 업데이트
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 

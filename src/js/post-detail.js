@@ -1,6 +1,6 @@
-"use strict";
-
 import { getStoredUser, requireAuthUser } from "./utils/user.js";
+import { formatDateTime, formatCount } from "./utils/format.js";
+
 const POST_DETAIL_BASE_URL = "/api/posts";
 const COMMENTS_BASE_URL = "/api/comments";
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
@@ -17,26 +17,6 @@ let pendingDeletePostId = null;
 const getPostIdFromQuery = () => {
   const params = new URLSearchParams(window.location.search);
   return params.get("postId");
-};
-
-/** 날짜 포맷 */
-const formatDateTime = (isoString) => {
-  if (!isoString) return "";
-  const d = new Date(isoString);
-  const pad = (n) => String(n).padStart(2, "0");
-  return (
-    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
-    `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
-  );
-};
-
-/** 카운트 포맷: 1k / 10k / 100k... */
-const formatCount = (n) => {
-  const num = Number(n) || 0;
-  if (num >= 100000) return "100k";
-  if (num >= 10000) return "10k";
-  if (num >= 1000) return "1k";
-  return String(num);
 };
 
 /** 상세 조회 */
@@ -473,7 +453,7 @@ const resetEditMode = () => {
   }
 };
 
-/* ---------------- 댓글 삭제 모달 ---------------- */
+/* 댓글 삭제 모달 */
 
 const openCommentDeleteModal = (commentId) => {
   pendingDeleteCommentId = commentId;
@@ -552,7 +532,7 @@ const setupCommentDeleteModal = () => {
   });
 };
 
-/* ---------------- 게시글 삭제 모달 ---------------- */
+/* 게시글 삭제 모달 */
 
 const openPostDeleteModal = (postId) => {
   pendingDeletePostId = postId;

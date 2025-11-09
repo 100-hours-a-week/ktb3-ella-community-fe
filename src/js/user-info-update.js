@@ -1,6 +1,10 @@
-"use strict";
+import {
+  getStoredUser,
+  saveStoredUser,
+  requireAuthUser,
+  clearStoredUser,
+} from "./utils/user.js";
 
-const USER_STORAGE_KEY = "ktb3-community:user";
 const USER_API_BASE = "/api/users";
 const AVAILABILITY_ENDPOINT = "/api/users/availability";
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
@@ -12,14 +16,7 @@ const ERROR_DUPLICATE = "*중복된 닉네임입니다.";
 let originalNickname = "";
 
 /** 현재 로그인 유저 가져오기 */
-const getCurrentUser = () => {
-  try {
-    const raw = localStorage.getItem(USER_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-};
+const getCurrentUser = () => getStoredUser();
 
 const showToast = (toastEl) => {
   if (!toastEl) return;
@@ -56,8 +53,8 @@ const checkAvailability = async (params) => {
 
 /** PATCH /api/users/me/{userId} 요청 */
 const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
-  const user = getCurrentUser();
-  if (!user || !user.id) {
+  const user = requireAuthUser();
+  if (!user) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
@@ -88,7 +85,7 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     nickname: updated.nickname,
     profileImageUrl: DEFAULT_PROFILE_IMAGE,
   };
-  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+  saveStoredUser(newUser);
 
   originalNickname = updated.nickname;
 
@@ -100,8 +97,8 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
 
 /** 회원탈퇴 DELETE /api/users/me/{userId} */
 const requestUserDelete = async () => {
-  const user = getCurrentUser();
-  if (!user || !user.id) {
+  const user = requireAuthUser();
+  if (!user) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
@@ -116,7 +113,6 @@ const requestUserDelete = async () => {
       const data = await res.json();
       if (data?.message) msg = data.message;
     } catch (e) {
-      // 204 등이면 body 없음
     }
     throw new Error(msg);
   }
@@ -142,16 +138,10 @@ const updateSubmitButtonState = ({ nicknameInput, submitBtn }) => {
   }
 };
 
-/** 초기화: DOM 준비 후 실행 */
 document.addEventListener("DOMContentLoaded", () => {
-  const user = getCurrentUser();
-  if (!user || !user.id) {
-    alert("로그인이 필요합니다.");
-    window.location.href = "./login.html";
-    return;
-  }
+  const user = requireAuthUser();
+  if (!user) return;
 
-  // DOM 요소들
   const emailValueEl = document.querySelector("#email-value");
   const nicknameInput = document.querySelector("#nickname");
   const nicknameErrorEl = document.querySelector("#user-nickname-error");
@@ -169,7 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 초기 세팅
   if (emailValueEl) emailValueEl.textContent = user.email || "";
   profileImageEl.src = DEFAULT_PROFILE_IMAGE;
 
@@ -188,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
   submitBtn.classList.remove("active");
   if (nicknameErrorEl) nicknameErrorEl.textContent = "";
 
-  // ===== 닉네임 입력 이벤트 =====
   nicknameInput.addEventListener("input", () => {
     if (nicknameErrorEl) nicknameErrorEl.textContent = "";
     nicknameInput.dataset.valid = "false";
@@ -238,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSubmitButtonState({ nicknameInput, submitBtn });
   });
 
-  // ===== 회원정보 수정 제출 =====
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -253,7 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 기존 닉네임에서 바뀌었는데 아직 valid 아님 → 한 번 더 중복체크
     if (
       value.trim() !== originalNickname &&
       nicknameInput.dataset.valid !== "true"
@@ -320,11 +306,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // 🔹 여기서 실제 탈퇴 API 호출
     confirmBtn?.addEventListener("click", async () => {
       try {
-        await requestUserDelete(); // DELETE /api/users/me/{userId}
-        localStorage.removeItem(USER_STORAGE_KEY);
+        await requestUserDelete();
+        clearStoredUser();
         closeUserDeleteModal(userDeleteModal);
         window.location.href = "./login.html";
       } catch (err) {

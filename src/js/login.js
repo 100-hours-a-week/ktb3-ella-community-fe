@@ -1,15 +1,7 @@
-"use strict";
-
 import { saveStoredUser } from "./utils/user.js";
+import { validateEmail, validatePassword } from "./utils/validation.js";
 
 const LOGIN_ENDPOINT = "/api/auth/login";
-
-const EMAIL_PATTERN =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
-// 비밀번호 정규식: 8~20자, 대문자+소문자+숫자+특수문자 모두 포함
-const PASSWORD_PATTERN =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,20}$/;
 
 const form = document.querySelector(".auth-form");
 const emailInput = document.querySelector("#email");
@@ -21,7 +13,6 @@ const submitButton = document.querySelector(".btn-login.btn-form-primary");
 let emailTimer;
 let passwordTimer;
 
-// 안전장치: 폼이 없으면 더 진행 안 함
 if (
   !form ||
   !emailInput ||
@@ -33,21 +24,6 @@ if (
   console.warn("로그인 폼 요소를 찾을 수 없습니다.");
 }
 
-// 이메일 검증 함수
-const validateEmail = (value) => {
-  if (!value.trim()) return "*이메일을 입력해주세요.";
-  if (!EMAIL_PATTERN.test(value))
-    return "*올바른 이메일 주소 형식을 입력해주세요. (예:example@example.com)";
-  return "";
-};
-
-// 비밀번호 검증 함수
-const validatePassword = (value) => {
-  if (!value.trim()) return "*비밀번호를 입력해주세요.";
-  if (!PASSWORD_PATTERN.test(value))
-    return "*비밀번호는 8자 이상, 20자 이하이며, 대문자, 소문자, 숫자, 특수문자를 각각 최소 1개 포함해야 합니다.";
-  return "";
-};
 
 // 유효성 검증 및 버튼 활성화 확인
 const checkValidation = () => {
