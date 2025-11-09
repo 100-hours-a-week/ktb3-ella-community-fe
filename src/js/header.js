@@ -1,4 +1,4 @@
-const USER_STORAGE_KEY = "ktb3-community:user";
+import { clearStoredUser } from "./utils/user.js";
 
 const closeAllDropdowns = (exclude) => {
   document.querySelectorAll(".profile-dropdown").forEach((dropdown) => {
@@ -31,7 +31,7 @@ const initProfileDropdowns = () => {
     });
 
     logoutBtn?.addEventListener("click", () => {
-      localStorage.removeItem(USER_STORAGE_KEY);
+      clearStoredUser();
       window.location.href = "./login.html";
     });
 

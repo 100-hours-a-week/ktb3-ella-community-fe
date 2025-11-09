@@ -1,6 +1,6 @@
 "use strict";
 
-const USER_STORAGE_KEY = "ktb3-community:user";
+import { getStoredUser, requireAuthUser } from "./utils/user.js";
 const POST_DETAIL_BASE_URL = "/api/posts";
 const COMMENTS_BASE_URL = "/api/comments";
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
@@ -12,16 +12,6 @@ let totalCommentsPages = 1;
 let editingCommentId = null;
 let pendingDeleteCommentId = null;
 let pendingDeletePostId = null;
-
-/** 로그인 유저 */
-const getCurrentUser = () => {
-  try {
-    const raw = localStorage.getItem(USER_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-};
 
 /** URL 쿼리 postId */
 const getPostIdFromQuery = () => {
@@ -51,7 +41,7 @@ const formatCount = (n) => {
 
 /** 상세 조회 */
 const fetchPostDetail = async (postId) => {
-  const currentUser = getCurrentUser();
+  const currentUser = getStoredUser();
   const userId = currentUser?.id ?? 0;
 
   const res = await fetch(`${POST_DETAIL_BASE_URL}/${postId}/${userId}`, {
@@ -374,11 +364,8 @@ const setupCommentForm = (postId) => {
     const content = textarea.value.trim();
     if (!content) return;
 
-    const currentUser = getCurrentUser();
-    if (!currentUser?.id) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
+    const currentUser = requireAuthUser();
+    if (!currentUser) return;
 
     try {
       // 수정 모드
@@ -519,9 +506,8 @@ const setupCommentDeleteModal = () => {
   confirmBtn?.addEventListener("click", async () => {
     if (!pendingDeleteCommentId) return;
 
-    const currentUser = getCurrentUser();
-    if (!currentUser?.id) {
-      alert("로그인이 필요합니다.");
+    const currentUser = requireAuthUser();
+    if (!currentUser) {
       closeCommentDeleteModal();
       return;
     }
@@ -595,9 +581,8 @@ const setupPostDeleteModal = () => {
   confirmBtn?.addEventListener("click", async () => {
     if (!pendingDeletePostId) return;
 
-    const currentUser = getCurrentUser();
-    if (!currentUser?.id) {
-      alert("로그인이 필요합니다.");
+    const currentUser = requireAuthUser();
+    if (!currentUser) {
       closePostDeleteModal();
       return;
     }

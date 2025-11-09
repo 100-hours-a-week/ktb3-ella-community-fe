@@ -1,7 +1,8 @@
 "use strict";
 
+import { saveStoredUser } from "./utils/user.js";
+
 const LOGIN_ENDPOINT = "/api/auth/login";
-const USER_STORAGE_KEY = "ktb3-community:user";
 
 const EMAIL_PATTERN =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -74,15 +75,6 @@ passwordInput.addEventListener("blur", () => {
   checkValidation();
 });
 
-const persistUser = (user) => {
-  if (!user) return;
-  try {
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-  } catch (error) {
-    console.warn("사용자 정보를 저장하지 못했습니다.", error);
-  }
-};
-
 // 실제 서버로 로그인 요청 보내는 함수
 const requestLogin = async ({ email, password }) => {
   const response = await fetch(LOGIN_ENDPOINT, {
@@ -134,7 +126,7 @@ form.addEventListener("submit", async (event) => {
       password: passwordInput.value.trim(),
     });
 
-    persistUser(data);
+    saveStoredUser(data);
 
     // 로그인 성공 시 이동할 페이지
     window.location.href = "./post-list.html";

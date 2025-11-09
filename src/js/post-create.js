@@ -1,7 +1,8 @@
 "use strict";
 
+import { requireAuthUser } from "./utils/user.js";
+
 const POST_CREATE_BASE_ENDPOINT = "/api/posts";
-const USER_STORAGE_KEY = "ktb3-community:user";
 const DEFAULT_IMAGE_URL = "/public/images/postImage.jpeg";
 
 const form = document.querySelector(".post-create");
@@ -11,16 +12,6 @@ const submitButton = document.querySelector(".btn-post-submit");
 const contentError = document.querySelector("#post-content-error");
 
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
-
-const getCurrentUser = () => {
-  try {
-    const raw = localStorage.getItem(USER_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch (error) {
-    console.warn("사용자 정보를 불러오지 못했습니다.", error);
-    return null;
-  }
-};
 
 const isFilled = () => {
   const title = (titleInput?.value || "").trim();
@@ -53,14 +44,13 @@ const attachFieldEvents = () => {
   });
 };
 
+requireAuthUser();
+
 const handleSubmit = async ({ title, content }) => {
-  const currentUser = getCurrentUser();
+  const user = requireAuthUser();
+  if (!user) return;
 
-  if (!currentUser || !currentUser.id) {
-    throw new Error("*로그인 정보가 없습니다. 다시 로그인해주세요.");
-  }
-
-  const endpoint = `${POST_CREATE_BASE_ENDPOINT}/${currentUser.id}`;
+  const endpoint = `${POST_CREATE_BASE_ENDPOINT}/${user.id}`;
 
   const payload = {
     title: title.trim(),

@@ -1,20 +1,11 @@
 "use strict";
 
-const USER_STORAGE_KEY = "ktb3-community:user";
+import { requireAuthUser } from "./utils/user.js";
 const PASSWORD_UPDATE_ENDPOINT = "/api/users/me/password";
 
 // 회원가입과 동일: 8~20자, 대/소문자/숫자/특수문자 1개 이상
 const PASSWORD_PATTERN =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,20}$/;
-
-const getCurrentUser = () => {
-  try {
-    const raw = localStorage.getItem(USER_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-};
 
 const validatePassword = (value) => {
   if (!value.trim()) return "*비밀번호를 입력해주세요.";
@@ -38,12 +29,8 @@ const showToast = (toastEl) => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const user = getCurrentUser();
-  if (!user || !user.id) {
-    alert("로그인이 필요합니다.");
-    window.location.href = "./login.html";
-    return;
-  }
+  const user = requireAuthUser();
+  if (!user) return;
 
   const form = document.querySelector(".auth-form");
   const passwordInput = document.querySelector("#password");
@@ -122,10 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const requestPasswordUpdate = async (newPassword) => {
-    const current = getCurrentUser();
-    if (!current || !current.id) {
-      throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
-    }
+    const current = requireAuthUser();
+    if (!current) return;
 
     const res = await fetch(
       `${PASSWORD_UPDATE_ENDPOINT}/${encodeURIComponent(current.id)}`,

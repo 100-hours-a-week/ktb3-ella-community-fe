@@ -1,8 +1,9 @@
 "use strict";
 
+import { saveStoredUser } from "./utils/user.js";
+
 const SIGNUP_ENDPOINT = "/api/auth/signup";
 const AVAILABILITY_ENDPOINT = "/api/users/availability";
-const USER_STORAGE_KEY = "ktb3-community:user";
 
 const DEFAULT_PROFILE_IMAGE_URL = "public/images/userProfile.png";
 
@@ -25,15 +26,6 @@ const passwordConfirmError = document.querySelector("#password-confirm-error");
 const nicknameError = document.querySelector("#nickname-error");
 
 const submitButton = document.querySelector(".btn-login.btn-form-primary");
-const persistUser = (user) => {
-  if (!user) return;
-  try {
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-  } catch (error) {
-    console.warn("사용자 정보를 저장하지 못했습니다.", error);
-  }
-};
-
 // 안전장치
 if (
   !form ||
@@ -246,7 +238,7 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const { data } = await requestSignup(payload);
-    persistUser(data);
+    saveStoredUser(data);
 
     // 성공 시 페이지 이동 
     window.location.href = "./login.html";

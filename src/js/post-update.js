@@ -1,6 +1,6 @@
 "use strict";
 
-const USER_STORAGE_KEY = "ktb3-community:user";
+import { requireAuthUser, getStoredUser } from "./utils/user.js";
 const POST_BASE_URL = "/api/posts";
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
 
@@ -11,15 +11,7 @@ const contentError = document.querySelector("#post-content-error");
 const submitButton = document.querySelector(".btn-post-submit");
 
 /** 현재 로그인 유저 조회 */
-const getCurrentUser = () => {
-  try {
-    const raw = localStorage.getItem(USER_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    console.warn("사용자 정보를 불러오지 못했습니다.", e);
-    return null;
-  }
-};
+requireAuthUser();
 
 /** URL 쿼리에서 postId 추출 */
 const getPostIdFromQuery = () => {
@@ -51,7 +43,7 @@ const updateButtonState = () => {
 
 /** 기존 게시글 조회해서 폼에 채우기: GET /api/posts/{postId}/{userId} */
 const loadPostData = async (postId) => {
-  const currentUser = getCurrentUser();
+  const currentUser = getStoredUser();
   const userId = currentUser?.id ?? 0;
 
   try {
@@ -80,11 +72,8 @@ const loadPostData = async (postId) => {
 
 /** 수정 요청: PUT /api/posts/{postId}/{userId} */
 const submitUpdate = async ({ postId, title, content }) => {
-  const currentUser = getCurrentUser();
-
-  if (!currentUser || !currentUser.id) {
-    throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
-  }
+  const currentUser = requireAuthUser();
+  if (!currentUser) return;
 
   const endpoint = `${POST_BASE_URL}/${postId}/${currentUser.id}`;
   const payload = {
