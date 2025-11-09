@@ -41,9 +41,10 @@
         </div>
       </div>
     </header>
+
     <div class="spacer-lg">
       <div class="post-detail">
-        <h1 class="post-detail-title">제목 1</h1>
+        <h1 class="post-detail-title"></h1>
         <div class="post-detail-title-container">
           <div class="post-detail-title-info">
             <div class="profile-img">
@@ -55,55 +56,38 @@
               />
             </div>
             <div class="post-author-name-date">
-              <p class="post-author-name">더미 작성자 1</p>
-              <p class="post-created-at">2021-01-01 00:00:00</p>
+              <p class="post-author-name"></p>
+              <p class="post-created-at"></p>
             </div>
           </div>
           <div class="post-update-delete-btns">
-            <button type="submit" class="btn-update">수정</button>
-            <button type="submit" class="btn-delete">삭제</button>
+            <button type="button" class="btn-update">수정</button>
+            <button type="button" class="btn-delete">삭제</button>
           </div>
         </div>
         <hr />
         <div class="post-detail-content-container">
           <div class="post-img">
-            <img
-              src="/public/images/postImage.jpeg"
-              width="30"
-              height="30"
-              alt="게시글 이미지"
-            />
+            <img src="/public/images/postImage.jpeg" alt="게시글 이미지" />
           </div>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+          <p class="post-detail-content"></p>
           <div class="post-detail-content-like-comment-count">
-            <div class="post-count">
-              <p class="post-count-value">123</p>
+            <button type="button" class="post-count like-button">
+              <p class="post-count-value">0</p>
               <p class="post-count-label">좋아요수</p>
-            </div>
-            <div class="post-count">
-              <p class="post-count-value">123</p>
+            </button>
+            <div class="post-count view-count-box">
+              <p class="post-count-value">0</p>
               <p class="post-count-label">조회수</p>
             </div>
-            <div class="post-count">
-              <p class="post-count-value">123</p>
+            <div class="post-count comment-count-box">
+              <p class="post-count-value">0</p>
               <p class="post-count-label">댓글</p>
             </div>
           </div>
           <hr />
           <div class="post-comments-section">
-            <form
-              class="post-comment-input-container"
-              action="/comments"
-              method="post"
-            >
+            <form class="post-comment-input-container" action="#" method="post">
               <div class="post-comment-input-box">
                 <textarea
                   class="post-comment-input"
@@ -112,43 +96,37 @@
               </div>
               <hr />
               <div class="post-comment-btn">
-                <button type="submit" class="btn-comment-submit">
+                <button type="submit" class="btn-comment-submit" disabled>
                   댓글 등록
                 </button>
               </div>
             </form>
-            <div class="post-comments-list-container">
-              <div class="post-comment-list">
-                <div class="post-comment-list-info">
-                  <div class="post-comment-info-container">
-                    <div class="profile-img">
-                      <img
-                        src="/public/images/userProfile.png"
-                        width="30"
-                        height="30"
-                        alt="작성자 아이콘"
-                      />
-                    </div>
-                    <div class="post-author-name-date">
-                      <p class="post-author-name">댓글 작성자 1</p>
-                      <p class="post-created-at">2021-01-01 00:00:00</p>
-                    </div>
-                  </div>
-                  <div class="post-comment-text-container">
-                    <p class="post-comment-text">
-                      이것은 더미 댓글입니다. 댓글 내용이 여기에 표시됩니다.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="post-comment-update-delete-btns">
-                <button type="submit" class="btn-update">수정</button>
-                <button type="submit" class="btn-delete">삭제</button>
-              </div>
-            </div>
+            <div class="post-comments-list-container"></div>
+            <div class="comments-pagination"></div>
           </div>
         </div>
       </div>
     </div>
+    <div class="modal-backdrop" id="post-delete-modal">
+      <div class="modal">
+        <p class="modal-message">게시글을 삭제하시겠습니까?</p>
+        <p class="modal-submessage">삭제된 내용은 복구할 수 없습니다.</p>
+        <div class="modal-actions">
+          <button type="button" class="modal-cancel">취소</button>
+          <button type="button" class="modal-confirm">확인</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="comment-delete-modal">
+      <div class="modal">
+        <p class="modal-message">댓글을 삭제하시겠습니까?</p>
+        <p class="modal-submessage">삭제된 내용은 복구할 수 없습니다.</p>
+        <div class="modal-actions">
+          <button type="button" class="modal-cancel">취소</button>
+          <button type="button" class="modal-confirm">확인</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="../src/js/post-detail.js"></script>
   </body>
 </html>
