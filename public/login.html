@@ -11,15 +11,25 @@
     <title>로그인</title>
   </head>
   <body class="page-login">
-    <header class="header">
-      <h1 class="title-xl">아무 말 대잔치</h1>
-    </header>
-    <div class="spacer-lg">
+    <div class="auth-lg">
       <div class="auth">
-        <h1 class="auth-title">로그인</h1>
+        <div class="auth-info-wrapper">
+          <img
+            src="/public/images/logo.svg"
+            alt="KTB3 커뮤니티 로고"
+            class="logo-image"
+          />
+          <h1 class="auth-title">개발자 커뮤니티</h1>
+          <div class="logo-container">
+            <span class="logo-text">로그인하여 커뮤니티에 참여하세요</span>
+          </div>
+        </div>
         <form class="auth-form" novalidate>
           <div class="field">
-            <label for="email" class="field_label">이메일</label>
+            <div class="field-label-wrapper">
+              <img src="/public/images/email.svg" class="logo-email" />
+              <label for="email" class="field_label">이메일</label>
+            </div>
             <input
               id="email"
               name="email"
@@ -30,7 +40,10 @@
             <p class="error-text" id="email-error"></p>
           </div>
           <div class="field">
-            <label for="password" class="field_label">비밀번호</label>
+            <div class="field-label-wrapper">
+              <img src="/public/images/password.svg" class="logo-password" />
+              <label for="password" class="field_label">비밀번호</label>
+            </div>
             <input
               id="password"
               name="password"
@@ -42,6 +55,7 @@
             <p class="error-text" id="password-error"></p>
           </div>
           <button type="submit" class="btn-login btn-form-primary">
+            <img src="/public/images/login.svg" class="logo-login" />
             로그인
           </button>
         </form>
