@@ -127,6 +127,7 @@ label {
 }
 
 .auth {
+  margin: 50px 0;
   width: min(var(--auth-card-width), 100%);
   border-radius: 16px;
   padding: 41px;
@@ -142,11 +143,15 @@ label {
 
 .auth-info-wrapper {
   width: 100%;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
   align-items: center;
   display: flex;
   flex-direction: column;
+}
+
+.auth-form {
+  padding: 50px 18px 0 18px;
 }
 
 .logo-image {
@@ -209,7 +214,7 @@ label {
   align-items: center;
   display: flex;
   width: 100%;
-  padding: 17px 127px 17px 120px;
+  padding: 14px 0;
   gap: 10px;
   color: #fff;
   border-radius: 12px;

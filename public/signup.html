@@ -11,53 +11,32 @@
     <title>회원가입</title>
   </head>
   <body class="page-signup">
-    <header class="header">
-      <div class="header-block">
-        <a href="./login.html">
-          <svg
-            width="34"
-            height="34"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M15 6L9 12L15 18"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="butt"
-              stroke-linejoin="miter"
-            />
-          </svg>
-        </a>
-        <h1 class="title-xl">아무 말 대잔치</h1>
-        <div class="header-back"></div>
-      </div>
-    </header>
-    <div class="spacer-lg">
+    <div class="auth-lg">
       <div class="auth">
-        <h1 class="auth-title">회원가입</h1>
-        <p class="auth-profile">프로필 사진</p>
-        <div class="auth-profile-image">
-          <svg
-            class="auth-profile-image-plus"
-            width="34"
-            height="34"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 5v14M5 12h14"
-              stroke="currentColor"
-              stroke-width="0.8"
-              stroke-linecap="round"
-            />
-          </svg>
-          <p class="error-text" id="profile-image-error"></p>
+        <div class="auth-info-wrapper">
+          <img
+            src="/public/images/logo.svg"
+            alt="KTB3 커뮤니티 로고"
+            class="logo-image"
+          />
+          <h1 class="auth-title">개발자 커뮤니티</h1>
+          <span class="logo-text">회원가입하여 커뮤니티에 참여하세요</span>
         </div>
         <form class="auth-form" novalidate>
           <div class="field">
+            <label for="profile-image" class="field_label">프로필 사진*</label>
+            <div class="auth-profile">
+              <div class="auth-profile-image">
+                <input
+                  type="file"
+                  id="profile-image-input"
+                  accept="image/*"
+                  style="display: none"
+                />
+                <img src="/public/images/plus.svg" class="logo-plus" />
+                <p class="error-text" id="profile-image-error"></p>
+              </div>
+            </div>
             <label for="email" class="field_label">이메일*</label>
             <input
               id="email"
@@ -108,6 +87,7 @@
             <p class="error-text" id="nickname-error"></p>
           </div>
           <button type="submit" class="btn-login btn-form-primary">
+            <img src="/public/images/login.svg" class="logo-login" />
             회원가입
           </button>
         </form>
