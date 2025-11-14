@@ -31,43 +31,31 @@ const createPostElement = (post) => {
   const contentContainer = document.createElement("div");
   contentContainer.className = "post-list-content-container";
 
+  const tagsWrapper = document.createElement("div");
+  tagsWrapper.className = "post-tags";
+
+  const tags = ["React", "JavaScript"];
+  tags.forEach((tagText) => {
+    const tagEl = document.createElement("span");
+    tagEl.className = "post-tag";
+    tagEl.textContent = `${tagText}`;
+    tagsWrapper.appendChild(tagEl);
+  });
+
   const titleEl = document.createElement("h1");
   titleEl.className = "post-title";
   titleEl.textContent = title;
 
-  const info = document.createElement("div");
-  info.className = "post-info";
-
-  const countBox = document.createElement("div");
-  countBox.className = "post-count";
-
-  const likeEl = document.createElement("p");
-  likeEl.textContent = `좋아요 ${formatCount(likeCount)}`;
-
-  const commentEl = document.createElement("p");
-  commentEl.textContent = `댓글 ${formatCount(commentCount)}`;
-
-  const viewEl = document.createElement("p");
-  viewEl.textContent = `조회수 ${formatCount(viewCount)}`;
-
-  countBox.append(likeEl, commentEl, viewEl);
-
-  const createdAtBox = document.createElement("div");
-  createdAtBox.className = "post-created-at";
-
-  const createdAtText = document.createElement("p");
-  createdAtText.textContent = formatDateTime(createdAt);
-
-  createdAtBox.appendChild(createdAtText);
-
-  info.append(countBox, createdAtBox);
-
-  contentContainer.append(titleEl, info);
-
-  const divider = document.createElement("hr");
+  contentContainer.append(tagsWrapper, titleEl);
 
   const authorBox = document.createElement("div");
   authorBox.className = "author-profile";
+
+  const authorLeft = document.createElement("div");
+  authorLeft.className = "author-left";
+
+  const authorInfo = document.createElement("div");
+  authorInfo.className = "author-info";
 
   const profileImgWrap = document.createElement("div");
   profileImgWrap.className = "author-profile-image";
@@ -75,17 +63,64 @@ const createPostElement = (post) => {
   const img = document.createElement("img");
   img.src = DEFAULT_PROFILE_IMAGE;
   img.alt = "작성자 아이콘";
-  img.width = 30;
-  img.height = 30;
+  img.width = 24;
+  img.height = 24;
 
   profileImgWrap.appendChild(img);
 
   const nickname = document.createElement("strong");
   nickname.textContent = (author && author.nickname) || "알 수 없음";
 
-  authorBox.append(profileImgWrap, nickname);
+  authorInfo.append(profileImgWrap, nickname);
 
-  wrapper.append(contentContainer, divider, authorBox);
+  const metaBox = document.createElement("div");
+  metaBox.className = "post-meta";
+
+  const metaItems = [
+    {
+      icon: "/public/images/like.svg",
+      alt: "좋아요 수",
+      text: formatCount(likeCount),
+    },
+    {
+      icon: "/public/images/comment.svg",
+      alt: "댓글 수",
+      text: formatCount(commentCount),
+    },
+    {
+      icon: "/public/images/view.svg",
+      alt: "조회수",
+      text: formatCount(viewCount),
+    },
+  ];
+
+  metaItems.forEach(({ icon, alt, text }) => {
+    const item = document.createElement("div");
+    item.className = "post-meta-item";
+
+    const iconEl = document.createElement("img");
+    iconEl.src = icon;
+    iconEl.alt = alt;
+    iconEl.width = 12;
+    iconEl.height = 12;
+    iconEl.className = "post-meta-icon";
+
+    const textEl = document.createElement("span");
+    textEl.textContent = text;
+
+    item.append(iconEl, textEl);
+    metaBox.appendChild(item);
+  });
+
+  const createdAtText = document.createElement("span");
+  createdAtText.className = "post-meta-date";
+  createdAtText.textContent = formatDateTime(createdAt);
+
+  authorLeft.append(authorInfo, metaBox);
+
+  authorBox.append(authorLeft, createdAtText);
+
+  wrapper.append(contentContainer, authorBox);
 
   // 클릭 시 상세 페이지 이동
   wrapper.addEventListener("click", () => {
@@ -151,8 +186,7 @@ const handleScroll = () => {
     scrollThrottle = null;
     if (!hasNextPage || isLoading) return;
 
-    const { scrollTop, scrollHeight, clientHeight } =
-      document.documentElement;
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
     const scrollPosition = scrollTop + clientHeight;
     const threshold = scrollHeight * 0.8;
 

@@ -73,8 +73,11 @@ const createCommentElement = (comment) => {
   img.alt = "작성자 아이콘";
   profileWrap.appendChild(img);
 
-  const nameDate = document.createElement("div");
-  nameDate.className = "post-author-name-date";
+  const contentWrap = document.createElement("div");
+  contentWrap.className = "post-comment-content";
+
+  const detailTop = document.createElement("div");
+  detailTop.className = "post-comment-detail-top";
 
   const nameEl = document.createElement("p");
   nameEl.className = "post-author-name";
@@ -84,8 +87,44 @@ const createCommentElement = (comment) => {
   dateEl.className = "post-created-at";
   dateEl.textContent = formatDateTime(comment.createdAt);
 
-  nameDate.append(nameEl, dateEl);
-  infoContainer.append(profileWrap, nameDate);
+  const actions = document.createElement("div");
+  actions.className = "post-comment-actions";
+
+  const editBtn = document.createElement("button");
+  editBtn.type = "button";
+  editBtn.className = "btn-comment-edit";
+
+  const editIcon = document.createElement("img");
+  editIcon.src = "/public/images/edit-gray.svg";
+  editIcon.width = 16;
+  editIcon.height = 16;
+  editIcon.alt = "댓글 수정";
+  editIcon.className = "comment-action-icon";
+
+  const editText = document.createElement("span");
+  editText.textContent = "수정";
+
+  editBtn.append(editIcon, editText);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.type = "button";
+  deleteBtn.className = "btn-comment-delete";
+
+  const deleteIcon = document.createElement("img");
+  deleteIcon.src = "/public/images/delete-gray.svg";
+  deleteIcon.width = 16;
+  deleteIcon.height = 16;
+  deleteIcon.alt = "댓글 삭제";
+  deleteIcon.className = "comment-action-icon";
+
+  const deleteText = document.createElement("span");
+  deleteText.textContent = "삭제";
+
+  deleteBtn.append(deleteIcon, deleteText);
+
+  actions.append(editBtn, deleteBtn);
+
+  detailTop.append(nameEl, dateEl, actions);
 
   const textContainer = document.createElement("div");
   textContainer.className = "post-comment-text-container";
@@ -96,25 +135,12 @@ const createCommentElement = (comment) => {
 
   textContainer.appendChild(textEl);
 
-  info.append(infoContainer, textContainer);
+  contentWrap.append(detailTop, textContainer);
+
+  infoContainer.append(profileWrap, contentWrap);
+
+  info.appendChild(infoContainer);
   wrapper.appendChild(info);
-
-  // 수정 / 삭제 버튼
-  const actions = document.createElement("div");
-  actions.className = "post-comment-actions";
-
-  const editBtn = document.createElement("button");
-  editBtn.type = "button";
-  editBtn.className = "btn-comment-edit";
-  editBtn.textContent = "수정";
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.type = "button";
-  deleteBtn.className = "btn-comment-delete";
-  deleteBtn.textContent = "삭제";
-
-  actions.append(editBtn, deleteBtn);
-  wrapper.appendChild(actions);
 
   editBtn.addEventListener("click", () => enterEditMode(comment));
   deleteBtn.addEventListener("click", () =>
@@ -331,6 +357,8 @@ const setupCommentInputState = () => {
   const submitBtn = document.querySelector(".btn-comment-submit");
   if (!textarea || !submitBtn) return;
 
+  const submitLabel = submitBtn.querySelector(".btn-comment-submit-label");
+
   const updateState = () => {
     const hasText = textarea.value.trim().length > 0;
     if (hasText) {
@@ -340,7 +368,8 @@ const setupCommentInputState = () => {
       submitBtn.classList.remove("active");
       submitBtn.disabled = true;
       if (!editingCommentId) {
-        submitBtn.textContent = "댓글 등록";
+        if (submitLabel) submitLabel.textContent = "댓글 등록";
+        else submitBtn.textContent = "댓글 등록";
       }
     }
   };
@@ -455,9 +484,11 @@ const enterEditMode = (comment) => {
   const submitBtn = document.querySelector(".btn-comment-submit");
   if (!textarea || !submitBtn) return;
 
+  const submitLabel = submitBtn.querySelector(".btn-comment-submit-label");
   editingCommentId = comment.commentId;
   textarea.value = comment.content;
-  submitBtn.textContent = "댓글 수정";
+  if (submitLabel) submitLabel.textContent = "댓글 수정";
+  else submitBtn.textContent = "댓글 수정";
   submitBtn.classList.add("active");
   submitBtn.disabled = false;
   textarea.focus();
@@ -468,7 +499,9 @@ const resetEditMode = () => {
   const textarea = document.querySelector(".post-comment-input");
   const submitBtn = document.querySelector(".btn-comment-submit");
   editingCommentId = null;
-  if (submitBtn) submitBtn.textContent = "댓글 등록";
+  const submitLabel = submitBtn?.querySelector(".btn-comment-submit-label");
+  if (submitLabel) submitLabel.textContent = "댓글 등록";
+  else if (submitBtn) submitBtn.textContent = "댓글 등록";
   if (textarea && !textarea.value.trim()) {
     submitBtn?.classList.remove("active");
     if (submitBtn) submitBtn.disabled = true;

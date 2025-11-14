@@ -12,6 +12,7 @@
   /* 폰트 패밀리 토큰 */
   --font-ui: "PretendardRegularUI", sans-serif;
   --font-ui-bold: "PretendardBoldUI", sans-serif;
+  --font-jalnan: "Jalnan2", sans-serif;
 
   /* 색상 */
   --color-text: #000;
@@ -23,7 +24,7 @@
   --auth-radius: 4px;
 
   /* 기본 폰트 크기 시스템 */
-  --fs-title-xl: 32px; /* 페이지 주요 제목 */
+  --fs-title-xl: 26px; /* 페이지 주요 제목 */
   --fs-title-modal: 24px; /* 모달 제목 */
   --fs-body: 14px; /* 일반 본문 */
   --fs-modal-body: 20px; /* 모달 설명 */
@@ -49,6 +50,11 @@
   font-family: "PretendardRegularUI";
   src: url("/public/fonts/Pretendard-Regular.woff2") format("woff2");
   font-display: swap;
+}
+
+@font-face {
+  font-family: "Jalnan2";
+  src: url("/public/fonts/Jalnan2TTF.ttf") format("truetype");
 }
 
 html,
@@ -113,6 +119,13 @@ label {
   align-items: center;
   display: flex;
   flex-direction: column;
+  border: 0 solid #e5e7eb;
+  background: linear-gradient(
+    135deg,
+    #e0f2fe 0%,
+    #ecfeff 35.36%,
+    #f0fdfa 70.71%
+  );
 }
 
 .auth-lg {
@@ -122,7 +135,13 @@ label {
   align-items: center;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f0f9ff, #bce4ff 30%, #eff6ff 70%);
+  border: 0 solid #e5e7eb;
+  background: linear-gradient(
+    135deg,
+    #f0f9ff 0%,
+    #bce4ff 35.36%,
+    #eff6ff 70.71%
+  );
   box-shadow: 0 8px 32px 0 rgba(103, 232, 249, 0.12);
 }
 
@@ -152,6 +171,12 @@ label {
 
 .auth-form {
   padding: 50px 18px 0 18px;
+}
+
+.field-label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .logo-image {

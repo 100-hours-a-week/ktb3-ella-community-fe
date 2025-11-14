@@ -24,7 +24,12 @@
         </div>
         <form class="auth-form" novalidate>
           <div class="field">
-            <label for="profile-image" class="field_label">프로필 사진*</label>
+            <div class="field-label-wrapper">
+              <img src="/public/images/profile.svg" class="logo-prifile" />
+              <label for="profile-image" class="field_label"
+                >프로필 사진*</label
+              >
+            </div>
             <div class="auth-profile">
               <div class="auth-profile-image">
                 <input
@@ -37,7 +42,10 @@
                 <p class="error-text" id="profile-image-error"></p>
               </div>
             </div>
-            <label for="email" class="field_label">이메일*</label>
+            <div class="field-label-wrapper">
+              <img src="/public/images/email.svg" class="logo-email" />
+              <label for="email" class="field_label">이메일*</label>
+            </div>
             <input
               id="email"
               name="email"
@@ -49,7 +57,10 @@
             <p class="error-text" id="email-error"></p>
           </div>
           <div class="field">
-            <label for="password" class="field_label">비밀번호*</label>
+            <div class="field-label-wrapper">
+              <img src="/public/images/password.svg" class="logo-password" />
+              <label for="password" class="field_label">비밀번호*</label>
+            </div>
             <input
               id="password"
               name="password"
@@ -61,9 +72,12 @@
             <p class="error-text" id="password-error"></p>
           </div>
           <div class="field">
-            <label for="password-confirm" class="field_label"
-              >비밀번호 확인*</label
-            >
+            <div class="field-label-wrapper">
+              <img src="/public/images/password.svg" class="logo-password" />
+              <label for="password-confirm" class="field_label"
+                >비밀번호 확인*</label
+              >
+            </div>
             <input
               id="password-confirm"
               name="password-confirm"
@@ -75,7 +89,10 @@
             <p class="error-text" id="password-confirm-error"></p>
           </div>
           <div class="field">
-            <label for="nickname" class="field_label">닉네임*</label>
+            <div class="field-label-wrapper">
+              <img src="/public/images/nickname.svg" class="logo-nickname" />
+              <label for="nickname" class="field_label">닉네임*</label>
+            </div>
             <input
               id="nickname"
               name="nickname"
