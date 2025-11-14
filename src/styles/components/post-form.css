@@ -133,3 +133,7 @@
 .post-update .btn-post-submit:disabled {
   opacity: 0.6;
 }
+
+.page-post-detail .spacer-lg {
+  padding: 40px;
+}

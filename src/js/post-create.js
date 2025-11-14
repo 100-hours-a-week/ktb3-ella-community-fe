@@ -90,8 +90,6 @@ form?.addEventListener("submit", async (event) => {
     return;
   }
 
-  submitButton.classList.add("is-loading");
-
   try {
     await handleSubmit({
       title: titleInput.value,
@@ -100,8 +98,6 @@ form?.addEventListener("submit", async (event) => {
     window.location.href = "./post-list.html";
   } catch (error) {
     if (contentError) contentError.textContent = error.message;
-  } finally {
-    submitButton.classList.remove("is-loading");
   }
 });
 

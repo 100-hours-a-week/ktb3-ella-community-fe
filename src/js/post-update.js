@@ -122,7 +122,6 @@ const setupForm = (postId) => {
     if (errorMsg) return;
 
     submitButton.disabled = true;
-    submitButton.classList.add("is-loading");
 
     try {
       await submitUpdate({
@@ -135,7 +134,6 @@ const setupForm = (postId) => {
       alert(error.message || "게시글 수정 중 오류가 발생했습니다.");
     } finally {
       submitButton.disabled = false;
-      submitButton.classList.remove("is-loading");
     }
   });
 };
