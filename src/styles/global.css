@@ -244,7 +244,7 @@ label {
   color: #fff;
   border-radius: 12px;
   border: 0 solid #e5e7eb;
-  background: linear-gradient(45deg, #2563eb 50%, #4f46e5 120.71%);
+  background: #84aafd;
   box-shadow: 0 4px 20px 0 rgba(37, 99, 235, 0.2);
 }
 
@@ -257,7 +257,7 @@ label {
 }
 
 .btn-login.btn-form-primary.active {
-  background: #7f6aee;
+  background: linear-gradient(45deg, #2563eb 50%, #4f46e5 120.71%);
 }
 
 /* 모달 */
@@ -324,8 +324,8 @@ label {
 
 /* 확인 버튼 */
 .modal-confirm {
-  background-color: #c4a5fa;
-  color: #000;
+  background: linear-gradient(45deg, #2563eb 50%, #4f46e5 120.71%);
+  color: #fff;
 }
 
 .toast {
@@ -334,7 +334,7 @@ label {
   bottom: 40px;
   transform: translateX(-50%) translateY(10px);
   padding: 12px 20px;
-  background: #aca0eb;
+  background: linear-gradient(45deg, #2563eb 50%, #4f46e5 120.71%);
   color: #fff;
   border-radius: 30px;
   font-size: 18px;
