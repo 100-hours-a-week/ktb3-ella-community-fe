@@ -8,7 +8,6 @@ import { initLikeToggle } from "./post-detail/likes.js";
 import { initCommentsSection } from "./post-detail/comments.js";
 
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
-const DEFAULT_POST_IMAGE = "/public/images/postImage.jpeg";
 
 const getPostIdFromQuery = () => {
   const params = new URLSearchParams(window.location.search);
@@ -49,6 +48,7 @@ const renderPostDetail = (post) => {
   const authorProfileImgs = document.querySelectorAll(
     ".post-detail-title-info .post-author-avatar"
   );
+  const postImageWrapper = document.querySelector(".post-img");
   const postImageEl = document.querySelector(".post-main-image");
   const contentEl = document.querySelector(".post-detail-content");
   const likeButton = document.querySelector(".btn-like");
@@ -73,13 +73,19 @@ const renderPostDetail = (post) => {
   });
 
   if (postImageEl) {
-    const src = post.imageUrl || postImageEl.dataset.placeholder || DEFAULT_POST_IMAGE;
-    postImageEl.addEventListener(
-      "load",
-      () => postImageEl.classList.add("is-loaded"),
-      { once: true }
-    );
-    postImageEl.src = src;
+    if (post.postImageUrl) {
+      postImageEl.addEventListener(
+        "load",
+        () => postImageEl.classList.add("is-loaded"),
+        { once: true }
+      );
+      postImageEl.src = post.postImageUrl;
+      postImageWrapper?.classList.remove("is-hidden");
+    } else {
+      postImageWrapper?.classList.add("is-hidden");
+      postImageEl.removeAttribute("src");
+      postImageEl.classList.remove("is-loaded");
+    }
   }
   if (contentEl) {
     contentEl.textContent = post.content || "";

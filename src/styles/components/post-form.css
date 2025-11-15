@@ -69,6 +69,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .post-create .btn-image-upload,
@@ -82,6 +83,24 @@
   cursor: pointer;
   font-family: var(--font-ui);
   font-size: 14px;
+}
+
+.post-create .post-image-input-text,
+.post-update .post-image-input-text {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: #475569;
+}
+
+.post-create .post-image-preview,
+.post-update .post-image-preview {
+  width: 160px;
+  height: 120px;
+  border-radius: 12px;
+  border: 1px solid #dbeafe;
+  background: #f8fafc;
+  object-fit: cover;
+  display: none;
 }
 
 .post-create .btn-post-submit-div,

@@ -5,10 +5,11 @@ const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
 
 const listContainer = document.querySelector(".post-list-content-wrapper");
 const createButton = document.querySelector(".btn-post-create");
+const sortSelect = document.querySelector(".post-filter-select");
 
 let currentPage = 1;
 const pageSize = 10;
-const sort = "NEW";
+let currentSort = "NEW";
 let isLoading = false;
 let hasNextPage = true;
 let scrollThrottle;
@@ -61,10 +62,18 @@ const createPostElement = (post) => {
   profileImgWrap.className = "author-profile-image";
 
   const img = document.createElement("img");
-  img.src = DEFAULT_PROFILE_IMAGE;
+  const profileImageUrl =
+    author?.profileImageUrl ||
+    author?.profileImage ||
+    post.authorProfileImageUrl ||
+    post.authorProfileImage;
   img.alt = "작성자 아이콘";
-  img.width = 24;
-  img.height = 24;
+  if (profileImageUrl) {
+    img.loading = "lazy";
+    img.src = profileImageUrl;
+  } else {
+    img.src = DEFAULT_PROFILE_IMAGE;
+  }
 
   profileImgWrap.appendChild(img);
 
@@ -101,8 +110,6 @@ const createPostElement = (post) => {
     const iconEl = document.createElement("img");
     iconEl.src = icon;
     iconEl.alt = alt;
-    iconEl.width = 12;
-    iconEl.height = 12;
     iconEl.className = "post-meta-icon";
 
     const textEl = document.createElement("span");
@@ -144,7 +151,7 @@ const fetchPosts = async (page) => {
   isLoading = true;
 
   try {
-    const data = await fetchPostList({ page, pageSize, sort });
+    const data = await fetchPostList({ page, pageSize, sort: currentSort });
     const posts = data?.content || [];
 
     appendPosts(posts);
@@ -167,16 +174,16 @@ const fetchPosts = async (page) => {
 
 // 스크롤 80% 도달 시 다음 페이지 로드
 const handleScroll = () => {
-  if (scrollThrottle) return;
-  scrollThrottle = window.requestAnimationFrame(() => {
-    scrollThrottle = null;
+  if (!listContainer || scrollThrottle) return;
+  scrollThrottle = true;
+  window.requestAnimationFrame(() => {
+    scrollThrottle = false;
     if (!hasNextPage || isLoading) return;
 
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    const scrollPosition = scrollTop + clientHeight;
+    const { scrollTop, scrollHeight, clientHeight } = listContainer;
     const threshold = scrollHeight * 0.8;
 
-    if (scrollPosition >= threshold) {
+    if (scrollTop + clientHeight >= threshold) {
       fetchPosts(currentPage + 1);
     }
   });
@@ -189,8 +196,23 @@ const setupCreateButton = () => {
   });
 };
 
+const setupSortFilter = () => {
+  if (!sortSelect || !listContainer) return;
+  sortSelect.value = currentSort;
+  sortSelect.addEventListener("change", () => {
+    currentSort = sortSelect.value || "NEW";
+    currentPage = 1;
+    hasNextPage = true;
+    isLoading = false;
+    listContainer.scrollTop = 0;
+    listContainer.innerHTML = "";
+    fetchPosts(1);
+  });
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   setupCreateButton();
+  setupSortFilter();
   fetchPosts(1);
-  window.addEventListener("scroll", handleScroll);
+  listContainer?.addEventListener("scroll", handleScroll);
 });

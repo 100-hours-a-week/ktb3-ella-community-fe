@@ -98,9 +98,22 @@
         <div class="post-image-input-container">
           <label class="btn-image-upload">
             파일 선택
-            <input type="file" name="image" accept="image/*" hidden />
+            <input
+              type="file"
+              id="post-image-input"
+              name="image"
+              accept="image/*"
+              hidden
+            />
           </label>
-          <p class="post-image-input-text">파일을 선택해주세요.</p>
+          <p class="post-image-input-text" id="post-image-text">
+            파일을 선택해주세요.
+          </p>
+          <img
+            class="post-image-preview"
+            alt="게시글 이미지 미리보기"
+            data-placeholder="/public/images/postImage.jpeg"
+          />
         </div>
         <div class="btn-post-submit-div">
           <button type="submit" class="btn-post-submit">완료</button>

@@ -1,4 +1,4 @@
-import { clearStoredUser } from "./utils/user.js";
+import { clearStoredUser, getStoredUser } from "./utils/user.js";
 
 const closeAllDropdowns = (exclude) => {
   document.querySelectorAll(".profile-dropdown").forEach((dropdown) => {
@@ -12,6 +12,16 @@ const closeAllDropdowns = (exclude) => {
 const initProfileDropdowns = () => {
   const dropdowns = document.querySelectorAll(".profile-dropdown");
   if (!dropdowns.length) return;
+
+  const currentUser = getStoredUser();
+  if (currentUser?.profileImageUrl) {
+    dropdowns.forEach((dropdown) => {
+      const avatarImg = dropdown.querySelector(".profile-dropdown-toggle img");
+      if (avatarImg) {
+        avatarImg.src = currentUser.profileImageUrl;
+      }
+    });
+  }
 
   dropdowns.forEach((dropdown) => {
     const toggle = dropdown.querySelector(".profile-dropdown-toggle");

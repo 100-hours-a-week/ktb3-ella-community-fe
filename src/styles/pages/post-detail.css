@@ -168,6 +168,10 @@
   margin-bottom: 24px;
 }
 
+.post-img.is-hidden {
+  display: none;
+}
+
 .post-img img {
   width: 100%;
   max-width: 544px;
