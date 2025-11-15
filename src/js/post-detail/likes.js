@@ -2,6 +2,16 @@ import { formatCount } from "../utils/format.js";
 import { requireAuthUser } from "../utils/user.js";
 import { likePost, unlikePost } from "../services/api.js";
 
+const ensureAuthUser = () => {
+  const user = requireAuthUser();
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "./login.html";
+    return null;
+  }
+  return user;
+};
+
 const updateCountElements = (elements = [], count = 0) => {
   elements.forEach((el) => {
     if (!el) return;
@@ -38,7 +48,7 @@ export const initLikeToggle = ({
   safeUpdateUI();
 
   buttonEl.addEventListener("click", async () => {
-    const currentUser = requireAuthUser();
+    const currentUser = ensureAuthUser();
     if (!currentUser) return;
 
     buttonEl.disabled = true;

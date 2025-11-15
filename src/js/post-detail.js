@@ -15,6 +15,16 @@ const getPostIdFromQuery = () => {
   return params.get("postId");
 };
 
+const ensureAuthUser = () => {
+  const user = requireAuthUser();
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "./login.html";
+    return null;
+  }
+  return user;
+};
+
 const selectAll = (selector) =>
   Array.from(document.querySelectorAll(selector)).filter(Boolean);
 
@@ -163,7 +173,7 @@ const setupPostDeleteModal = (postId) => {
   });
 
   confirmBtn?.addEventListener("click", async () => {
-    const currentUser = requireAuthUser();
+    const currentUser = ensureAuthUser();
     if (!currentUser) {
       closeModal();
       return;

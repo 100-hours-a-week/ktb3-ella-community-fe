@@ -18,6 +18,16 @@ const ERROR_DUPLICATE = "*중복된 닉네임입니다.";
 let originalNickname = "";
 let profileImageUploader = null;
 
+const ensureAuthUser = () => {
+  const user = requireAuthUser();
+  if (!user) {
+    alert("로그인이 필요합니다. 다시 로그인해주세요.");
+    window.location.href = "./login.html";
+    return null;
+  }
+  return user;
+};
+
 const showToast = (toastEl) => {
   if (!toastEl) return;
   toastEl.classList.add("show");
@@ -78,7 +88,7 @@ const validateAndCheckNickname = async (nicknameInput, nicknameErrorEl) => {
 
 /** PATCH /api/users/me/{userId} 요청 */
 const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
-  const user = requireAuthUser();
+  const user = ensureAuthUser();
   if (!user) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
@@ -112,7 +122,7 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
 
 /** 회원탈퇴 DELETE /api/users/me/{userId} */
 const requestUserDelete = async () => {
-  const user = requireAuthUser();
+  const user = ensureAuthUser();
   if (!user) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
@@ -141,7 +151,6 @@ const updateSubmitButtonState = ({ nicknameInput, submitBtn }) => {
 };
 
 // 폼 submit 핸들러 
-
 const handleFormSubmit = async ({
   event,
   nicknameInput,
@@ -198,7 +207,7 @@ const handleFormSubmit = async ({
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const user = requireAuthUser();
+  const user = ensureAuthUser();
   if (!user) return;
 
   const emailValueEl = document.querySelector("#email-value");

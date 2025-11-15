@@ -30,8 +30,6 @@ export const clearStoredUser = () => {
 export const requireAuthUser = () => {
   const user = getStoredUser();
   if (!user || !user.id) {
-    alert("로그인이 필요합니다.");
-    window.location.href = "./login.html";
     return null;
   }
   return user;

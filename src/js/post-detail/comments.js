@@ -7,6 +7,16 @@ import {
 } from "../services/api.js";
 import { requireAuthUser } from "../utils/user.js";
 
+const ensureAuthUser = () => {
+  const user = requireAuthUser();
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "./login.html";
+    return null;
+  }
+  return user;
+};
+
 const createElement = (tag, className) => {
   const el = document.createElement(tag);
   if (className) el.className = className;
@@ -230,7 +240,7 @@ export const initCommentsSection = ({
         closeDeleteModal();
         return;
       }
-      const currentUser = requireAuthUser();
+      const currentUser = ensureAuthUser();
       if (!currentUser) {
         closeDeleteModal();
         return;
@@ -265,7 +275,7 @@ export const initCommentsSection = ({
       return;
     }
 
-    const currentUser = requireAuthUser();
+    const currentUser = ensureAuthUser();
     if (!currentUser) return;
 
     submitBtn.disabled = true;

@@ -5,6 +5,16 @@ import {
 import { requireAuthUser } from "./utils/user.js";
 import { updateUserPassword } from "./services/api.js";
 
+const ensureAuthUser = () => {
+  const user = requireAuthUser();
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "./login.html";
+    return null;
+  }
+  return user;
+};
+
 const showToast = (toastEl) => {
   if (!toastEl) return;
   toastEl.classList.add("show");
@@ -14,7 +24,7 @@ const showToast = (toastEl) => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const user = requireAuthUser();
+  const user = ensureAuthUser();
   if (!user) return;
 
   const form = document.querySelector(".auth-form");
@@ -92,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const requestPasswordUpdate = async (newPassword) => {
-    const current = requireAuthUser();
+    const current = ensureAuthUser();
     if (!current) return;
 
     await updateUserPassword({
