@@ -174,6 +174,12 @@
   height: auto;
   border-radius: 12px;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.post-img img.is-loaded {
+  opacity: 1;
 }
 
 .post-count {
@@ -423,9 +429,7 @@
   padding: 24px;
   width: 100%;
   border-radius: 16px;
-  border: 0 solid #e5e7eb;
-  background: #fff;
-  box-shadow: 0 0 30px 0 rgba(34, 211, 238, 0.15);
+  border: 1px solid #dbeafe;
 }
 
 .author-profile-image-border {
@@ -436,10 +440,24 @@
 .author-profile-image-border .profile-img {
   width: 64px;
   height: 64px;
+  border: 1px solid #dbeafe;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
+
 .author-profile-image-border img {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.author-profile-image-border img.is-loaded {
+  opacity: 1;
 }
 
 .author-name {
