@@ -5,8 +5,7 @@ import {
   validateConfirmPassword,
 } from "./utils/validation.js";
 import { checkAvailability, requestSignup } from "./services/api.js";
-
-const DEFAULT_PROFILE_IMAGE_URL = "public/images/userProfile.png";
+import { createImageUploadController } from "./utils/imageUploadController.js";
 
 const form = document.querySelector(".auth-form");
 const emailInput = document.querySelector("#email");
@@ -19,7 +18,23 @@ const passwordError = document.querySelector("#password-error");
 const passwordConfirmError = document.querySelector("#password-confirm-error");
 const nicknameError = document.querySelector("#nickname-error");
 
+const profileImageInput = document.querySelector("#profile-image-input");
+const profileImageWrapper = document.querySelector(".auth-profile-image");
+let profileImagePreview =
+  profileImageWrapper?.querySelector(".profile-image-preview") || null;
+const profileImageError = document.querySelector("#profile-image-error");
+
+if (!profileImagePreview && profileImageWrapper) {
+  profileImagePreview = document.createElement("img");
+  profileImagePreview.className = "profile-image-preview";
+  profileImagePreview.alt = "프로필 미리보기";
+  profileImagePreview.style.display = "none";
+  profileImageWrapper.appendChild(profileImagePreview);
+}
+
 const submitButton = document.querySelector(".btn-login.btn-form-primary");
+
+let profileImageUploader = null;
 
 if (
   !form ||
@@ -63,6 +78,38 @@ const checkValidation = () => {
     submitButton.disabled = true;
     submitButton.classList.remove("active");
   }
+};
+
+const setupProfileImageUploader = () => {
+  if (!profileImageInput || !profileImagePreview || !profileImageWrapper)
+    return;
+
+  profileImageUploader = createImageUploadController({
+    inputEl: profileImageInput,
+    previewEl: profileImagePreview,
+    defaultPreview: "",
+    onError: (error) => {
+      if (profileImageError) {
+        profileImageError.textContent =
+          error?.message || "프로필 이미지를 준비할 수 없습니다.";
+      }
+    },
+    onPreviewStateChange: (hasPreview) => {
+      profileImageWrapper.classList.toggle("has-preview", hasPreview);
+    },
+  });
+
+  profileImageUploader.setUploadedUrl("");
+
+  profileImageWrapper.addEventListener("click", () => {
+    if (profileImageError) profileImageError.textContent = "";
+    profileImageUploader?.openFilePicker();
+  });
+
+  profileImageInput.addEventListener("change", () => {
+    if (profileImageError) profileImageError.textContent = "";
+    profileImageUploader?.handleFileChange();
+  });
 };
 
 
@@ -176,11 +223,30 @@ form.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   submitButton.classList.add("is-loading");
 
+  let profileImageUrl = "";
+
+  if (profileImageUploader) {
+    try {
+      const uploadedUrl = await profileImageUploader.ensureUploaded();
+      if (uploadedUrl) {
+        profileImageUrl = uploadedUrl;
+      }
+    } catch (uploadError) {
+      if (profileImageError) {
+        profileImageError.textContent =
+          uploadError?.message || "프로필 이미지를 업로드할 수 없습니다.";
+      }
+      submitButton.disabled = false;
+      submitButton.classList.remove("is-loading");
+      return;
+    }
+  }
+
   const payload = {
     email: emailInput.value.trim(),
     password: passwordInput.value.trim(),
     nickname: nicknameInput.value.trim(),
-    profileImageUrl: DEFAULT_PROFILE_IMAGE_URL,
+    profileImageUrl,
   };
 
   try {
@@ -196,3 +262,5 @@ form.addEventListener("submit", async (event) => {
     submitButton.classList.remove("is-loading");
   }
 });
+
+setupProfileImageUploader();

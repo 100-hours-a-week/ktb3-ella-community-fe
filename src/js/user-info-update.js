@@ -9,17 +9,14 @@ import {
   updateUserProfile as updateUserProfileApi,
   deleteCurrentUser,
 } from "./services/api.js";
-
-const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
+import { createImageUploadController } from "./utils/imageUploadController.js";
 
 const ERROR_REQUIRED = "*닉네임을 입력해주세요.";
 const ERROR_LENGTH = "*닉네임은 최대 11자까지 가능합니다.";
 const ERROR_DUPLICATE = "*중복된 닉네임입니다.";
 
 let originalNickname = "";
-
-/** 현재 로그인 유저 가져오기 */
-const getCurrentUser = () => getStoredUser();
+let profileImageUploader = null;
 
 const showToast = (toastEl) => {
   if (!toastEl) return;
@@ -86,15 +83,18 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
+  const normalizedProfileImageUrl = (profileImageUrl || "").trim();
+
   const updated = await updateUserProfileApi({
     userId: user.id,
     nickname: nickname.trim(),
-    profileImageUrl: DEFAULT_PROFILE_IMAGE,
+    profileImageUrl: normalizedProfileImageUrl,
   });
 
   const sanitized = {
     ...updated,
-    profileImageUrl: DEFAULT_PROFILE_IMAGE,
+    profileImageUrl:
+      (updated && updated.profileImageUrl) || normalizedProfileImageUrl,
   };
 
   const newUser = {
@@ -147,7 +147,7 @@ const handleFormSubmit = async ({
   nicknameInput,
   nicknameErrorEl,
   submitBtn,
-  profileImageEl,
+  imageUploader,
   toastEl,
 }) => {
   event.preventDefault();
@@ -165,11 +165,28 @@ const handleFormSubmit = async ({
 
   submitBtn.disabled = true;
 
+  let profileImageUrlToSave = imageUploader?.getCurrentUrl() || "";
+
+  if (imageUploader) {
+    try {
+      profileImageUrlToSave = await imageUploader.ensureUploaded();
+    } catch (uploadError) {
+      alert(
+        uploadError.message || "프로필 이미지 업로드 중 오류가 발생했습니다."
+      );
+      submitBtn.disabled = false;
+      return;
+    }
+  }
+
   try {
-    await requestUserUpdate({
+    const updated = await requestUserUpdate({
       nickname: nicknameInput.value,
-      profileImageUrl: profileImageEl.src,
+      profileImageUrl: profileImageUrlToSave,
     });
+    const syncedUrl =
+      (updated && updated.profileImageUrl) || profileImageUrlToSave;
+    imageUploader?.setUploadedUrl(syncedUrl);
 
     showToast(toastEl);
     updateSubmitButtonState({ nicknameInput, submitBtn });
@@ -202,16 +219,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (emailValueEl) emailValueEl.textContent = user.email || "";
-  profileImageEl.src = DEFAULT_PROFILE_IMAGE;
+  const initialProfileImageSrc = profileImageEl.src || "";
+  const initialUploadedImageUrl =
+    (user.profileImageUrl && user.profileImageUrl.trim()) ||
+    initialProfileImageSrc;
 
-  // 프로필 이미지 변경 버튼
-  profileImageBtn?.addEventListener("click", () => profileImageInput?.click());
-  profileImageInput?.addEventListener("change", () => {
-    const file = profileImageInput.files?.[0];
-    if (!file) return;
-    const previewUrl = URL.createObjectURL(file);
-    profileImageEl.src = previewUrl;
-  });
+  if (profileImageInput) {
+    profileImageUploader = createImageUploadController({
+      inputEl: profileImageInput,
+      previewEl: profileImageEl,
+      defaultPreview: initialProfileImageSrc,
+      onError: (error) => {
+        alert(error?.message || "업로드 URL 발급 중 오류가 발생했습니다.");
+      },
+    });
+    profileImageUploader.setUploadedUrl(initialUploadedImageUrl);
+
+    profileImageBtn?.addEventListener("click", () =>
+      profileImageUploader?.openFilePicker()
+    );
+    profileImageInput.addEventListener("change", () => {
+      profileImageUploader?.handleFileChange();
+    });
+  }
 
   // 닉네임 초기 상태 설정
   originalNickname = user.nickname || "";
@@ -241,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
       nicknameInput,
       nicknameErrorEl,
       submitBtn,
-      profileImageEl,
+      imageUploader: profileImageUploader,
       toastEl,
     })
   );

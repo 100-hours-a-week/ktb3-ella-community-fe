@@ -23,6 +23,41 @@
   display: flex;
   margin-top: 8px;
   background-color: #e5e7eb;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+.auth-profile-image input[type="file"] {
+  display: none;
+}
+
+.auth-profile-image .logo-plus {
+  width: 48px;
+  height: 48px;
+  z-index: 1;
+}
+
+.auth-profile-image .profile-image-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: none;
+}
+
+.auth-profile-image.has-preview {
+  background-color: transparent;
+}
+
+.auth-profile-image.has-preview .logo-plus {
+  display: none;
+}
+
+.auth-profile-image.has-preview .profile-image-preview {
+  display: block;
 }
 
 .page-signup .btn-form-primary {
