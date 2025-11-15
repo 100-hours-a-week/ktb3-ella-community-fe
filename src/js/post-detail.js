@@ -1,8 +1,16 @@
 import { getStoredUser, requireAuthUser } from "./utils/user.js";
 import { formatDateTime, formatCount } from "./utils/format.js";
+import {
+  fetchPostDetail as requestPostDetail,
+  fetchCommentsPage as requestCommentsPage,
+  likePost,
+  unlikePost,
+  createComment as createCommentApi,
+  updateComment as updateCommentApi,
+  deleteComment as deleteCommentApi,
+  deletePost as deletePostApi,
+} from "./services/api.js";
 
-const POST_DETAIL_BASE_URL = "/api/posts";
-const COMMENTS_BASE_URL = "/api/comments";
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
 const DEFAULT_POST_IMAGE = "/public/images/postImage.jpeg";
 
@@ -23,32 +31,12 @@ const getPostIdFromQuery = () => {
 const fetchPostDetail = async (postId) => {
   const currentUser = getStoredUser();
   const userId = currentUser?.id ?? 0;
-
-  const res = await fetch(`${POST_DETAIL_BASE_URL}/${postId}/${userId}`, {
-    method: "GET",
-    headers: { Accept: "*/*" },
-  });
-
-  if (!res.ok) throw new Error("게시글 정보를 불러오지 못했습니다.");
-
-  const body = await res.json();
-  return body.data;
+  return requestPostDetail({ postId, userId });
 };
 
 /** 댓글 페이지 조회 */
 const fetchCommentsPage = async (postId, page) => {
-  const res = await fetch(
-    `${POST_DETAIL_BASE_URL}/${postId}/comments?page=${page}`,
-    {
-      method: "GET",
-      headers: { Accept: "*/*" },
-    }
-  );
-
-  if (!res.ok) throw new Error("댓글을 불러오지 못했습니다.");
-
-  const body = await res.json();
-  return body.data;
+  return requestCommentsPage({ postId, page });
 };
 
 /** 댓글 요소 생성 */
@@ -288,11 +276,7 @@ const renderPostDetail = (post) => {
 
       try {
         if (!liked) {
-          const res = await fetch(`/api/posts/${postId}/likes/${userId}`, {
-            method: "POST",
-            headers: { Accept: "*/*" },
-          });
-          if (!res.ok) throw new Error("좋아요 요청 실패");
+          await likePost({ postId, userId });
 
           const next = current + 1;
           likeBtn.dataset.liked = "true";
@@ -300,12 +284,7 @@ const renderPostDetail = (post) => {
           likeValueEl.dataset.rawCount = String(next);
           likeValueEl.textContent = formatCount(next);
         } else {
-          const res = await fetch(`/api/posts/${postId}/likes/${userId}`, {
-            method: "DELETE",
-            headers: { Accept: "*/*" },
-          });
-          if (!res.ok && res.status !== 204)
-            throw new Error("좋아요 취소 실패");
+          await unlikePost({ postId, userId });
 
           const next = Math.max(current - 1, 0);
           likeBtn.dataset.liked = "false";
@@ -401,27 +380,11 @@ const setupCommentForm = (postId) => {
     try {
       // 수정 모드
       if (editingCommentId) {
-        const res = await fetch(
-          `${COMMENTS_BASE_URL}/${editingCommentId}/${currentUser.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "*/*",
-            },
-            body: JSON.stringify({ content }),
-          }
-        );
-
-        if (res.status === 403) {
-          alert("댓글 수정 권한이 없습니다.");
-          resetEditMode();
-          return;
-        }
-        if (!res.ok) throw new Error("댓글 수정에 실패했습니다.");
-
-        const body = await res.json();
-        const updated = body.data;
+        const updated = await updateCommentApi({
+          commentId: editingCommentId,
+          userId: currentUser.id,
+          content,
+        });
 
         const target = listContainer.querySelector(
           `.post-comment-list[data-comment-id="${editingCommentId}"] .post-comment-text`
@@ -434,21 +397,11 @@ const setupCommentForm = (postId) => {
         submitBtn.disabled = true;
       } else {
         // 신규 댓글 등록
-        const res = await fetch(
-          `${POST_DETAIL_BASE_URL}/${postId}/comments/${currentUser.id}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "*/*",
-            },
-            body: JSON.stringify({ content }),
-          }
-        );
-        if (!res.ok) throw new Error("댓글 등록에 실패했습니다.");
-
-        const body = await res.json();
-        const newComment = body.data;
+        const newComment = await createCommentApi({
+          postId,
+          userId: currentUser.id,
+          content,
+        });
 
         // 리스트에 바로 추가
         if (
@@ -548,22 +501,10 @@ const setupCommentDeleteModal = () => {
     }
 
     try {
-      const res = await fetch(
-        `${COMMENTS_BASE_URL}/${pendingDeleteCommentId}/${currentUser.id}`,
-        {
-          method: "DELETE",
-          headers: { Accept: "*/*" },
-        }
-      );
-
-      if (res.status === 403) {
-        alert("댓글 삭제 권한이 없습니다.");
-        closeCommentDeleteModal();
-        return;
-      }
-      if (!res.ok && res.status !== 204) {
-        throw new Error("댓글 삭제에 실패했습니다.");
-      }
+      await deleteCommentApi({
+        commentId: pendingDeleteCommentId,
+        userId: currentUser.id,
+      });
 
       const target = listContainer.querySelector(
         `.post-comment-list[data-comment-id="${pendingDeleteCommentId}"]`
@@ -623,22 +564,10 @@ const setupPostDeleteModal = () => {
     }
 
     try {
-      const res = await fetch(
-        `${POST_DETAIL_BASE_URL}/${pendingDeletePostId}/${currentUser.id}`,
-        {
-          method: "DELETE",
-          headers: { Accept: "*/*" },
-        }
-      );
-
-      if (res.status === 403) {
-        alert("게시글 삭제 권한이 없습니다.");
-        closePostDeleteModal();
-        return;
-      }
-      if (!res.ok && res.status !== 204) {
-        throw new Error("게시글 삭제에 실패했습니다.");
-      }
+      await deletePostApi({
+        postId: pendingDeletePostId,
+        userId: currentUser.id,
+      });
 
       closePostDeleteModal();
       window.location.href = "./post-list.html";

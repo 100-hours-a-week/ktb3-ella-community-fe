@@ -1,6 +1,6 @@
 import { formatDateTime, formatCount } from "./utils/format.js";
+import { fetchPostList } from "./services/api.js";
 
-const POST_LIST_ENDPOINT = "/api/posts";
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
 
 const listContainer = document.querySelector(".post-list-content-wrapper");
@@ -144,27 +144,13 @@ const fetchPosts = async (page) => {
   isLoading = true;
 
   try {
-    const url = `${POST_LIST_ENDPOINT}?page=${page}&pageSize=${pageSize}&sort=${sort}`;
-
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "*/*",
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error("게시글 목록을 불러오지 못했습니다.");
-    }
-
-    const body = await res.json();
-    const data = body?.data;
+    const data = await fetchPostList({ page, pageSize, sort });
     const posts = data?.content || [];
 
     appendPosts(posts);
 
-    currentPage = data.page;
-    const totalPages = data.totalPages ?? 1;
+    currentPage = data?.page ?? page;
+    const totalPages = data?.totalPages ?? 1;
     hasNextPage = currentPage < totalPages;
   } catch (error) {
     console.error(error);

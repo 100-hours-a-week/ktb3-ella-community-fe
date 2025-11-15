@@ -4,9 +4,12 @@ import {
   requireAuthUser,
   clearStoredUser,
 } from "./utils/user.js";
+import {
+  checkAvailability,
+  updateUserProfile as updateUserProfileApi,
+  deleteCurrentUser,
+} from "./services/api.js";
 
-const USER_API_BASE = "/api/users";
-const AVAILABILITY_ENDPOINT = "/api/users/availability";
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
 
 const ERROR_REQUIRED = "*닉네임을 입력해주세요.";
@@ -34,30 +37,6 @@ const validateNickname = (value) => {
   return "";
 };
 
-/** 중복 체크 공통 함수*/
-const checkAvailability = async (params) => {
-  try {
-    const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${AVAILABILITY_ENDPOINT}?${query}`, {
-      method: "GET",
-      headers: { Accept: "*/*" },
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.data) {
-      throw new Error("중복 확인에 실패했습니다. 잠시 후 다시 시도해주세요.");
-    }
-
-    return result.data;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("중복 확인 응답을 처리할 수 없습니다.");
-    }
-    throw error;
-  }
-};
-
 /** PATCH /api/users/me/{userId} 요청 */
 const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   const user = requireAuthUser();
@@ -65,47 +44,28 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
-  try {
-    const response = await fetch(`${USER_API_BASE}/me/${user.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "*/*",
-      },
-      body: JSON.stringify({
-        nickname: nickname.trim(),
-        profileImageUrl: DEFAULT_PROFILE_IMAGE,
-      }),
-    });
+  const updated = await updateUserProfileApi({
+    userId: user.id,
+    nickname: nickname.trim(),
+    profileImageUrl: DEFAULT_PROFILE_IMAGE,
+  });
 
-    const result = await response.json();
+  const sanitized = {
+    ...updated,
+    profileImageUrl: DEFAULT_PROFILE_IMAGE,
+  };
 
-    if (!response.ok) {
-      throw new Error(result.message || "회원정보 수정에 실패했습니다.");
-    }
+  const newUser = {
+    ...user,
+    email: sanitized.email,
+    nickname: sanitized.nickname,
+    profileImageUrl: sanitized.profileImageUrl,
+  };
+  saveStoredUser(newUser);
 
-    const updated = result.data;
+  originalNickname = sanitized.nickname;
 
-    const newUser = {
-      ...user,
-      email: updated.email,
-      nickname: updated.nickname,
-      profileImageUrl: DEFAULT_PROFILE_IMAGE,
-    };
-    saveStoredUser(newUser);
-
-    originalNickname = updated.nickname;
-
-    return {
-      ...updated,
-      profileImageUrl: DEFAULT_PROFILE_IMAGE,
-    };
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("회원정보 수정 응답을 처리할 수 없습니다.");
-    }
-    throw error;
-  }
+  return sanitized;
 };
 
 /** 회원탈퇴 DELETE /api/users/me/{userId} */
@@ -115,20 +75,7 @@ const requestUserDelete = async () => {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
-  const res = await fetch(`${USER_API_BASE}/me/${user.id}`, {
-    method: "DELETE",
-    headers: { Accept: "*/*" },
-  });
-
-  if (!res.ok) {
-    let msg = "회원 탈퇴에 실패했습니다.";
-    try {
-      const data = await res.json();
-      if (data?.message) msg = data.message;
-    } catch (e) {
-    }
-    throw new Error(msg);
-  }
+  await deleteCurrentUser({ userId: user.id });
 };
 
 /** 회원탈퇴 모달 열기/닫기 */

@@ -4,9 +4,7 @@ import {
   validatePassword,
   validateConfirmPassword,
 } from "./utils/validation.js";
-
-const SIGNUP_ENDPOINT = "/api/auth/signup";
-const AVAILABILITY_ENDPOINT = "/api/users/availability";
+import { checkAvailability, requestSignup } from "./services/api.js";
 
 const DEFAULT_PROFILE_IMAGE_URL = "public/images/userProfile.png";
 
@@ -46,28 +44,6 @@ const validateNickname = (value) => {
   if (value.length < 2 || value.length > 12)
     return "닉네임은 2자 이상 12자 이하로 입력해주세요.";
   return "";
-};
-
-// 중복 체크 공통 함수 
-const checkAvailability = async (params) => {
-  try {
-    const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${AVAILABILITY_ENDPOINT}?${query}`, {
-      method: "GET",
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.data) {
-      throw new Error("중복 확인에 실패했습니다. 잠시 후 다시 시도해주세요.");
-    }
-    return result.data;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("중복 확인 응답을 처리할 수 없습니다.");
-    }
-    throw error;
-  }
 };
 
 // 전체 검증 & 버튼 활성화 
@@ -169,36 +145,6 @@ passwordConfirmInput.addEventListener("blur", () => {
   checkValidation();
 });
 
-// ====== 회원가입 요청 ======
-const requestSignup = async ({
-  email,
-  password,
-  nickname,
-  profileImageUrl,
-}) => {
-  try {
-    const response = await fetch(SIGNUP_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password, nickname, profileImageUrl }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || "회원가입에 실패했습니다.");
-    }
-    return result;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("회원가입 응답을 처리할 수 없습니다.");
-    }
-    throw error;
-  }
-};
-
 //  폼 제출 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -238,7 +184,7 @@ form.addEventListener("submit", async (event) => {
   };
 
   try {
-    const { data } = await requestSignup(payload);
+    const data = await requestSignup(payload);
     saveStoredUser(data);
 
     // 성공 시 페이지 이동 

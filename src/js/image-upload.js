@@ -1,3 +1,5 @@
+import { requestPresignedUploadUrl } from "./services/api.js";
+
 const input = document.getElementById("image-input");
 const uploadBtn = document.getElementById("upload-button");
 const previewImg = document.getElementById("preview-image");
@@ -16,27 +18,10 @@ const previewImg = document.getElementById("preview-image");
  * }
  */
 async function getPresignedUrl(file) {
-  const fileName = encodeURIComponent(file.name);
-  const contentType = encodeURIComponent(
-    file.type || "application/octet-stream"
-  );
+  const fileName = file.name;
+  const contentType = file.type || "application/octet-stream";
 
-  const res = await fetch(
-    `/api/uploads/presigned-url?fileName=${fileName}&contentType=${contentType}`,
-    {
-      method: "GET",
-    }
-  );
-
-  if (!res.ok) {
-    throw new Error("presigned url 발급 실패: " + res.status);
-  }
-
-  const json = await res.json();
-  // ApiResult 껍데기 안에 data가 있을 거라고 가정
-  const data = json.data ?? json; // 혹시 ApiResult 안 쓰면 json 그대로 사용
-
-  return data; // { uploadUrl, key, headers }
+  return requestPresignedUploadUrl({ fileName, contentType });
 }
 
 /**

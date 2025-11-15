@@ -1,5 +1,9 @@
 import { getStoredUser } from "./utils/user.js";
-const POST_BASE_URL = "/api/posts";
+import {
+  fetchPostDetail as requestPostDetail,
+  updatePost as updatePostApi,
+} from "./services/api.js";
+
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
 
 const form = document.querySelector(".post-update");
@@ -39,17 +43,7 @@ const loadPostData = async (postId) => {
   const userId = currentUser?.id ?? 0;
 
   try {
-    const res = await fetch(`${POST_BASE_URL}/${postId}/${userId}`, {
-      method: "GET",
-      headers: { Accept: "*/*" },
-    });
-
-    if (!res.ok) {
-      throw new Error("게시글 정보를 불러오지 못했습니다.");
-    }
-
-    const body = await res.json();
-    const data = body.data;
+    const data = await requestPostDetail({ postId, userId });
 
     if (titleInput) titleInput.value = data.title || "";
     if (contentInput) contentInput.value = data.content || "";
@@ -69,33 +63,17 @@ const submitUpdate = async ({ postId, title, content }) => {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
-  const endpoint = `${POST_BASE_URL}/${postId}/${currentUser.id}`;
   const payload = {
     title: title.trim(),
     content: content.trim(),
     // TODO: 이미지 수정 필요 시 imageUrl 추가
   };
 
-  const res = await fetch(endpoint, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "*/*",
-    },
-    body: JSON.stringify(payload),
+  return updatePostApi({
+    postId,
+    userId: currentUser.id,
+    payload,
   });
-
-  if (res.status === 403) {
-    throw new Error("게시글 수정 권한이 없습니다.");
-  }
-
-  const result = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    throw new Error(result.message || "게시글 수정에 실패했습니다.");
-  }
-
-  return result.data;
 };
 
 const setupForm = (postId) => {

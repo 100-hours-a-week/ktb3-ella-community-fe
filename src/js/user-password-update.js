@@ -3,7 +3,7 @@ import {
   validateConfirmPassword,
 } from "./utils/validation.js";
 import { requireAuthUser } from "./utils/user.js";
-const PASSWORD_UPDATE_ENDPOINT = "/api/users/me/password";
+import { updateUserPassword } from "./services/api.js";
 
 const showToast = (toastEl) => {
   if (!toastEl) return;
@@ -95,27 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const current = requireAuthUser();
     if (!current) return;
 
-    const res = await fetch(
-      `${PASSWORD_UPDATE_ENDPOINT}/${encodeURIComponent(current.id)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "*/*",
-        },
-        body: JSON.stringify({ newPassword: newPassword.trim() }),
-      }
-    );
-
-    if (!res.ok) {
-      let msg = "비밀번호 수정에 실패했습니다.";
-      try {
-        const data = await res.json();
-        if (data?.message) msg = data.message;
-      } catch (_) {
-      }
-      throw new Error(msg);
-    }
+    await updateUserPassword({
+      userId: current.id,
+      newPassword: newPassword.trim(),
+    });
   };
 
   // 폼 제출
