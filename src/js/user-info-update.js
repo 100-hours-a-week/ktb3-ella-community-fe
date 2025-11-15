@@ -37,6 +37,48 @@ const validateNickname = (value) => {
   return "";
 };
 
+// 닉네임 기본 유효성 검사 + 중복 검사
+const validateAndCheckNickname = async (nicknameInput, nicknameErrorEl) => {
+  const value = nicknameInput.value;
+  const trimmed = value.trim();
+
+  // 기본 유효성 검사
+  const basicMsg = validateNickname(value);
+  nicknameInput.dataset.valid = "false";
+
+  if (nicknameErrorEl) nicknameErrorEl.textContent = basicMsg;
+
+  if (basicMsg) {
+    return false;
+  }
+
+  // 기존 닉네임이면 중복 체크 스킵
+  if (trimmed === originalNickname) {
+    if (nicknameErrorEl) nicknameErrorEl.textContent = "";
+    nicknameInput.dataset.valid = "true";
+    return true;
+  }
+
+  // 중복 체크
+  try {
+    const { nicknameAvailable } = await checkAvailability({ nickname: trimmed });
+
+    if (!nicknameAvailable) {
+      if (nicknameErrorEl) nicknameErrorEl.textContent = ERROR_DUPLICATE;
+      nicknameInput.dataset.valid = "false";
+      return false;
+    }
+
+    if (nicknameErrorEl) nicknameErrorEl.textContent = "";
+    nicknameInput.dataset.valid = "true";
+    return true;
+  } catch (e) {
+    if (nicknameErrorEl) nicknameErrorEl.textContent = e.message;
+    nicknameInput.dataset.valid = "false";
+    return false;
+  }
+};
+
 /** PATCH /api/users/me/{userId} 요청 */
 const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   const user = requireAuthUser();
@@ -78,11 +120,11 @@ const requestUserDelete = async () => {
   await deleteCurrentUser({ userId: user.id });
 };
 
-/** 회원탈퇴 모달 열기/닫기 */
+// 회원탈퇴 모달 열기/닫기 
 const openUserDeleteModal = (modal) => modal?.classList.add("active");
 const closeUserDeleteModal = (modal) => modal?.classList.remove("active");
 
-/** 버튼 활성화 체크 */
+// 버튼 활성화 체크
 const updateSubmitButtonState = ({ nicknameInput, submitBtn }) => {
   if (!nicknameInput || !submitBtn) return;
 
@@ -95,6 +137,46 @@ const updateSubmitButtonState = ({ nicknameInput, submitBtn }) => {
   } else {
     submitBtn.disabled = true;
     submitBtn.classList.remove("active");
+  }
+};
+
+// 폼 submit 핸들러 
+
+const handleFormSubmit = async ({
+  event,
+  nicknameInput,
+  nicknameErrorEl,
+  submitBtn,
+  profileImageEl,
+  toastEl,
+}) => {
+  event.preventDefault();
+
+  // 닉네임 최종 검증
+  const isValid = await validateAndCheckNickname(
+    nicknameInput,
+    nicknameErrorEl
+  );
+  updateSubmitButtonState({ nicknameInput, submitBtn });
+
+  if (!isValid) {
+    return;
+  }
+
+  submitBtn.disabled = true;
+
+  try {
+    await requestUserUpdate({
+      nickname: nicknameInput.value,
+      profileImageUrl: profileImageEl.src,
+    });
+
+    showToast(toastEl);
+    updateSubmitButtonState({ nicknameInput, submitBtn });
+  } catch (err) {
+    alert(err.message || "회원정보 수정 중 오류가 발생했습니다.");
+  } finally {
+    submitBtn.disabled = false;
   }
 };
 
@@ -122,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (emailValueEl) emailValueEl.textContent = user.email || "";
   profileImageEl.src = DEFAULT_PROFILE_IMAGE;
 
+  // 프로필 이미지 변경 버튼
   profileImageBtn?.addEventListener("click", () => profileImageInput?.click());
   profileImageInput?.addEventListener("change", () => {
     const file = profileImageInput.files?.[0];
@@ -130,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
     profileImageEl.src = previewUrl;
   });
 
+  // 닉네임 초기 상태 설정
   originalNickname = user.nickname || "";
   nicknameInput.value = originalNickname;
   nicknameInput.dataset.valid = "true";
@@ -137,117 +221,32 @@ document.addEventListener("DOMContentLoaded", () => {
   submitBtn.classList.remove("active");
   if (nicknameErrorEl) nicknameErrorEl.textContent = "";
 
+  // 입력 중에는 "아직 검증 안 됨" 상태로 만들기
   nicknameInput.addEventListener("input", () => {
     if (nicknameErrorEl) nicknameErrorEl.textContent = "";
     nicknameInput.dataset.valid = "false";
     updateSubmitButtonState({ nicknameInput, submitBtn });
   });
 
+  // 포커스 아웃 시 서버 중복 체크 포함 검증
   nicknameInput.addEventListener("blur", async () => {
-    const value = nicknameInput.value;
-    const basicMsg = validateNickname(value);
-
-    nicknameInput.dataset.valid = "false";
-
-    if (nicknameErrorEl) nicknameErrorEl.textContent = basicMsg;
-
-    if (basicMsg) {
-      updateSubmitButtonState({ nicknameInput, submitBtn });
-      return;
-    }
-
-    const trimmed = value.trim();
-
-    // 기존 닉네임과 같으면 중복 체크 스킵
-    if (trimmed === originalNickname) {
-      if (nicknameErrorEl) nicknameErrorEl.textContent = "";
-      nicknameInput.dataset.valid = "true";
-      updateSubmitButtonState({ nicknameInput, submitBtn });
-      return;
-    }
-
-    try {
-      const { nicknameAvailable } = await checkAvailability({
-        nickname: trimmed,
-      });
-
-      if (!nicknameAvailable) {
-        if (nicknameErrorEl) nicknameErrorEl.textContent = ERROR_DUPLICATE;
-        nicknameInput.dataset.valid = "false";
-      } else {
-        if (nicknameErrorEl) nicknameErrorEl.textContent = "";
-        nicknameInput.dataset.valid = "true";
-      }
-    } catch (e) {
-      if (nicknameErrorEl) nicknameErrorEl.textContent = e.message;
-      nicknameInput.dataset.valid = "false";
-    }
-
+    await validateAndCheckNickname(nicknameInput, nicknameErrorEl);
     updateSubmitButtonState({ nicknameInput, submitBtn });
   });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // 폼 제출
+  form.addEventListener("submit", (e) =>
+    handleFormSubmit({
+      event: e,
+      nicknameInput,
+      nicknameErrorEl,
+      submitBtn,
+      profileImageEl,
+      toastEl,
+    })
+  );
 
-    const value = nicknameInput.value;
-    const basicMsg = validateNickname(value);
-
-    if (nicknameErrorEl) nicknameErrorEl.textContent = basicMsg;
-
-    if (basicMsg) {
-      nicknameInput.dataset.valid = "false";
-      updateSubmitButtonState({ nicknameInput, submitBtn });
-      return;
-    }
-
-    if (
-      value.trim() !== originalNickname &&
-      nicknameInput.dataset.valid !== "true"
-    ) {
-      try {
-        const { nicknameAvailable } = await checkAvailability({
-          nickname: value.trim(),
-        });
-
-        if (!nicknameAvailable) {
-          if (nicknameErrorEl) nicknameErrorEl.textContent = ERROR_DUPLICATE;
-          nicknameInput.dataset.valid = "false";
-          updateSubmitButtonState({ nicknameInput, submitBtn });
-          return;
-        } else {
-          if (nicknameErrorEl) nicknameErrorEl.textContent = "";
-          nicknameInput.dataset.valid = "true";
-        }
-      } catch (e2) {
-        if (nicknameErrorEl) nicknameErrorEl.textContent = e2.message;
-        nicknameInput.dataset.valid = "false";
-        updateSubmitButtonState({ nicknameInput, submitBtn });
-        return;
-      }
-    }
-
-    if (nicknameInput.dataset.valid !== "true") {
-      updateSubmitButtonState({ nicknameInput, submitBtn });
-      return;
-    }
-
-    submitBtn.disabled = true;
-
-    try {
-      await requestUserUpdate({
-        nickname: value,
-        profileImageUrl: profileImageEl.src,
-      });
-      showToast(toastEl);
-      updateSubmitButtonState({ nicknameInput, submitBtn });
-    } catch (err) {
-      alert(err.message || "회원정보 수정 중 오류가 발생했습니다.");
-    } finally {
-      submitBtn.disabled = false;
-    }
-  });
-
-  // ===== 회원탈퇴 =====
+  // 회원탈퇴
   if (withdrawBtn && userDeleteModal) {
     const cancelBtn = userDeleteModal.querySelector(".modal-cancel");
     const confirmBtn = userDeleteModal.querySelector(".modal-confirm");
