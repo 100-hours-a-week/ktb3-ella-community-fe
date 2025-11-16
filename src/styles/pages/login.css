@@ -5,14 +5,6 @@
   flex-direction: column;
 }
 
-.auth-title {
-  margin: 0 0 18px;
-}
-
-.auth-form {
-  padding: 50px 18px 0 18px;
-}
-
 .page-login .btn-form-primary {
   margin-top: 26px;
 }

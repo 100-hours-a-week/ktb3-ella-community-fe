@@ -1,0 +1,19 @@
+<svg
+  width="17"
+  height="17"
+  viewBox="0 0 17 17"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- 카메라 본체 -->
+  <rect x="2" y="5" width="13" height="9" rx="2" fill="#2563eb"/>
+
+  <!-- 카메라 상단 뷰파인더 -->
+  <rect x="5.5" y="4" width="6" height="2" rx="1" fill="#2563eb"/>
+
+  <!-- 렌즈 바깥 -->
+  <circle cx="8.5" cy="9.5" r="2.5" fill="white"/>
+
+  <!-- 렌즈 안쪽 -->
+  <circle cx="8.5" cy="9.5" r="1.3" fill="#2563eb"/>
+</svg>
