@@ -120,6 +120,17 @@ const getImageUrl = async () => {
   return imageUploader.ensureUploaded();
 };
 
+const setupAutoScrollInputs = () => {
+  const inputs = [titleInput, contentInput];
+  inputs
+    .filter((input) => input)
+    .forEach((input) => {
+      input.addEventListener("focus", () => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+};
+
 const setupForm = (postId) => {
   if (!form || !titleInput || !contentInput || !submitButton) return;
 
@@ -181,6 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   setupImageUploader();
+  setupAutoScrollInputs();
   loadPostData(postId);
   setupForm(postId);
 });

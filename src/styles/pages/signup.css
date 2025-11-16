@@ -3,6 +3,13 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.page-signup::-webkit-scrollbar {
+  display: none;
 }
 
 .auth-profile {
@@ -46,6 +53,7 @@
   object-fit: cover;
   border-radius: 50%;
   display: none;
+  border: 1px solid #dbeafe;
 }
 
 .auth-profile-image.has-preview {

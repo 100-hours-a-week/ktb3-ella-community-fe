@@ -124,3 +124,14 @@ form?.addEventListener("submit", async (event) => {
 attachFieldEvents();
 updateButtonState();
 setupImageUploader();
+const setupAutoScrollInputs = () => {
+  const inputs = [titleInput, contentInput];
+  inputs
+    .filter((input) => input)
+    .forEach((input) => {
+      input.addEventListener("focus", () => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+};
+setupAutoScrollInputs();

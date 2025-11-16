@@ -127,6 +127,11 @@
   display: none;
 }
 
+.post-list-sentinel {
+  width: 100%;
+  height: 1px;
+}
+
 .post-list-content {
   width: 100%;
   cursor: pointer;

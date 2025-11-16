@@ -112,6 +112,22 @@ const setupProfileImageUploader = () => {
   });
 };
 
+const setupAutoScrollInputs = () => {
+  const inputs = [
+    profileImageInput,
+    emailInput,
+    passwordInput,
+    passwordConfirmInput,
+    nicknameInput,
+  ].filter(Boolean);
+
+  inputs.forEach((input) => {
+    input.addEventListener("focus", () => {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+};
+
 
 // 이메일 blur: 형식 → 중복 체크
 emailInput.addEventListener("blur", async () => {
@@ -264,3 +280,4 @@ form.addEventListener("submit", async (event) => {
 });
 
 setupProfileImageUploader();
+setupAutoScrollInputs();

@@ -114,6 +114,7 @@ hr {
 }
 
 .profile-dropdown-toggle img {
+  background-color: #000;
   border: 1px solid #dbeafe;
   width: 36px;
   height: 36px;

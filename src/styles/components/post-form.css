@@ -156,3 +156,14 @@
 .page-post-detail .spacer-lg {
   padding: 40px;
 }
+
+.page-post-form {
+  min-height: 100vh;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.page-post-form::-webkit-scrollbar {
+  display: none;
+}

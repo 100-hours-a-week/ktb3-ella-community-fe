@@ -6,13 +6,15 @@ const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
 const listContainer = document.querySelector(".post-list-content-wrapper");
 const createButton = document.querySelector(".btn-post-create");
 const sortSelect = document.querySelector(".post-filter-select");
+const sentinel = document.createElement("div");
+sentinel.className = "post-list-sentinel";
+let observer = null;
 
 let currentPage = 1;
 const pageSize = 10;
 let currentSort = "NEW";
 let isLoading = false;
 let hasNextPage = true;
-let scrollThrottle;
 
 // 게시글 생성
 const createPostElement = (post) => {
@@ -143,6 +145,7 @@ const appendPosts = (posts) => {
     const el = createPostElement(post);
     listContainer.appendChild(el);
   });
+  ensureSentinel();
 };
 
 // API 호출 (페이지 단위)
@@ -159,6 +162,9 @@ const fetchPosts = async (page) => {
     currentPage = data?.page ?? page;
     const totalPages = data?.totalPages ?? 1;
     hasNextPage = currentPage < totalPages;
+    if (!hasNextPage && observer) {
+      observer.disconnect();
+    }
   } catch (error) {
     console.error(error);
     hasNextPage = false;
@@ -173,27 +179,41 @@ const fetchPosts = async (page) => {
 };
 
 // 스크롤 80% 도달 시 다음 페이지 로드
-const handleScroll = () => {
-  if (!listContainer || scrollThrottle) return;
-  scrollThrottle = true;
-  window.requestAnimationFrame(() => {
-    scrollThrottle = false;
-    if (!hasNextPage || isLoading) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = listContainer;
-    const threshold = scrollHeight * 0.8;
-
-    if (scrollTop + clientHeight >= threshold) {
-      fetchPosts(currentPage + 1);
-    }
-  });
-};
-
 const setupCreateButton = () => {
   if (!createButton) return;
   createButton.addEventListener("click", () => {
     window.location.href = "./post-create.html";
   });
+};
+
+const ensureSentinel = () => {
+  if (!listContainer) return;
+  if (!sentinel.parentElement) {
+    listContainer.appendChild(sentinel);
+  } else {
+    listContainer.appendChild(sentinel);
+  }
+};
+
+const setupObserver = () => {
+  if (!listContainer || !window.IntersectionObserver) return;
+  ensureSentinel();
+  if (observer) observer.disconnect();
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !isLoading && hasNextPage) {
+          fetchPosts(currentPage + 1);
+        }
+      });
+    },
+    {
+      root: listContainer,
+      rootMargin: "200px 0px",
+      threshold: 0,
+    }
+  );
+  observer.observe(sentinel);
 };
 
 const setupSortFilter = () => {
@@ -206,6 +226,7 @@ const setupSortFilter = () => {
     isLoading = false;
     listContainer.scrollTop = 0;
     listContainer.innerHTML = "";
+    ensureSentinel();
     fetchPosts(1);
   });
 };
@@ -214,5 +235,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCreateButton();
   setupSortFilter();
   fetchPosts(1);
-  listContainer?.addEventListener("scroll", handleScroll);
+  setupObserver();
 });
