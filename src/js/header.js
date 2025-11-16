@@ -1,5 +1,17 @@
 import { clearStoredUser, getStoredUser } from "./utils/user.js";
 
+const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
+
+const updateDropdownAvatars = (src) => {
+  const finalSrc = src || DEFAULT_PROFILE_IMAGE;
+  document
+    .querySelectorAll(".profile-dropdown-toggle img")
+    .forEach((avatarImg) => {
+      if (!avatarImg) return;
+      avatarImg.src = finalSrc;
+    });
+};
+
 const closeAllDropdowns = (exclude) => {
   document.querySelectorAll(".profile-dropdown").forEach((dropdown) => {
     if (dropdown === exclude) return;
@@ -15,12 +27,9 @@ const initProfileDropdowns = () => {
 
   const currentUser = getStoredUser();
   if (currentUser?.profileImageUrl) {
-    dropdowns.forEach((dropdown) => {
-      const avatarImg = dropdown.querySelector(".profile-dropdown-toggle img");
-      if (avatarImg) {
-        avatarImg.src = currentUser.profileImageUrl;
-      }
-    });
+    updateDropdownAvatars(currentUser.profileImageUrl);
+  } else {
+    updateDropdownAvatars();
   }
 
   dropdowns.forEach((dropdown) => {
@@ -61,3 +70,8 @@ if (document.readyState === "loading") {
 } else {
   initProfileDropdowns();
 }
+
+window.addEventListener("user:profile-updated", (event) => {
+  const newUrl = event.detail?.profileImageUrl;
+  updateDropdownAvatars(newUrl);
+});

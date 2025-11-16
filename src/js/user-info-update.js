@@ -196,6 +196,11 @@ const handleFormSubmit = async ({
     const syncedUrl =
       (updated && updated.profileImageUrl) || profileImageUrlToSave;
     imageUploader?.setUploadedUrl(syncedUrl);
+    window.dispatchEvent(
+      new CustomEvent("user:profile-updated", {
+        detail: { profileImageUrl: syncedUrl },
+      })
+    );
 
     showToast(toastEl);
     updateSubmitButtonState({ nicknameInput, submitBtn });

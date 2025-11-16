@@ -33,6 +33,7 @@
   cursor: pointer;
   overflow: hidden;
   position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .auth-profile-image input[type="file"] {
@@ -66,6 +67,11 @@
 
 .auth-profile-image.has-preview .profile-image-preview {
   display: block;
+}
+
+.auth-profile-image:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px rgba(129, 140, 248, 0.3);
 }
 
 .page-signup .btn-form-primary {
