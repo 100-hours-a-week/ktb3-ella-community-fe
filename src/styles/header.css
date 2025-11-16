@@ -1,0 +1,105 @@
+.header {
+  width: 100%;
+  height: 104px;
+  display: flex;
+  justify-content: center; /* 가운데 정렬(가로) */
+  align-items: center; /* 가운데 정렬(세로) */
+  border-bottom: 1px solid #000;
+}
+
+.header-block {
+  width: 592px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-block a {
+  color: #000;
+}
+
+.header-back {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+hr {
+  border: 1px solid rgba(0, 0, 0, 0.16);
+}
+
+.profile-img {
+  border: 1px solid #000;
+  border-radius: 50%;
+  padding: 2px;
+  width: 36px;
+  height: 36px;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-dropdown-toggle {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-dropdown-toggle img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 50%;
+  padding: 2px;
+  background-color: #000;
+  border: 1px solid #000;
+  box-sizing: border-box;
+}
+
+.profile-dropdown-menu {
+  position: absolute;
+  top: 115%;
+  right: 0;
+  width: 115px;
+  background: #fff;
+  display: none;
+  flex-direction: column;
+  z-index: 1200;
+}
+
+.profile-dropdown.open .profile-dropdown-menu {
+  display: flex;
+}
+
+.profile-dropdown-item {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  padding: 10px 24px;
+  color: #000;
+  text-decoration: none;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  text-align: left;
+  background: #d9d9d9;
+  border: none;
+}

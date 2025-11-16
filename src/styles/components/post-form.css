@@ -1,0 +1,116 @@
+.post-create,
+.post-update {
+  width: min(592px, 100%);
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-create-text,
+.post-update-text {
+  display: flex;
+  padding: 24px 0;
+  font-size: var(--fs-title-modal);
+  align-items: center;
+  justify-content: center;
+}
+
+.post-create .post-label,
+.post-update .post-label {
+  padding: 26px 16px 16px 16px;
+}
+
+.post-create .post-label-text,
+.post-update .post-label-text {
+  font-family: var(--font-ui-bold);
+  font-size: 16px;
+  line-height: 130%;
+}
+
+.post-title-input::placeholder,
+.post-content-input::placeholder {
+  color: #838486;
+}
+
+.post-create .post-title-input,
+.post-update .post-title-input {
+  width: 100%;
+  padding: 24px 20px;
+  background-color: transparent;
+  border: none;
+  font-family: var(--font-ui-bold);
+  font-size: 16px;
+  color: #000;
+  outline: none;
+}
+
+.post-create .post-content-input,
+.post-update .post-content-input {
+  width: 100%;
+  height: 280px;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  background-color: transparent;
+  padding: 20px;
+  border: none;
+  line-height: 141%;
+  outline: none;
+  color: #000;
+}
+
+.post-create .post-image-input-container,
+.post-update .post-image-input-container {
+  padding: 0 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.post-create .btn-image-upload,
+.post-update .btn-image-upload {
+  padding: 6px 8px;
+  display: inline-block;
+  border: 1px solid #000;
+  border-radius: 4px;
+  background-color: #d9d9d9;
+  color: #000;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+
+.post-create .btn-post-submit-div,
+.post-update .btn-post-submit-div {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.post-create .btn-post-submit,
+.post-update .btn-post-submit {
+  margin-top: 27px;
+  padding: 8px 165px;
+  font-family: var(--font-ui-bold);
+  color: #fff;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #aca0eb;
+  cursor: not-allowed;
+  transition: background-color 0.2s ease;
+}
+
+.post-create .btn-post-submit.active,
+.post-update .btn-post-submit.active {
+  cursor: pointer;
+}
+
+.post-create .btn-post-submit:is(.active),
+.post-update .btn-post-submit:is(.active) {
+  background-color: #7f6aee;
+}
+
+.post-create .btn-post-submit:disabled,
+.post-update .btn-post-submit:disabled {
+  opacity: 0.6;
+}

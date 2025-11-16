@@ -1,0 +1,64 @@
+.header-block {
+  width: min(355px, 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-block a {
+  color: #000;
+}
+
+.page-signup {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-signup .auth {
+  width: min(355px, 100%);
+}
+
+.auth-title {
+  margin: 0 0 10px 0;
+}
+
+.auth-profile {
+  width: 100%;
+  font-family: var(--font-ui-bold);
+  font-size: 15px;
+  text-align: left;
+}
+
+.auth-profile-image {
+  width: 149px;
+  height: 149px;
+  border: none;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  margin-top: 8px;
+  background-color: #c4c4c4;
+}
+
+.auth-form {
+  margin-top: 30px;
+  padding: 6px 18px;
+}
+
+.field_label {
+  margin-bottom: 4px;
+}
+
+.page-signup .btn-form-primary {
+  margin-top: 20px;
+}
+
+.link-login {
+  margin: auto;
+  color: #000;
+  padding: 12px 0px;
+  text-decoration: none;
+}
