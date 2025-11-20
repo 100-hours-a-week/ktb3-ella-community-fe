@@ -1,4 +1,4 @@
-import { getStoredUser, requireAuthUser } from "./utils/user.js";
+import { requireAuthUser } from "./utils/user.js";
 import { formatDateTime, formatCount } from "./utils/format.js";
 import {
   fetchPostDetail as requestPostDetail,
@@ -35,11 +35,7 @@ const updateCountElements = (elements, value = 0) => {
   });
 };
 
-const fetchPostData = (postId) => {
-  const currentUser = getStoredUser();
-  const userId = currentUser?.id ?? 0;
-  return requestPostDetail({ postId, userId });
-};
+const fetchPostData = (postId) => requestPostDetail({ postId });
 
 const renderPostDetail = (post) => {
   const titleEl = document.querySelector(".post-detail-title");
@@ -185,7 +181,7 @@ const setupPostDeleteModal = (postId) => {
       return;
     }
     try {
-      await deletePostApi({ postId, userId: currentUser.id });
+      await deletePostApi({ postId });
       window.location.href = "./post-list.html";
     } catch (error) {
       alert(error?.message || "게시글 삭제 중 오류가 발생했습니다.");

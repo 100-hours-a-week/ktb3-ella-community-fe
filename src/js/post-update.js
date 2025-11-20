@@ -42,13 +42,10 @@ const updateButtonState = () => {
   }
 };
 
-/** 기존 게시글 조회해서 폼에 채우기: GET /api/posts/{postId}/{userId} */
+/** 기존 게시글 조회해서 폼에 채우기: GET /api/posts/{postId} */
 const loadPostData = async (postId) => {
-  const currentUser = getStoredUser();
-  const userId = currentUser?.id ?? 0;
-
   try {
-    const data = await requestPostDetail({ postId, userId });
+    const data = await requestPostDetail({ postId });
 
     if (titleInput) titleInput.value = data.title || "";
     if (contentInput) contentInput.value = data.content || "";
@@ -69,7 +66,7 @@ const loadPostData = async (postId) => {
   }
 };
 
-/** 수정 요청: PUT /api/posts/{postId}/{userId} */
+/** 수정 요청: PUT /api/posts/{postId} */
 const submitUpdate = async ({ postId, title, content, postImageUrl }) => {
   const currentUser = getStoredUser();
   if (!currentUser || !currentUser.id) {
@@ -84,7 +81,6 @@ const submitUpdate = async ({ postId, title, content, postImageUrl }) => {
 
   return updatePostApi({
     postId,
-    userId: currentUser.id,
     payload,
   });
 };

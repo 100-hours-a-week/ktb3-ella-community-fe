@@ -86,7 +86,7 @@ const validateAndCheckNickname = async (nicknameInput, nicknameErrorEl) => {
   }
 };
 
-/** PATCH /api/users/me/{userId} 요청 */
+/** PATCH /api/users/me 요청 */
 const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   const user = ensureAuthUser();
   if (!user) {
@@ -96,7 +96,6 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   const normalizedProfileImageUrl = (profileImageUrl || "").trim();
 
   const updated = await updateUserProfileApi({
-    userId: user.id,
     nickname: nickname.trim(),
     profileImageUrl: normalizedProfileImageUrl,
   });
@@ -120,14 +119,14 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   return sanitized;
 };
 
-/** 회원탈퇴 DELETE /api/users/me/{userId} */
+/** 회원탈퇴 DELETE /api/users/me */
 const requestUserDelete = async () => {
   const user = ensureAuthUser();
   if (!user) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
-  await deleteCurrentUser({ userId: user.id });
+  await deleteCurrentUser();
 };
 
 // 회원탈퇴 모달 열기/닫기 

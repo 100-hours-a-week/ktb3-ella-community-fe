@@ -106,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!current) return;
 
     await updateUserPassword({
-      userId: current.id,
       newPassword: newPassword.trim(),
     });
   };

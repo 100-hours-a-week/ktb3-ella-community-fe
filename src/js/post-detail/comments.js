@@ -248,7 +248,6 @@ export const initCommentsSection = ({
       try {
         await deleteCommentApi({
           commentId: state.pendingDeleteCommentId,
-          userId: currentUser.id,
         });
         const target = listContainer.querySelector(
           `.post-comment-list[data-comment-id="${state.pendingDeleteCommentId}"]`
@@ -283,7 +282,6 @@ export const initCommentsSection = ({
       if (state.editingCommentId) {
         const updated = await updateCommentApi({
           commentId: state.editingCommentId,
-          userId: currentUser.id,
           content,
         });
         const target = listContainer.querySelector(
@@ -294,7 +292,6 @@ export const initCommentsSection = ({
       } else {
         const newComment = await createCommentApi({
           postId,
-          userId: currentUser.id,
           content,
         });
         if (

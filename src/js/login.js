@@ -1,5 +1,9 @@
 import { saveStoredUser } from "./utils/user.js";
-import { requestLogin } from "./services/api.js";
+import {
+  fetchMe,
+  requestLogin,
+  setAccessToken,
+} from "./services/api.js";
 import { validateEmail, validatePassword } from "./utils/validation.js";
 
 const form = document.querySelector(".auth-form");
@@ -22,7 +26,6 @@ if (
 ) {
   console.warn("로그인 폼 요소를 찾을 수 없습니다.");
 }
-
 
 // 유효성 검증 및 버튼 활성화 확인
 const checkValidation = () => {
@@ -54,33 +57,25 @@ passwordInput.addEventListener("blur", () => {
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
+  // 유효성 검사
   const emailMsg = validateEmail(emailInput.value);
   const passwordMsg = validatePassword(passwordInput.value);
+  if (emailMsg || passwordMsg) return;
 
-  emailError.textContent = emailMsg;
-  passwordError.textContent = passwordMsg;
-
-  // 둘 중 하나라도 에러 있으면 전송 안 함
-  if (emailMsg || passwordMsg) {
-    return;
-  }
-
-  // 버튼/폼 로딩 상태 표시
   submitButton.disabled = true;
   submitButton.classList.add("is-loading");
 
   try {
-    const data = await requestLogin({
+    // 1. 로그인 요청 (Access Token 받기)
+    const { accessToken } = await requestLogin({
       email: emailInput.value.trim(),
       password: passwordInput.value.trim(),
     });
-
-    saveStoredUser(data);
-
-    // 로그인 성공 시 이동할 페이지
+    setAccessToken(accessToken);
+    const userData = await fetchMe();
+    saveStoredUser(userData);
     window.location.href = "./post-list.html";
   } catch (error) {
-    // 서버에서 온 에러 메시지
     passwordError.textContent = error.message;
   } finally {
     submitButton.disabled = false;

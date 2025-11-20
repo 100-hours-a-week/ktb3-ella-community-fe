@@ -96,7 +96,7 @@ const handleSubmit = async ({ title, content }) => {
     content: content.trim(),
     postImageUrl: postImageUrl || undefined,
   };
-  return createPost({ userId: user.id, payload });
+  return createPost({ payload });
 };
 
 form?.addEventListener("submit", async (event) => {

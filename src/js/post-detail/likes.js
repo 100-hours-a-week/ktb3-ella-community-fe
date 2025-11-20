@@ -54,11 +54,11 @@ export const initLikeToggle = ({
     buttonEl.disabled = true;
     try {
       if (!state.liked) {
-        await likePost({ postId, userId: currentUser.id });
+        await likePost({ postId });
         state.liked = true;
         state.count += 1;
       } else {
-        await unlikePost({ postId, userId: currentUser.id });
+        await unlikePost({ postId });
         state.liked = false;
         state.count = Math.max(0, state.count - 1);
       }
