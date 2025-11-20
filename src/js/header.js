@@ -10,6 +10,8 @@ import {
   setAccessToken,
 } from "./services/api.js";
 
+import { isAuthRequired } from "./utils/auth.js";
+
 const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
 
 const updateDropdownAvatars = (src) => {
@@ -76,8 +78,8 @@ const initProfileDropdowns = () => {
   document.addEventListener("click", () => closeAllDropdowns());
 };
 
-// 앱 초기화 
-const initAuth = async () => {
+let authInitPromise = null;
+const runAuth = async () => {
   // 1. 먼저 로컬에 저장된 유저 정보가 있으면 UI 먼저 그림
   const storedUser = getStoredUser();
   if (storedUser?.profileImageUrl) {
@@ -107,25 +109,29 @@ const initAuth = async () => {
     console.log("Silent Refresh Success");
   } catch (error) {
     console.log("Silent Refresh Failed (Guest Mode or Expired)");
-    // 갱신 실패 시 로컬 유저 정보도 삭제 
+    // 갱신 실패 시 로컬 유저 정보도 삭제
     clearStoredUser();
-    updateDropdownAvatars(); 
+    updateDropdownAvatars();
 
-    if (isAuthRequired(path)) window.location.href = './login.html';
+    if (isAuthRequired(path)) window.location.href = "./login.html";
   }
 };
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    initProfileDropdowns();
-    initAuth();
-  });
-} else {
+export const initAuth = () => {
+  if (!authInitPromise) {
+    authInitPromise = runAuth();
+  }
+  return authInitPromise;
+};
+
+export const initHeader = () => {
   initProfileDropdowns();
-  initAuth();
-}
+  return initAuth();
+};
 
 window.addEventListener("user:profile-updated", (event) => {
   const newUrl = event.detail?.profileImageUrl;
   updateDropdownAvatars(newUrl);
 });
+
+export const getAuthReady = () => authInitPromise || Promise.resolve();

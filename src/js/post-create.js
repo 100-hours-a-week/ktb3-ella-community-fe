@@ -78,6 +78,17 @@ const getImageUrl = async () => {
   return imageUploader.ensureUploaded();
 };
 
+const setupAutoScrollInputs = () => {
+  const inputs = [titleInput, contentInput];
+  inputs
+    .filter((input) => input)
+    .forEach((input) => {
+      input.addEventListener("focus", () => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+};
+
 const handleSubmit = async ({ title, content }) => {
   const user = getCurrentUser();
   if (!user || !user.id) {
@@ -99,39 +110,30 @@ const handleSubmit = async ({ title, content }) => {
   return createPost({ payload });
 };
 
-form?.addEventListener("submit", async (event) => {
-  event.preventDefault();
+export const initPage = () => {
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  // 버튼 클릭했을 때만 검증
-  const msg = validateForm();
-  if (msg) {
-    if (contentError) contentError.textContent = msg;
-    updateButtonState();
-    return;
-  }
+    const msg = validateForm();
+    if (msg) {
+      if (contentError) contentError.textContent = msg;
+      updateButtonState();
+      return;
+    }
 
-  try {
-    await handleSubmit({
-      title: titleInput.value,
-      content: contentInput.value,
-    });
-    window.location.href = "./post-list.html";
-  } catch (error) {
-    if (contentError) contentError.textContent = error.message;
-  }
-});
-
-attachFieldEvents();
-updateButtonState();
-setupImageUploader();
-const setupAutoScrollInputs = () => {
-  const inputs = [titleInput, contentInput];
-  inputs
-    .filter((input) => input)
-    .forEach((input) => {
-      input.addEventListener("focus", () => {
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
+    try {
+      await handleSubmit({
+        title: titleInput.value,
+        content: contentInput.value,
       });
-    });
+      window.location.href = "./post-list.html";
+    } catch (error) {
+      if (contentError) contentError.textContent = error.message;
+    }
+  });
+
+  attachFieldEvents();
+  updateButtonState();
+  setupImageUploader();
+  setupAutoScrollInputs();
 };
-setupAutoScrollInputs();

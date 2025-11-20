@@ -241,7 +241,10 @@
         </div>
       </div>
     </div>
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/post-detail.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/post-detail.js";
+      bootstrapApp(initPage);
+    </script>
   </body>
 </html>

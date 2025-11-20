@@ -6,8 +6,11 @@
     <link rel="stylesheet" href="../src/styles/global.css" />
     <link rel="stylesheet" href="../src/styles/header.css" />
     <link rel="stylesheet" href="../src/styles/pages/post-list.css" />
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/post-list.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/post-list.js";
+      bootstrapApp(initPage);
+    </script>
     <title>게시글 목록조회</title>
   </head>
   <body class="page-post-list">

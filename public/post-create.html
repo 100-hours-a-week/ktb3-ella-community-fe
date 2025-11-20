@@ -6,8 +6,11 @@
     <link rel="stylesheet" href="../src/styles/global.css" />
     <link rel="stylesheet" href="../src/styles/header.css" />
     <link rel="stylesheet" href="../src/styles/components/post-form.css" />
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/post-create.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/post-create.js";
+      bootstrapApp(initPage);
+    </script>
     <title>게시글</title>
   </head>
   <body class="page-post-detail page-post-form">

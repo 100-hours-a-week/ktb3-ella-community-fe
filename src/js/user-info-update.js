@@ -210,7 +210,7 @@ const handleFormSubmit = async ({
   }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   const user = ensureAuthUser();
   if (!user) return;
 
@@ -319,4 +319,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-});
+};

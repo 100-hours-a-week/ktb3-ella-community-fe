@@ -231,9 +231,9 @@ const setupSortFilter = () => {
   });
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   setupCreateButton();
   setupSortFilter();
   fetchPosts(1);
   setupObserver();
-});
+};

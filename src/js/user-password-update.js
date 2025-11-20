@@ -23,7 +23,7 @@ const showToast = (toastEl) => {
   }, 2000);
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   const user = ensureAuthUser();
   if (!user) return;
 
@@ -146,4 +146,4 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.classList.remove("active");
     }
   });
-});
+};

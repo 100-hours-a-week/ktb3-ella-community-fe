@@ -138,7 +138,10 @@
       </div>
     </div>
     <div class="toast" id="update-toast">수정 완료</div>
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/user-info-update.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/user-info-update.js";
+      bootstrapApp(initPage);
+    </script>
   </body>
 </html>

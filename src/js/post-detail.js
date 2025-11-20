@@ -191,7 +191,7 @@ const setupPostDeleteModal = (postId) => {
   });
 };
 
-const initializePage = async () => {
+export const initPage = async () => {
   const postId = getPostIdFromQuery();
   if (!postId) {
     alert("잘못된 접근입니다.");
@@ -227,5 +227,3 @@ const initializePage = async () => {
     window.location.href = "./post-list.html";
   }
 };
-
-document.addEventListener("DOMContentLoaded", initializePage);

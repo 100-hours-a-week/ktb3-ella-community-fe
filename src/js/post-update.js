@@ -178,7 +178,7 @@ const setupForm = (postId) => {
 };
 
 /** 초기화 */
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   const postId = getPostIdFromQuery();
 
   if (!postId) {
@@ -191,4 +191,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAutoScrollInputs();
   loadPostData(postId);
   setupForm(postId);
-});
+};

@@ -6,8 +6,11 @@
     <link rel="stylesheet" href="../src/styles/global.css" />
     <link rel="stylesheet" href="../src/styles/header.css" />
     <link rel="stylesheet" href="../src/styles/pages/signup.css" />
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/signup.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/signup.js";
+      bootstrapApp(initPage);
+    </script>
     <title>회원가입</title>
   </head>
   <body class="page-signup">
