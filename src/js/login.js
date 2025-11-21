@@ -1,9 +1,5 @@
 import { saveStoredUser } from "./utils/user.js";
-import {
-  fetchMe,
-  requestLogin,
-  setAccessToken,
-} from "./services/api.js";
+import { fetchMe, requestLogin, setAccessToken } from "./services/api.js";
 import { validateEmail, validatePassword } from "./utils/validation.js";
 
 const form = document.querySelector(".auth-form");
@@ -69,7 +65,15 @@ export const initPage = () => {
       saveStoredUser(userData);
       window.location.href = "./post-list.html";
     } catch (error) {
-      passwordError.textContent = error.message;
+      if (error.status === 404) {
+        passwordError.textContent = "*아이디와 비밀번호를 다시 확인해주세요.";
+      } else if (error.status === 422) {
+        emailError.textContent = "";
+        passwordError.textContent =
+          "*아이디와 비밀번호 값이 올바르지 않습니다.";
+      } else {
+        passwordError.textContent = error.message || "로그인에 실패했습니다.";
+      }
     } finally {
       submitButton.disabled = false;
       submitButton.classList.remove("is-loading");
