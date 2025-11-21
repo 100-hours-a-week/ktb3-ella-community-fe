@@ -15,7 +15,10 @@ export const getStoredUser = () => {
 export const saveStoredUser = (user) => {
   if (!user) return;
   try {
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+    const normalizedUser = {
+      ...user,
+    };
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(normalizedUser));
   } catch (error) {
     console.warn("사용자 정보를 저장하지 못했습니다.", error);
   }

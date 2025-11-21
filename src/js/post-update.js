@@ -69,7 +69,7 @@ const loadPostData = async (postId) => {
 /** 수정 요청: PUT /api/posts/{postId} */
 const submitUpdate = async ({ postId, title, content, postImageUrl }) => {
   const currentUser = getStoredUser();
-  if (!currentUser || !currentUser.id) {
+  if (!currentUser) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 

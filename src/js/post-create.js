@@ -91,7 +91,7 @@ const setupAutoScrollInputs = () => {
 
 const handleSubmit = async ({ title, content }) => {
   const user = getCurrentUser();
-  if (!user || !user.id) {
+  if (!user) {
     throw new Error("*로그인 정보가 없습니다. 다시 로그인해주세요.");
   }
 

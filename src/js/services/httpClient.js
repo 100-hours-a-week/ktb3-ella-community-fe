@@ -140,7 +140,7 @@ export const apiRequest = async (endpoint, options = {}, retryCount = 0) => {
       retryCount < MAX_RETRY_COUNT;
 
     if (isTokenExpired && refreshHandler) {
-      console.log("Access Token expired. Refreshing...");
+      console.log("어세스 토큰 만료, 리프레시 시도 중...");
       try {
         const refreshed = await refreshHandler();
         if (refreshed?.accessToken) {
@@ -148,7 +148,7 @@ export const apiRequest = async (endpoint, options = {}, retryCount = 0) => {
         }
         return apiRequest(endpoint, options, retryCount + 1);
       } catch (refreshError) {
-        console.error("Refresh failed. Logout.", refreshError);
+        console.error("리프레시 실패", refreshError);
         clearStoredUser();
         if (!window.location.href.includes("login.html")) {
           window.location.href = "/login.html";
