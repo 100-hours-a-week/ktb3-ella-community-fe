@@ -1,6 +1,6 @@
 const USER_STORAGE_KEY = "ktb3-community:user";
 
-// 사용자 정보(닉네임, ID, 프로필이미지)만 가져옵니다.
+// 사용자 정보(닉네임, 프로필이미지)만 가져옵니다.
 export const getStoredUser = () => {
   try {
     const raw = localStorage.getItem(USER_STORAGE_KEY);

@@ -12,14 +12,15 @@ import {
 
 import { isAuthRequired } from "./utils/auth.js";
 
-const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
-
 const updateDropdownAvatars = (src) => {
-  const finalSrc = src || DEFAULT_PROFILE_IMAGE;
+  const finalSrc = src;
   document
     .querySelectorAll(".profile-dropdown-toggle img")
     .forEach((avatarImg) => {
-      if (!avatarImg) return;
+      if (!avatarImg) {
+        console.error("프로필 이미지 요소를 찾을 수 없습니다.");
+        return;
+      }
       avatarImg.src = finalSrc;
     });
 };
@@ -95,7 +96,7 @@ const runAuth = async () => {
   }
 
   try {
-    // 백엔드에 토큰 재발급 요청 (쿠키 사용)
+    // 백엔드에 토큰 재발급 요청
     const { accessToken } = await requestRefresh();
 
     // 성공하면 메모리에 토큰 저장
@@ -105,10 +106,7 @@ const runAuth = async () => {
     const userData = await fetchMe();
     saveStoredUser(userData);
     updateDropdownAvatars(userData.profileImageUrl);
-
-    console.log("Silent Refresh Success");
   } catch (error) {
-    console.log("Silent Refresh Failed (Guest Mode or Expired)");
     // 갱신 실패 시 로컬 유저 정보도 삭제
     clearStoredUser();
     updateDropdownAvatars();
@@ -124,6 +122,7 @@ export const initAuth = () => {
   return authInitPromise;
 };
 
+// 헤더 초기화 함수
 export const initHeader = () => {
   initProfileDropdowns();
   return initAuth();
