@@ -3,7 +3,7 @@ import {
   apiRequest,
   toQueryString,
   unwrapData,
-} from "./httpClient.js";
+} from "./http-client.js";
 
 const AVAILABILITY_ENDPOINT = "/api/users/availability";
 const USERS_ENDPOINT = "/api/users";

@@ -3,7 +3,7 @@ import {
   apiRequest,
   toQueryString,
   unwrapData,
-} from "./httpClient.js";
+} from "./http-client.js";
 
 const POSTS_ENDPOINT = "/api/posts";
 const COMMENTS_ENDPOINT = "/api/comments";

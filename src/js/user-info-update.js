@@ -8,7 +8,7 @@ import {
   updateUserProfile as updateUserProfileApi,
   deleteCurrentUser,
 } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-upload-controller.js";
 
 const ERROR_REQUIRED = "*닉네임을 입력해주세요.";
 const ERROR_LENGTH = "*닉네임은 최대 11자까지 가능합니다.";

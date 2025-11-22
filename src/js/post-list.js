@@ -48,7 +48,7 @@ const createPostElement = (post) => {
   titleEl.textContent = title;
 
   contentContainer.append(tagsWrapper, titleEl);
-
+  
   const authorBox = document.createElement("div");
   authorBox.className = "author-profile";
 

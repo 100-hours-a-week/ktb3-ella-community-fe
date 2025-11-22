@@ -1,6 +1,6 @@
 import { getStoredUser } from "./utils/user.js";
 import { createPost } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-upload-controller.js";
 
 const ensureAuthUser = () => {
   const user = getStoredUser();

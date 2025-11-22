@@ -3,7 +3,7 @@ import {
   fetchPostDetail as requestPostDetail,
   updatePost as updatePostApi,
 } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-upload-controller.js";
 
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
 

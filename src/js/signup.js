@@ -5,7 +5,7 @@ import {
   validateConfirmPassword,
 } from "./utils/validation.js";
 import { checkAvailability, requestSignup } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-uploadController.js";
 
 const form = document.querySelector(".auth-form");
 const emailInput = document.querySelector("#email");
