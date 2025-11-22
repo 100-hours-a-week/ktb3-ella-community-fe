@@ -203,6 +203,20 @@
   margin-bottom: 32px;
 }
 
+.post-detail-content h2 {
+  font-size: 18px;
+  font-family: var(--font-ui-bold);
+  margin: 16px 0 8px;
+}
+
+.post-detail-content p {
+  margin: 0 0 12px;
+}
+
+.post-detail-content strong {
+  font-family: var(--font-ui-bold);
+}
+
 .post-detail-content-like-comment-count {
   margin: 30px 0;
   display: flex;

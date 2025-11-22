@@ -7,6 +7,33 @@ import {
 import { initLikeToggle } from "./post-detail/likes.js";
 import { initCommentsSection } from "./post-detail/comments.js";
 
+const escapeHtml = (value = "") =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+const renderSimpleMarkdown = (value = "") => {
+  if (!value) return "";
+  return value
+    .split(/\n/)
+    .map((line) => {
+      const trimmed = line.trim();
+      const escaped = escapeHtml(line).replace(
+        /\*\*(.+?)\*\*/g,
+        "<strong>$1</strong>"
+      );
+
+      if (!trimmed) return "<br />";
+      if (/^##\s+/.test(trimmed)) {
+        return `<h2>${escaped.replace(/^##\s+/, "")}</h2>`;
+      }
+      return `<p>${escaped}</p>`;
+    })
+    .join("");
+};
+
 const getPostIdFromQuery = () => {
   const params = new URLSearchParams(window.location.search);
   return params.get("postId");
@@ -59,8 +86,7 @@ const renderPostDetail = (post) => {
   authorProfileImgs.forEach((img) => {
     const src =
       post.author?.profileImageUrl ||
-      img.dataset.placeholder ||
-      DEFAULT_PROFILE_IMAGE;
+      img.dataset.placeholder;
     img.addEventListener("load", () => img.classList.add("is-loaded"), {
       once: true,
     });
@@ -83,7 +109,7 @@ const renderPostDetail = (post) => {
     }
   }
   if (contentEl) {
-    contentEl.textContent = post.content || "";
+    contentEl.innerHTML = renderSimpleMarkdown(post.content || "");
   }
 
   const likeCountEls = selectAll(".post-like-count-value");
@@ -122,8 +148,7 @@ const setupAuthorSidebar = (post) => {
   if (sidebarImageEl) {
     const src =
       post.author?.profileImageUrl ||
-      sidebarImageEl.dataset.placeholder ||
-      DEFAULT_PROFILE_IMAGE;
+      sidebarImageEl.dataset.placeholder;
     sidebarImageEl.addEventListener(
       "load",
       () => sidebarImageEl.classList.add("is-loaded"),
