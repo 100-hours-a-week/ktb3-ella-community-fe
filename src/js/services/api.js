@@ -2,6 +2,7 @@ export {
   ApiError,
   apiRequest,
   getAccessToken,
+  hydrateAccessToken,
   setAccessToken,
   toQueryString,
   unwrapData,

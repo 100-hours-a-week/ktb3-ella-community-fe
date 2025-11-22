@@ -5,6 +5,8 @@ import {
 } from "./utils/user.js";
 import {
   fetchMe,
+  getAccessToken,
+  hydrateAccessToken,
   requestLogout,
   requestRefresh,
   setAccessToken,
@@ -102,11 +104,14 @@ const runAuth = async () => {
   }
 
   try {
-    // 백엔드에 토큰 재발급 요청
-    const { accessToken } = await requestRefresh();
-
-    // 성공하면 메모리에 토큰 저장
-    setAccessToken(accessToken);
+    // 세션스토리지에 토큰 있으면 재사용, 없으면 리프레시
+    hydrateAccessToken();
+    let accessToken = getAccessToken();
+    if (!accessToken) {
+      const refreshed = await requestRefresh();
+      accessToken = refreshed?.accessToken;
+      setAccessToken(accessToken);
+    }
 
     // 최신 유저 정보 다시 받아오기
     const userData = await fetchMe();

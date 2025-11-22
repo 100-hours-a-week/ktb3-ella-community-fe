@@ -9,15 +9,36 @@ const DEFAULT_HEADERS = {
   Accept: "*/*",
 };
 const MAX_RETRY_COUNT = 1;
+const ACCESS_TOKEN_KEY = "ktb3-community:accessToken";
 
 let _accessToken = null;
 let refreshHandler = null;
 
 export const setAccessToken = (token) => {
   _accessToken = token;
+  try {
+    if (token) {
+      sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
+    } else {
+      sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+    }
+  } catch (_) {
+  }
 };
 
 export const getAccessToken = () => _accessToken;
+
+export const hydrateAccessToken = () => {
+  if (_accessToken) return _accessToken;
+  try {
+    const stored = sessionStorage.getItem(ACCESS_TOKEN_KEY);
+    if (stored) {
+      _accessToken = stored;
+    }
+  } catch (_) {
+  }
+  return _accessToken;
+};
 
 export const registerRefreshHandler = (handler) => {
   refreshHandler = handler;
