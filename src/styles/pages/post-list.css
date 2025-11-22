@@ -191,7 +191,6 @@
 .author-profile-image {
   border: 1px solid #dbeafe;
   border-radius: 50%;
-  padding: 2px;
   width: 24px;
   height: 24px;
   background-color: #000;
@@ -202,8 +201,8 @@
 }
 
 .author-profile-image img {
-  width: 24px;
-  height: 24px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
 }
 
