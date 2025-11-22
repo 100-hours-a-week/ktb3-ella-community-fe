@@ -13,7 +13,7 @@ export {
   requestLogout,
   requestRefresh,
   requestSignup,
-} from "./authService.js";
+} from "./auth-service.js";
 
 export {
   fetchMe,
