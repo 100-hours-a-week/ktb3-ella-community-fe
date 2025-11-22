@@ -51,7 +51,6 @@ if (
   console.warn("회원가입 폼 요소를 찾을 수 없습니다.");
 }
 
-
 const validateNickname = (value) => {
   if (!value.trim()) return "닉네임을 입력해주세요.";
   if (/\s/.test(value)) return "*띄어쓰기를 없애주세요.";
@@ -61,14 +60,14 @@ const validateNickname = (value) => {
   return "";
 };
 
-// 전체 검증 & 버튼 활성화 
+// 전체 검증 & 버튼 활성화
 const checkValidation = () => {
   const emailValid = emailInput.dataset.valid === "true";
   const nicknameValid = nicknameInput.dataset.valid === "true";
   const passwordValid = !validatePassword(passwordInput.value);
   const confirmValid = !validateConfirmPassword(
     passwordConfirmInput.value,
-    passwordInput.value,
+    passwordInput.value
   );
 
   if (emailValid && nicknameValid && passwordValid && confirmValid) {
@@ -127,7 +126,6 @@ const setupAutoScrollInputs = () => {
     });
   });
 };
-
 
 export const initPage = () => {
   if (
@@ -215,7 +213,7 @@ export const initPage = () => {
   passwordConfirmInput.addEventListener("blur", () => {
     const msg = validateConfirmPassword(
       passwordConfirmInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
     passwordConfirmError.textContent = msg;
     checkValidation();
@@ -228,7 +226,7 @@ export const initPage = () => {
     const pwMsg = validatePassword(passwordInput.value);
     const confirmMsg = validateConfirmPassword(
       passwordConfirmInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
     const nickMsg = validateNickname(nicknameInput.value);
 
@@ -280,7 +278,7 @@ export const initPage = () => {
     try {
       const data = await requestSignup(payload);
       saveStoredUser(data);
-      window.location.href = "./login.html";
+      window.location.href = "./post-list.html";
     } catch (error) {
       passwordError.textContent = error.message;
     } finally {
