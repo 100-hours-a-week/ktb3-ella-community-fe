@@ -3,7 +3,7 @@ import {
   registerRefreshHandler,
   setAccessToken,
   unwrapData,
-} from "./httpClient.js";
+} from "./http-client.js";
 
 const LOGIN_ENDPOINT = "/api/auth/login";
 const SIGNUP_ENDPOINT = "/api/auth/signup";
