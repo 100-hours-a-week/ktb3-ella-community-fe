@@ -23,12 +23,12 @@ export const isAuthRequired = (endpoint) => {
 export const buildAuthAndCsrfHeaders = (endpoint, csrfToken, accessToken) => {
   const headers = {};
 
-  // 1. JWT Access Token (Authorization) 헤더 추가
+  // JWT Access Token (Authorization) 헤더 추가
   if (isAuthRequired(endpoint) && accessToken) {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
-  // 2. CSRF (X-XSRF-TOKEN) 헤더 추가
+  // CSRF (X-XSRF-TOKEN) 헤더 추가
   if (csrfToken) {
     headers["X-XSRF-TOKEN"] = csrfToken;
   }

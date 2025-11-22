@@ -2,7 +2,15 @@ import { getStoredUser } from "./utils/user.js";
 import { createPost } from "./services/api.js";
 import { createImageUploadController } from "./utils/imageUploadController.js";
 
-const getCurrentUser = () => getStoredUser();
+const ensureAuthUser = () => {
+  const user = getStoredUser();
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "./login.html";
+    return null;
+  }
+  return user;
+};
 
 const form = document.querySelector(".post-create");
 const titleInput = document.querySelector("#post-title");
@@ -90,11 +98,9 @@ const setupAutoScrollInputs = () => {
 };
 
 const handleSubmit = async ({ title, content }) => {
-  const user = getCurrentUser();
-  if (!user) {
-    throw new Error("*로그인 정보가 없습니다. 다시 로그인해주세요.");
-  }
-
+  const user = ensureAuthUser();
+  if (!user) return;
+  
   let postImageUrl = "";
   try {
     postImageUrl = await getImageUrl();

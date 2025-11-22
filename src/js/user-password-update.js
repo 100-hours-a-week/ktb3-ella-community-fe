@@ -2,11 +2,11 @@ import {
   validatePassword,
   validateConfirmPassword,
 } from "./utils/validation.js";
-import { requireAuthUser } from "./utils/user.js";
+import { getStoredUser } from "./utils/user.js";
 import { updateUserPassword } from "./services/api.js";
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다.");
     window.location.href = "./login.html";
@@ -56,7 +56,7 @@ export const initPage = () => {
     const pwMsg = validatePassword(passwordInput.value);
     const cfMsg = validateConfirmPassword(
       passwordCheckInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
 
     const isValid = !pwMsg && !cfMsg;
@@ -81,7 +81,7 @@ export const initPage = () => {
   passwordCheckInput.addEventListener("blur", () => {
     const msg = validateConfirmPassword(
       passwordCheckInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
     passwordConfirmError.textContent = msg;
     updateSubmitState();
@@ -117,7 +117,7 @@ export const initPage = () => {
     const pwMsg = validatePassword(passwordInput.value);
     const cfMsg = validateConfirmPassword(
       passwordCheckInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
 
     passwordError.textContent = pwMsg;

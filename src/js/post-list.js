@@ -1,8 +1,6 @@
 import { formatDateTime, formatCount } from "./utils/format.js";
 import { fetchPostList } from "./services/api.js";
 
-const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
-
 const listContainer = document.querySelector(".post-list-content-wrapper");
 const createButton = document.querySelector(".btn-post-create");
 const sortSelect = document.querySelector(".post-filter-select");
@@ -74,7 +72,7 @@ const createPostElement = (post) => {
     img.loading = "lazy";
     img.src = profileImageUrl;
   } else {
-    img.src = DEFAULT_PROFILE_IMAGE;
+    console.warn("프로필 이미지가 없습니다.");
   }
 
   profileImgWrap.appendChild(img);
@@ -178,7 +176,6 @@ const fetchPosts = async (page) => {
   }
 };
 
-// 스크롤 80% 도달 시 다음 페이지 로드
 const setupCreateButton = () => {
   if (!createButton) return;
   createButton.addEventListener("click", () => {

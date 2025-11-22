@@ -1,4 +1,4 @@
-import { initHeader, initAuth } from "./header.js";
+import { initHeader } from "./header.js";
 
 const domReady = () =>
   new Promise((resolve) => {

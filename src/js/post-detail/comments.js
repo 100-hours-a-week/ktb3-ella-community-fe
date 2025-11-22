@@ -5,10 +5,10 @@ import {
   updateComment as updateCommentApi,
   deleteComment as deleteCommentApi,
 } from "../services/api.js";
-import { requireAuthUser } from "../utils/user.js";
+import { getStoredUser } from "../utils/user.js";
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다.");
     window.location.href = "./login.html";

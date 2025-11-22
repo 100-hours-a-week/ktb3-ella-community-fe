@@ -1,4 +1,4 @@
-import { requireAuthUser } from "./utils/user.js";
+import { getStoredUser } from "./utils/user.js";
 import { formatDateTime, formatCount } from "./utils/format.js";
 import {
   fetchPostDetail as requestPostDetail,
@@ -7,15 +7,13 @@ import {
 import { initLikeToggle } from "./post-detail/likes.js";
 import { initCommentsSection } from "./post-detail/comments.js";
 
-const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
-
 const getPostIdFromQuery = () => {
   const params = new URLSearchParams(window.location.search);
   return params.get("postId");
 };
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다.");
     window.location.href = "./login.html";
@@ -59,12 +57,13 @@ const renderPostDetail = (post) => {
     el.textContent = formatDateTime(post.createdAt);
   });
   authorProfileImgs.forEach((img) => {
-    const src = post.author?.profileImageUrl || img.dataset.placeholder || DEFAULT_PROFILE_IMAGE;
-    img.addEventListener(
-      "load",
-      () => img.classList.add("is-loaded"),
-      { once: true }
-    );
+    const src =
+      post.author?.profileImageUrl ||
+      img.dataset.placeholder ||
+      DEFAULT_PROFILE_IMAGE;
+    img.addEventListener("load", () => img.classList.add("is-loaded"), {
+      once: true,
+    });
     img.src = src;
   });
 
@@ -121,7 +120,10 @@ const setupAuthorSidebar = (post) => {
     sidebarBioEl.textContent = post.author?.bio || "열정적인 커뮤니티 멤버";
   }
   if (sidebarImageEl) {
-    const src = post.author?.profileImageUrl || sidebarImageEl.dataset.placeholder || DEFAULT_PROFILE_IMAGE;
+    const src =
+      post.author?.profileImageUrl ||
+      sidebarImageEl.dataset.placeholder ||
+      DEFAULT_PROFILE_IMAGE;
     sidebarImageEl.addEventListener(
       "load",
       () => sidebarImageEl.classList.add("is-loaded"),
@@ -175,8 +177,8 @@ const setupPostDeleteModal = (postId) => {
   });
 
   confirmBtn?.addEventListener("click", async () => {
-    const currentUser = ensureAuthUser();
-    if (!currentUser) {
+    const user = ensureAuthUser();
+    if (!user) {
       closeModal();
       return;
     }

@@ -1,7 +1,6 @@
 import {
   getStoredUser,
   saveStoredUser,
-  requireAuthUser,
   clearStoredUser,
 } from "./utils/user.js";
 import {
@@ -19,7 +18,7 @@ let originalNickname = "";
 let profileImageUploader = null;
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다. 다시 로그인해주세요.");
     window.location.href = "./login.html";
@@ -68,7 +67,9 @@ const validateAndCheckNickname = async (nicknameInput, nicknameErrorEl) => {
 
   // 중복 체크
   try {
-    const { nicknameAvailable } = await checkAvailability({ nickname: trimmed });
+    const { nicknameAvailable } = await checkAvailability({
+      nickname: trimmed,
+    });
 
     if (!nicknameAvailable) {
       if (nicknameErrorEl) nicknameErrorEl.textContent = ERROR_DUPLICATE;
@@ -129,7 +130,7 @@ const requestUserDelete = async () => {
   await deleteCurrentUser();
 };
 
-// 회원탈퇴 모달 열기/닫기 
+// 회원탈퇴 모달 열기/닫기
 const openUserDeleteModal = (modal) => modal?.classList.add("active");
 const closeUserDeleteModal = (modal) => modal?.classList.remove("active");
 
@@ -149,7 +150,7 @@ const updateSubmitButtonState = ({ nicknameInput, submitBtn }) => {
   }
 };
 
-// 폼 submit 핸들러 
+// 폼 submit 핸들러
 const handleFormSubmit = async ({
   event,
   nicknameInput,

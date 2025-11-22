@@ -1,9 +1,9 @@
 import { formatCount } from "../utils/format.js";
-import { requireAuthUser } from "../utils/user.js";
+import { getStoredUser } from "../utils/user.js";
 import { likePost, unlikePost } from "../services/api.js";
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다.");
     window.location.href = "./login.html";
