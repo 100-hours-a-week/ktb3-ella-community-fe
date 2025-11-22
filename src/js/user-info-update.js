@@ -249,6 +249,13 @@ export const initPage = () => {
     });
     profileImageUploader.setUploadedUrl(initialUploadedImageUrl);
 
+    profileImageEl.classList.remove("is-loaded");
+    profileImageEl.addEventListener(
+      "load",
+      () => profileImageEl.classList.add("is-loaded"),
+      { once: true }
+    );
+
     profileImageBtn?.addEventListener("click", () =>
       profileImageUploader?.openFilePicker()
     );

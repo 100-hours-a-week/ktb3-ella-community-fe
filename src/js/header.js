@@ -21,7 +21,13 @@ const updateDropdownAvatars = (src) => {
         console.error("프로필 이미지 요소를 찾을 수 없습니다.");
         return;
       }
-      avatarImg.src = finalSrc;
+      avatarImg.classList.remove("is-loaded");
+      avatarImg.addEventListener(
+        "load",
+        () => avatarImg.classList.add("is-loaded"),
+        { once: true }
+      );
+      avatarImg.src = finalSrc || "";
     });
 };
 
