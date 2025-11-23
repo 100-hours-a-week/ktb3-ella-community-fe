@@ -113,10 +113,12 @@ const runAuth = async () => {
       setAccessToken(accessToken);
     }
 
-    // 최신 유저 정보 다시 받아오기
-    const userData = await fetchMe();
-    saveStoredUser(userData);
-    updateDropdownAvatars(userData.profileImageUrl);
+    // 로컬 유저가 없을 때만 최신 정보 조회
+    if (!storedUser) {
+      const userData = await fetchMe();
+      saveStoredUser(userData);
+      updateDropdownAvatars(userData.profileImageUrl);
+    }
   } catch (error) {
     // 갱신 실패 시 로컬 유저 정보도 삭제
     clearStoredUser();
