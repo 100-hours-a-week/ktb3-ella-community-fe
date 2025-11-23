@@ -43,6 +43,32 @@ export const initCommentsSection = ({
     return;
   }
 
+  listContainer.addEventListener("click", (e) => {
+    const target = e.target;
+
+    // 삭제 버튼 클릭 처리
+    const deleteBtn = target.closest(".btn-comment-delete");
+    if (deleteBtn) {
+      const wrapper = deleteBtn.closest(".post-comment-list");
+      const commentId = wrapper.dataset.commentId;
+      if (commentId) {
+        openDeleteModal(commentId);
+      }
+      return;
+    }
+
+    // 수정 버튼 클릭 처리
+    const editBtn = target.closest(".btn-comment-edit");
+    if (editBtn) {
+      const wrapper = editBtn.closest(".post-comment-list");
+      const commentId = wrapper.dataset.commentId;
+
+      const contentEl = wrapper.querySelector(".post-comment-text");
+      const content = contentEl ? contentEl.textContent : "";
+      enterEditMode({ commentId, content });
+    }
+  });
+
   const state = {
     page: initialData?.page ?? 1,
     totalPages: initialData?.totalPages ?? 1,
@@ -99,15 +125,6 @@ export const initCommentsSection = ({
     deleteModal?.classList.add("active");
   };
 
-  const bindCommentActions = (element, comment) => {
-    const editBtn = element.querySelector(".btn-comment-edit");
-    const deleteBtn = element.querySelector(".btn-comment-delete");
-    editBtn?.addEventListener("click", () => enterEditMode(comment));
-    deleteBtn?.addEventListener("click", () =>
-      openDeleteModal(comment.commentId)
-    );
-  };
-
   const createCommentElement = (comment) => {
     const wrapper = createElement("div", "post-comment-list");
     wrapper.dataset.commentId = comment.commentId;
@@ -155,27 +172,27 @@ export const initCommentsSection = ({
     info.appendChild(infoContainer);
     wrapper.appendChild(info);
 
-    bindCommentActions(wrapper, comment);
     return wrapper;
   };
 
   const renderCommentsList = (comments = []) => {
-    listContainer.innerHTML = "";
     if (!comments.length) {
       const empty = document.createElement("p");
       empty.textContent = "첫 댓글을 남겨보세요!";
-      listContainer.appendChild(empty);
+      listContainer.replaceChildren(empty);
       return;
     }
-    comments.forEach((comment) => {
-      listContainer.appendChild(createCommentElement(comment));
-    });
+    const commentElements = comments.map(comment => createCommentElement(comment));
+    listContainer.replaceChildren(...commentElements);
   };
 
   const renderPagination = () => {
     if (!paginationEl) return;
-    paginationEl.innerHTML = "";
-    if (state.totalPages <= 1) return;
+
+    if (state.totalPages <= 1) {
+      paginationEl.replaceChildren(); 
+      return;
+    }
 
     const createButton = (label, targetPage, { disabled, active } = {}) => {
       const btn = document.createElement("button");
@@ -193,20 +210,23 @@ export const initCommentsSection = ({
       }
       return btn;
     };
+    
+    const buttons = [];
 
-    paginationEl.appendChild(
+    buttons.push(
       createButton("이전", state.page - 1, { disabled: state.page === 1 })
     );
     for (let page = 1; page <= state.totalPages; page += 1) {
-      paginationEl.appendChild(
+      buttons.push(
         createButton(String(page), page, { active: page === state.page })
       );
     }
-    paginationEl.appendChild(
+    buttons.push(
       createButton("다음", state.page + 1, {
         disabled: state.page === state.totalPages,
       })
     );
+    paginationEl.replaceChildren(...buttons);
   };
 
   const loadPage = async (page) => {
