@@ -137,7 +137,7 @@ const appendPosts = (posts) => {
 
   // 메모리상의 가상 컨테이너 생성
   const fragment = document.createDocumentFragment();
-  
+
   posts.forEach((post) => {
     const el = createPostElement(post);
     fragment.appendChild(el); // 가상 컨테이너에 추가
@@ -224,8 +224,7 @@ const setupSortFilter = () => {
     hasNextPage = true;
     isLoading = false;
     listContainer.scrollTop = 0;
-    listContainer.innerHTML = "";
-    ensureSentinel();
+    listContainer.replaceChildren(sentinel);
     fetchPosts(1);
   });
 };
