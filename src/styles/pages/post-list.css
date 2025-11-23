@@ -140,6 +140,8 @@
   border: 1px solid #eff6ff;
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 4px 6px 0 rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: inherit;
 }
 
 .post-list-content-container {

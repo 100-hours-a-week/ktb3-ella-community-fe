@@ -26,8 +26,9 @@ const createPostElement = (post) => {
     createdAt,
   } = post;
 
-  const wrapper = document.createElement("div");
+  const wrapper = document.createElement("a");
   wrapper.className = "post-list-content";
+  wrapper.href = `./post-detail.html?postId=${postId}`;
 
   const contentContainer = document.createElement("div");
   contentContainer.className = "post-list-content-container";
@@ -48,7 +49,6 @@ const createPostElement = (post) => {
   titleEl.textContent = title;
 
   contentContainer.append(tagsWrapper, titleEl);
-  
   const authorBox = document.createElement("div");
   authorBox.className = "author-profile";
 
@@ -129,20 +129,22 @@ const createPostElement = (post) => {
 
   wrapper.append(contentContainer, authorBox);
 
-  // 클릭 시 상세 페이지 이동
-  wrapper.addEventListener("click", () => {
-    window.location.href = `./post-detail.html?postId=${postId}`;
-  });
-
   return wrapper;
 };
 
 const appendPosts = (posts) => {
   if (!listContainer || !posts || posts.length === 0) return;
+
+  // 메모리상의 가상 컨테이너 생성
+  const fragment = document.createDocumentFragment();
+  
   posts.forEach((post) => {
     const el = createPostElement(post);
-    listContainer.appendChild(el);
+    fragment.appendChild(el); // 가상 컨테이너에 추가
   });
+
+  // 완성된 덩어리를 실제 DOM에 한 번에 이동
+  listContainer.appendChild(fragment);
   ensureSentinel();
 };
 
