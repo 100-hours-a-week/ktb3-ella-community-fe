@@ -36,18 +36,18 @@
 
 ## 🖼️ 시연 영상
 
-### 회원가입, 목록 조회, 댓글게시글 (작성/수정/삭제)
-<video src="https://github.com/user-attachments/assets/d587b20a-1f50-4789-b1c2-eed503589360">
+### 1. 회원가입, 목록 조회, 댓글
+<video src="https://github.com/user-attachments/assets/d587b20a-1f50-4789-b1c2-eed503589360" controls width="100%"></video>
 
 <br>
 
-### 게시글 (작성/수정/삭제)
-<video src="https://github.com/user-attachments/assets/65d3ae60-7663-4e1b-bfda-ad9aec4c8ef0">
+### 2. 게시글 (작성 / 수정 / 삭제)
+<video src="https://github.com/user-attachments/assets/65d3ae60-7663-4e1b-bfda-ad9aec4c8ef0" controls width="100%"></video>
 
 <br>
 
 ## 🛠 기술 스택 (Tech Stack)
-=
+
 * **Language:** JavaScript (ES6+), HTML5, CSS3
 * **Package Manager:** NPM
 
