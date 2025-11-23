@@ -1,5 +1,10 @@
 import { getStoredUser } from "./utils/user.js";
-const POST_BASE_URL = "/api/posts";
+import {
+  fetchPostDetail as requestPostDetail,
+  updatePost as updatePostApi,
+} from "./services/api.js";
+import { createImageUploadController } from "./utils/imageUploadController.js";
+
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
 
 const form = document.querySelector(".post-update");
@@ -7,6 +12,10 @@ const titleInput = document.querySelector("#post-title");
 const contentInput = document.querySelector("#post-content");
 const contentError = document.querySelector("#post-content-error");
 const submitButton = document.querySelector(".btn-post-submit");
+const imageInput = document.querySelector("#post-image-input");
+const imageText = document.querySelector("#post-image-text");
+const imagePreview = document.querySelector(".post-image-preview");
+let imageUploader = null;
 
 /** URL 쿼리에서 postId 추출 */
 const getPostIdFromQuery = () => {
@@ -39,20 +48,18 @@ const loadPostData = async (postId) => {
   const userId = currentUser?.id ?? 0;
 
   try {
-    const res = await fetch(`${POST_BASE_URL}/${postId}/${userId}`, {
-      method: "GET",
-      headers: { Accept: "*/*" },
-    });
-
-    if (!res.ok) {
-      throw new Error("게시글 정보를 불러오지 못했습니다.");
-    }
-
-    const body = await res.json();
-    const data = body.data;
+    const data = await requestPostDetail({ postId, userId });
 
     if (titleInput) titleInput.value = data.title || "";
     if (contentInput) contentInput.value = data.content || "";
+    if (imageUploader) {
+      imageUploader.setUploadedUrl(data.postImageUrl || "");
+      if (imageText) {
+        imageText.textContent = data.postImageUrl
+          ? "현재 등록된 이미지가 있습니다."
+          : "파일을 선택해주세요.";
+      }
+    }
 
     updateButtonState();
   } catch (error) {
@@ -63,39 +70,65 @@ const loadPostData = async (postId) => {
 };
 
 /** 수정 요청: PUT /api/posts/{postId}/{userId} */
-const submitUpdate = async ({ postId, title, content }) => {
+const submitUpdate = async ({ postId, title, content, postImageUrl }) => {
   const currentUser = getStoredUser();
   if (!currentUser || !currentUser.id) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
-  const endpoint = `${POST_BASE_URL}/${postId}/${currentUser.id}`;
   const payload = {
     title: title.trim(),
     content: content.trim(),
-    // TODO: 이미지 수정 필요 시 imageUrl 추가
+    postImageUrl: postImageUrl || undefined,
   };
 
-  const res = await fetch(endpoint, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "*/*",
+  return updatePostApi({
+    postId,
+    userId: currentUser.id,
+    payload,
+  });
+};
+
+const setupImageUploader = () => {
+  if (!imageInput || !imagePreview) return;
+
+  imageUploader = createImageUploadController({
+    inputEl: imageInput,
+    previewEl: imagePreview,
+    defaultPreview: imagePreview.dataset.placeholder || "",
+    onError: (error) => {
+      if (imageText) {
+        imageText.textContent =
+          error?.message || "이미지를 준비하는 중 오류가 발생했습니다.";
+      }
     },
-    body: JSON.stringify(payload),
   });
 
-  if (res.status === 403) {
-    throw new Error("게시글 수정 권한이 없습니다.");
-  }
+  imageUploader.setUploadedUrl("");
 
-  const result = await res.json().catch(() => ({}));
+  imageInput.addEventListener("change", () => {
+    if (imageText) {
+      const fileName = imageInput.files?.[0]?.name;
+      imageText.textContent = fileName || "파일을 선택해주세요.";
+    }
+    imageUploader?.handleFileChange();
+  });
+};
 
-  if (!res.ok) {
-    throw new Error(result.message || "게시글 수정에 실패했습니다.");
-  }
+const getImageUrl = async () => {
+  if (!imageUploader) return "";
+  return imageUploader.ensureUploaded();
+};
 
-  return result.data;
+const setupAutoScrollInputs = () => {
+  const inputs = [titleInput, contentInput];
+  inputs
+    .filter((input) => input)
+    .forEach((input) => {
+      input.addEventListener("focus", () => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
 };
 
 const setupForm = (postId) => {
@@ -122,20 +155,28 @@ const setupForm = (postId) => {
     if (errorMsg) return;
 
     submitButton.disabled = true;
-    submitButton.classList.add("is-loading");
 
     try {
+      let postImageUrl = "";
+      try {
+        postImageUrl = await getImageUrl();
+      } catch (uploadError) {
+        alert(uploadError.message || "이미지 업로드 중 오류가 발생했습니다.");
+        submitButton.disabled = false;
+        return;
+      }
+
       await submitUpdate({
         postId,
         title: titleInput.value,
         content: contentInput.value,
+        postImageUrl,
       });
       window.location.href = `./post-detail.html?postId=${postId}`;
     } catch (error) {
       alert(error.message || "게시글 수정 중 오류가 발생했습니다.");
     } finally {
       submitButton.disabled = false;
-      submitButton.classList.remove("is-loading");
     }
   });
 };
@@ -150,6 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  setupImageUploader();
+  setupAutoScrollInputs();
   loadPostData(postId);
   setupForm(postId);
 });

@@ -1,7 +1,6 @@
 import { getStoredUser } from "./utils/user.js";
-
-const POST_CREATE_BASE_ENDPOINT = "/api/posts";
-const DEFAULT_IMAGE_URL = "/public/images/postImage.jpeg";
+import { createPost } from "./services/api.js";
+import { createImageUploadController } from "./utils/imageUploadController.js";
 
 const getCurrentUser = () => getStoredUser();
 
@@ -10,6 +9,10 @@ const titleInput = document.querySelector("#post-title");
 const contentInput = document.querySelector("#post-content");
 const submitButton = document.querySelector(".btn-post-submit");
 const contentError = document.querySelector("#post-content-error");
+const imageInput = document.querySelector("#post-image-input");
+const imageText = document.querySelector("#post-image-text");
+const imagePreview = document.querySelector(".post-image-preview");
+let imageUploader = null;
 
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
 
@@ -44,39 +47,56 @@ const attachFieldEvents = () => {
   });
 };
 
+const setupImageUploader = () => {
+  if (!imageInput || !imagePreview) return;
+
+  imageUploader = createImageUploadController({
+    inputEl: imageInput,
+    previewEl: imagePreview,
+    defaultPreview: imagePreview.dataset.placeholder || "",
+    onError: (error) => {
+      if (imageText) {
+        imageText.textContent =
+          error?.message || "이미지를 준비하는 중 오류가 발생했습니다.";
+      }
+    },
+  });
+
+  imageUploader.setUploadedUrl("");
+
+  imageInput.addEventListener("change", () => {
+    if (imageText) {
+      const fileName = imageInput.files?.[0]?.name;
+      imageText.textContent = fileName || "파일을 선택해주세요.";
+    }
+    imageUploader?.handleFileChange();
+  });
+};
+
+const getImageUrl = async () => {
+  if (!imageUploader) return "";
+  return imageUploader.ensureUploaded();
+};
+
 const handleSubmit = async ({ title, content }) => {
   const user = getCurrentUser();
   if (!user || !user.id) {
     throw new Error("*로그인 정보가 없습니다. 다시 로그인해주세요.");
   }
 
-  const endpoint = `${POST_CREATE_BASE_ENDPOINT}/${user.id}`;
+  let postImageUrl = "";
+  try {
+    postImageUrl = await getImageUrl();
+  } catch (error) {
+    throw new Error(error?.message || "이미지 업로드에 실패했습니다.");
+  }
 
   const payload = {
     title: title.trim(),
     content: content.trim(),
-    imageUrl: DEFAULT_IMAGE_URL,
+    postImageUrl: postImageUrl || undefined,
   };
-
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || "*게시글 생성에 실패했습니다.");
-    }
-
-    return result;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("서버 응답을 처리할 수 없습니다.");
-    }
-    throw error;
-  }
+  return createPost({ userId: user.id, payload });
 };
 
 form?.addEventListener("submit", async (event) => {
@@ -90,8 +110,6 @@ form?.addEventListener("submit", async (event) => {
     return;
   }
 
-  submitButton.classList.add("is-loading");
-
   try {
     await handleSubmit({
       title: titleInput.value,
@@ -100,10 +118,20 @@ form?.addEventListener("submit", async (event) => {
     window.location.href = "./post-list.html";
   } catch (error) {
     if (contentError) contentError.textContent = error.message;
-  } finally {
-    submitButton.classList.remove("is-loading");
   }
 });
 
 attachFieldEvents();
 updateButtonState();
+setupImageUploader();
+const setupAutoScrollInputs = () => {
+  const inputs = [titleInput, contentInput];
+  inputs
+    .filter((input) => input)
+    .forEach((input) => {
+      input.addEventListener("focus", () => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+};
+setupAutoScrollInputs();

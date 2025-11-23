@@ -4,11 +4,8 @@ import {
   validatePassword,
   validateConfirmPassword,
 } from "./utils/validation.js";
-
-const SIGNUP_ENDPOINT = "/api/auth/signup";
-const AVAILABILITY_ENDPOINT = "/api/users/availability";
-
-const DEFAULT_PROFILE_IMAGE_URL = "public/images/userProfile.png";
+import { checkAvailability, requestSignup } from "./services/api.js";
+import { createImageUploadController } from "./utils/imageUploadController.js";
 
 const form = document.querySelector(".auth-form");
 const emailInput = document.querySelector("#email");
@@ -21,7 +18,23 @@ const passwordError = document.querySelector("#password-error");
 const passwordConfirmError = document.querySelector("#password-confirm-error");
 const nicknameError = document.querySelector("#nickname-error");
 
+const profileImageInput = document.querySelector("#profile-image-input");
+const profileImageWrapper = document.querySelector(".auth-profile-image");
+let profileImagePreview =
+  profileImageWrapper?.querySelector(".profile-image-preview") || null;
+const profileImageError = document.querySelector("#profile-image-error");
+
+if (!profileImagePreview && profileImageWrapper) {
+  profileImagePreview = document.createElement("img");
+  profileImagePreview.className = "profile-image-preview";
+  profileImagePreview.alt = "프로필 미리보기";
+  profileImagePreview.style.display = "none";
+  profileImageWrapper.appendChild(profileImagePreview);
+}
+
 const submitButton = document.querySelector(".btn-login.btn-form-primary");
+
+let profileImageUploader = null;
 
 if (
   !form ||
@@ -48,28 +61,6 @@ const validateNickname = (value) => {
   return "";
 };
 
-// 중복 체크 공통 함수 
-const checkAvailability = async (params) => {
-  try {
-    const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${AVAILABILITY_ENDPOINT}?${query}`, {
-      method: "GET",
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.data) {
-      throw new Error("중복 확인에 실패했습니다. 잠시 후 다시 시도해주세요.");
-    }
-    return result.data;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("중복 확인 응답을 처리할 수 없습니다.");
-    }
-    throw error;
-  }
-};
-
 // 전체 검증 & 버튼 활성화 
 const checkValidation = () => {
   const emailValid = emailInput.dataset.valid === "true";
@@ -87,6 +78,54 @@ const checkValidation = () => {
     submitButton.disabled = true;
     submitButton.classList.remove("active");
   }
+};
+
+const setupProfileImageUploader = () => {
+  if (!profileImageInput || !profileImagePreview || !profileImageWrapper)
+    return;
+
+  profileImageUploader = createImageUploadController({
+    inputEl: profileImageInput,
+    previewEl: profileImagePreview,
+    defaultPreview: "",
+    onError: (error) => {
+      if (profileImageError) {
+        profileImageError.textContent =
+          error?.message || "프로필 이미지를 준비할 수 없습니다.";
+      }
+    },
+    onPreviewStateChange: (hasPreview) => {
+      profileImageWrapper.classList.toggle("has-preview", hasPreview);
+    },
+  });
+
+  profileImageUploader.setUploadedUrl("");
+
+  profileImageWrapper.addEventListener("click", () => {
+    if (profileImageError) profileImageError.textContent = "";
+    profileImageUploader?.openFilePicker();
+  });
+
+  profileImageInput.addEventListener("change", () => {
+    if (profileImageError) profileImageError.textContent = "";
+    profileImageUploader?.handleFileChange();
+  });
+};
+
+const setupAutoScrollInputs = () => {
+  const inputs = [
+    profileImageInput,
+    emailInput,
+    passwordInput,
+    passwordConfirmInput,
+    nicknameInput,
+  ].filter(Boolean);
+
+  inputs.forEach((input) => {
+    input.addEventListener("focus", () => {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
 };
 
 
@@ -169,36 +208,6 @@ passwordConfirmInput.addEventListener("blur", () => {
   checkValidation();
 });
 
-// ====== 회원가입 요청 ======
-const requestSignup = async ({
-  email,
-  password,
-  nickname,
-  profileImageUrl,
-}) => {
-  try {
-    const response = await fetch(SIGNUP_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password, nickname, profileImageUrl }),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || "회원가입에 실패했습니다.");
-    }
-    return result;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error("회원가입 응답을 처리할 수 없습니다.");
-    }
-    throw error;
-  }
-};
-
 //  폼 제출 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -230,15 +239,34 @@ form.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   submitButton.classList.add("is-loading");
 
+  let profileImageUrl = "";
+
+  if (profileImageUploader) {
+    try {
+      const uploadedUrl = await profileImageUploader.ensureUploaded();
+      if (uploadedUrl) {
+        profileImageUrl = uploadedUrl;
+      }
+    } catch (uploadError) {
+      if (profileImageError) {
+        profileImageError.textContent =
+          uploadError?.message || "프로필 이미지를 업로드할 수 없습니다.";
+      }
+      submitButton.disabled = false;
+      submitButton.classList.remove("is-loading");
+      return;
+    }
+  }
+
   const payload = {
     email: emailInput.value.trim(),
     password: passwordInput.value.trim(),
     nickname: nicknameInput.value.trim(),
-    profileImageUrl: DEFAULT_PROFILE_IMAGE_URL,
+    profileImageUrl,
   };
 
   try {
-    const { data } = await requestSignup(payload);
+    const data = await requestSignup(payload);
     saveStoredUser(data);
 
     // 성공 시 페이지 이동 
@@ -250,3 +278,6 @@ form.addEventListener("submit", async (event) => {
     submitButton.classList.remove("is-loading");
   }
 });
+
+setupProfileImageUploader();
+setupAutoScrollInputs();

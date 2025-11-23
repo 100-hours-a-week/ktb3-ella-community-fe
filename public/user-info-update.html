@@ -11,61 +11,104 @@
   <body class="page-user-info">
     <header class="header">
       <div class="header-block">
-        <div class="header-back"></div>
-        <h1 class="title-xl">아무 말 대잔치</h1>
-        <div class="profile-dropdown">
-          <button type="button" class="profile-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
-            <img
-              src="/public/images/userProfile.png"
-              width="30"
-              height="30"
-              alt="프로필 메뉴"
-            />
+        <div class="header-front">
+          <img
+            src="/public/images/logo.svg"
+            alt="KTB3 커뮤니티 로고"
+            class="logo-image"
+          />
+          <h1 class="title-xl">아무말대잔치</h1>
+        </div>
+        <div class="header-back">
+          <button type="button" class="post-create-button">
+            <img src="/public/images/post.svg" width="16" height="16" />
+            <a href="./post-create.html" class="link-post">글쓰기</a>
           </button>
-          <div class="profile-dropdown-menu" role="menu">
-            <a href="./user-info-update.html" class="profile-dropdown-item" role="menuitem">회원정보 수정</a>
-            <a href="./user-password-update.html" class="profile-dropdown-item" role="menuitem">비밀번호 수정</a>
-            <button type="button" class="profile-dropdown-item profile-dropdown-logout" role="menuitem">로그아웃</button>
+          <div class="profile-dropdown">
+            <button
+              type="button"
+              class="profile-dropdown-toggle"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              <img
+                src="/public/images/userProfile.png"
+                width="30"
+                height="30"
+                alt="프로필 메뉴"
+              />
+            </button>
+            <div class="profile-dropdown-menu" role="menu">
+              <a
+                href="./user-info-update.html"
+                class="profile-dropdown-item"
+                role="menuitem"
+                >회원정보 수정</a
+              >
+              <a
+                href="./user-password-update.html"
+                class="profile-dropdown-item"
+                role="menuitem"
+                >비밀번호 수정</a
+              >
+              <button
+                type="button"
+                class="profile-dropdown-item profile-dropdown-logout"
+                role="menuitem"
+              >
+                로그아웃
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </header>
-    <div class="spacer-lg">
+    <div class="auth-lg">
       <div class="auth">
         <h1 class="auth-title">회원정보 수정</h1>
-        <div class="field-profile-image">
-          <p class="field_label_profile_image">프로필 사진*</p>
-        </div>
-        <div class="spacer-sm">
-          <div class="profile-img-update">
-            <button
-              type="button"
-              class="profile-img-change"
-              aria-label="프로필 이미지 변경"
-            >
-              변경
-            </button>
-            <input
-              type="file"
-              id="profile-image-input"
-              accept="image/*"
-              hidden
-            />
-            <img
-              id="profile-image"
-              src="/public/images/userProfile.png"
-              alt="프로필 이미지"
-            />
-          </div>
-        </div>
-
         <form class="auth-form">
           <div class="field">
-            <p class="field_label">이메일</p>
+            <div class="field-label-wrapper">
+              <img src="/public/images/profile.svg" class="logo-prifile" />
+              <label for="profile-image" class="field_label"
+                >프로필 사진*</label
+              >
+            </div>
+            <div class="spacer-sm">
+              <div class="profile-img-update">
+                <button
+                  type="button"
+                  class="profile-img-change"
+                  aria-label="프로필 이미지 변경"
+                >
+                  변경
+                </button>
+                <input
+                  type="file"
+                  id="profile-image-input"
+                  accept="image/*"
+                  hidden
+                />
+                <img
+                  id="profile-image"
+                  src="/public/images/userProfile.png"
+                  alt="프로필 이미지"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label-wrapper">
+              <img src="/public/images/email.svg" class="logo-email" />
+              <label for="email" class="field_label">이메일*</label>
+            </div>
             <p class="field_value" id="email-value"></p>
           </div>
           <div class="field">
-            <label for="nickname" class="field_label">닉네임</label>
+            <div class="field-label-wrapper">
+              <img src="/public/images/nickname.svg" class="logo-nickname" />
+              <label for="nickname" class="field_label">닉네임*</label>
+            </div>
             <input
               id="nickname"
               name="nickname"
