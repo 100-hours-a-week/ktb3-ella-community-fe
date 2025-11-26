@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "@/styles/global.css";
 import "@/styles/header.css";
 import "@/styles/pages/login.css";
@@ -20,6 +21,7 @@ import {
  * setFormData : formData 객체를 업데이트하는 함수
  */
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "", // 초기값: 빈 문자열
     password: "",
@@ -43,8 +45,6 @@ const LoginPage = () => {
       ...prev, // 기존의 formData 내용을 복사
       [name]: value, //{ email: value } 또는 { password: value } 형태로 업데이트
     }));
-
-    console.log(formData); // 변경된 입력값을 콘솔에 출력 (디버깅용)
   };
 
   const handleBlur = (e) => {
@@ -59,7 +59,6 @@ const LoginPage = () => {
 
     // 에러 상태 업데이트
     setErrors((prev) => ({ ...prev, [name]: errorMessage }));
-    console.log("Validation error for", name, ":", errorMessage, errors);
   };
 
   const isButtonActive =
@@ -73,7 +72,7 @@ const LoginPage = () => {
     //` 폼 제출 기본 동작 방지 (페이지 새로고침 방지)
     e.preventDefault();
 
-    // 1. 제출 전 마지막 유효성 검사
+    // 제출 전 마지막 유효성 검사
     const emailMsg = validateEmail(formData.email);
     const passwordMsg = validatePassword(formData.password);
 
@@ -83,29 +82,28 @@ const LoginPage = () => {
     }
 
     try {
-      // 3. 로그인 API 요청
+      // 로그인 API 요청
       const { accessToken } = await requestLogin({
         email: formData.email.trim(),
         password: formData.password.trim(),
       });
 
-      // 4. 토큰 저장 및 유저 정보 조회
+      // 토큰 저장 및 유저 정보 조회
       setAccessToken(accessToken);
       const userData = await fetchMe();
       saveStoredUser(userData);
 
-      // 5. 페이지 이동 (React Router를 쓴다면 navigate('/post-list') 권장)
-      window.location.href = "./post-list.html";
+      // 페이지 이동
+      navigate("/posts");
     } catch (error) {
-      // 6. 에러 처리 로직 (기존 바닐라 JS 로직 이식)
       console.error(error);
 
-      if (error.status === 404) {
+      if (error.status === "USER_NOT_FOUND") {
         setErrors((prev) => ({
           ...prev,
           password: "*아이디와 비밀번호를 다시 확인해주세요.",
         }));
-      } else if (error.status === 422) {
+      } else if (error.status === "INVALID_INPUT_VALUE") {
         setErrors({
           email: "",
           password: "*아이디와 비밀번호 값이 올바르지 않습니다.",
@@ -123,7 +121,6 @@ const LoginPage = () => {
     <div className="page-login">
       <div className="auth-lg">
         <div className="auth">
-          {/* ... 상단 로고 영역 생략 ... */}
           <div className="auth-info-wrapper">
             <img
               src="/src/assets/images/logo.svg"
@@ -134,9 +131,6 @@ const LoginPage = () => {
             <span className="logo-text">로그인하여 커뮤니티에 참여하세요</span>
           </div>
 
-          {/* form 태그에 onSubmit 이벤트를 연결합니다.
-            버튼 클릭뿐만 아니라 인풋에서 엔터 키를 눌러도 handleSubmit이 실행됩니다.
-          */}
           <form className="auth-form" noValidate onSubmit={handleSubmit}>
             {/* 이메일 입력 필드 */}
             <div className="field">
@@ -152,11 +146,11 @@ const LoginPage = () => {
               </div>
               <input
                 id="email"
-                name="email" // 이 name 속성이 handleChange의 e.target.name이 됩니다.
+                name="email" // 이 name 속성이 handleChange의 e.target.name이 됨
                 type="email"
                 className="field-input"
                 placeholder="이메일을 입력하세요"
-                value={formData.email} // 리액트 상태와 인풋 값을 동기화 (Controlled Component)
+                value={formData.email} // 리액트 상태와 인풋 값을 동기화
                 onChange={handleChange} // 키를 누를 때마다 상태 업데이트
                 onBlur={handleBlur} // 포커스가 벗어날 때 유효성 검사 실행
               />
@@ -179,12 +173,12 @@ const LoginPage = () => {
               </div>
               <input
                 id="password"
-                name="password" // handleChange가 'password' 필드임을 알 수 있게 해줍니다.
+                name="password"
                 type="password"
                 className="field-input"
                 placeholder="비밀번호를 입력하세요"
                 required
-                value={formData.password} // 입력값이 상태(formData.password)에 의해 제어됩니다.
+                value={formData.password}
                 onChange={handleChange}
                 onBlur={handleBlur} // 포커스가 벗어날 때 유효성 검사 실행
               />
@@ -193,7 +187,12 @@ const LoginPage = () => {
               </p>
             </div>
 
-            <button type="submit" className="btn-login btn-form-primary">
+            <button
+              type="submit"
+              className={`btn-login btn-form-primary ${
+                isButtonActive ? "active" : ""
+              }`}
+            >
               <img
                 src="/src/assets/images/login.svg"
                 alt="login icon"
@@ -203,9 +202,9 @@ const LoginPage = () => {
             </button>
           </form>
 
-          <a href="./signup.html" className="link-signup">
+          <Link to="/signup" className="link-signup">
             회원가입
-          </a>
+          </Link>
         </div>
       </div>
     </div>
