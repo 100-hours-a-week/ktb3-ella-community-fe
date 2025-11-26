@@ -2,8 +2,8 @@ import {
   buildAuthAndCsrfHeaders,
   getCsrfToken,
   isAuthRequired,
-} from "../utils/auth.js";
-import { clearStoredUser } from "../utils/user.js";
+} from "../js/utils/auth.js";
+import { clearStoredUser } from "../js/utils/user.js";
 
 const DEFAULT_HEADERS = {
   Accept: "*/*",

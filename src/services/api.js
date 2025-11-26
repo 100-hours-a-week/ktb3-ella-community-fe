@@ -21,7 +21,7 @@ export {
   deleteCurrentUser,
   updateUserPassword,
   updateUserProfile,
-} from "./user-service.js";
+} from "../js/services/user-service.js";
 
 export {
   createComment,
@@ -35,6 +35,6 @@ export {
   unlikePost,
   updateComment,
   updatePost,
-} from "./post-service.js";
+} from "../js/services/post-service.js";
 
-export { requestPresignedUploadUrl } from "./upload-service.js";
+export { requestPresignedUploadUrl } from "../js/services/upload-service.js";
