@@ -211,13 +211,13 @@ label {
   gap: 8px;
 }
 
-.field_label {
+.field-label {
   font-family: var(--font-ui);
   font-size: var(--fs-body);
   font-weight: 400;
 }
 
-.field_input {
+.field-input {
   width: 100%;
   padding: 18px 16px;
   font-size: var(--fs-body);
@@ -228,7 +228,7 @@ label {
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.field_input:focus-visible {
+.field-input:focus-visible {
   outline: none;
   border-color: #818cf8;
   box-shadow: 0 10px 25px rgba(129, 140, 248, 0.2);
@@ -249,8 +249,7 @@ label {
   border: 0 solid #e5e7eb;
   background: #84aafd;
   box-shadow: 0 4px 20px 0 rgba(37, 99, 235, 0.2);
-  transition: transform 0.25s ease, box-shadow 0.25s ease,
-    background 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
 }
 
 .error-text {
