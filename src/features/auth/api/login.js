@@ -1,4 +1,4 @@
-import { saveStoredUser } from "./utils/user.js";
+import { saveStoredUser } from "../../../js/utils/user.js";
 import { fetchMe, requestLogin, setAccessToken } from "./services/api.js";
 import { validateEmail, validatePassword } from "./utils/validation.js";
 
