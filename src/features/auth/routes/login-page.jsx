@@ -1,10 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "@/styles/global.css";
 import "@/styles/header.css";
 import "@/styles/pages/login.css";
 import "@/styles/pages/login.css";
 
 import { validateEmail, validatePassword } from "@/utils/validation";
+
+import { saveStoredUser } from "@/js/utils/user.js";
+import { fetchMe, requestLogin, setAccessToken } from "@/services/api.js";
 
 /**
  * useState를 사용하여 사용자가 입력한 이메일과 비밀번호를 실시간으로 저장
@@ -55,21 +58,61 @@ const LoginPage = () => {
     console.log("Validation error for", name, ":", errorMessage, errors);
   };
 
+  const isButtonActive =
+    !validateEmail(formData.email) && !validatePassword(formData.password);
+
   /**
    * 폼 제출 핸들러
    * 로그인 버튼을 누르거나 엔터를 눌렀을 때 실행되는 함수
    */
-  const handleSubmit = (e) => {
-    // 브라우저의 기본 동작인 페이지 새로고침을 막음
+  const handleSubmit = async (e) => {
+    //` 폼 제출 기본 동작 방지 (페이지 새로고침 방지)
     e.preventDefault();
 
-    // 유효성 검사 로직을 추가
-    if (!formData.email || !formData.password) {
-      alert("이메일과 비밀번호를 모두 입력해주세요.");
+    // 1. 제출 전 마지막 유효성 검사
+    const emailMsg = validateEmail(formData.email);
+    const passwordMsg = validatePassword(formData.password);
+
+    if (emailMsg || passwordMsg) {
+      setErrors({ email: emailMsg, password: passwordMsg });
       return;
     }
 
-    console.log("폼 제출됨:", formData);
+    try {
+      // 3. 로그인 API 요청
+      const { accessToken } = await requestLogin({
+        email: formData.email.trim(),
+        password: formData.password.trim(),
+      });
+
+      // 4. 토큰 저장 및 유저 정보 조회
+      setAccessToken(accessToken);
+      const userData = await fetchMe();
+      saveStoredUser(userData);
+
+      // 5. 페이지 이동 (React Router를 쓴다면 navigate('/post-list') 권장)
+      window.location.href = "./post-list.html";
+    } catch (error) {
+      // 6. 에러 처리 로직 (기존 바닐라 JS 로직 이식)
+      console.error(error);
+
+      if (error.status === 404) {
+        setErrors((prev) => ({
+          ...prev,
+          password: "*아이디와 비밀번호를 다시 확인해주세요.",
+        }));
+      } else if (error.status === 422) {
+        setErrors({
+          email: "",
+          password: "*아이디와 비밀번호 값이 올바르지 않습니다.",
+        });
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          password: error.message || "로그인에 실패했습니다.",
+        }));
+      }
+    }
   };
 
   return (

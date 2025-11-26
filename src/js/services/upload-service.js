@@ -1,4 +1,8 @@
-import { apiRequest, toQueryString, unwrapData } from "./http-client.js";
+import {
+  apiRequest,
+  toQueryString,
+  unwrapData,
+} from "@/services/http-client.js";
 
 const UPLOADS_ENDPOINT = "/api/uploads";
 

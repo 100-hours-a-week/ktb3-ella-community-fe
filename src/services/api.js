@@ -6,7 +6,7 @@ export {
   setAccessToken,
   toQueryString,
   unwrapData,
-} from "./http-client.js";
+} from "@/services/http-client.js";
 
 export {
   requestLogin,

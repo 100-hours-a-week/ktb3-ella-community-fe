@@ -3,7 +3,7 @@ import {
   apiRequest,
   toQueryString,
   unwrapData,
-} from "./http-client.js";
+} from "@/services/http-client.js";
 
 const POSTS_ENDPOINT = "/api/posts";
 const COMMENTS_ENDPOINT = "/api/comments";
@@ -108,29 +108,23 @@ export const unlikePost = async ({ postId }) => {
 };
 
 export const createComment = async ({ postId, content }) => {
-  const result = await apiRequest(
-    `${POSTS_ENDPOINT}/${postId}/comments`,
-    {
-      method: "POST",
-      body: { content },
-      parseErrorMessage: "댓글 처리 응답을 해석할 수 없습니다.",
-      defaultErrorMessage: "댓글 등록에 실패했습니다.",
-    }
-  );
+  const result = await apiRequest(`${POSTS_ENDPOINT}/${postId}/comments`, {
+    method: "POST",
+    body: { content },
+    parseErrorMessage: "댓글 처리 응답을 해석할 수 없습니다.",
+    defaultErrorMessage: "댓글 등록에 실패했습니다.",
+  });
   return unwrapData(result);
 };
 
 export const updateComment = async ({ commentId, content }) => {
   try {
-    const result = await apiRequest(
-      `${COMMENTS_ENDPOINT}/${commentId}`,
-      {
-        method: "PUT",
-        body: { content },
-        parseErrorMessage: "댓글 처리 응답을 해석할 수 없습니다.",
-        defaultErrorMessage: "댓글 수정에 실패했습니다.",
-      }
-    );
+    const result = await apiRequest(`${COMMENTS_ENDPOINT}/${commentId}`, {
+      method: "PUT",
+      body: { content },
+      parseErrorMessage: "댓글 처리 응답을 해석할 수 없습니다.",
+      defaultErrorMessage: "댓글 수정에 실패했습니다.",
+    });
     return unwrapData(result);
   } catch (error) {
     if (error instanceof ApiError && error.status === 403) {
