@@ -33,28 +33,28 @@
 /* 웹폰트 */
 @font-face {
   font-family: "PretendardBoldUI";
-  src: url("/public/fonts/Pretendard-Bold.subset.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Bold.subset.woff2") format("woff2");
   font-display: swap;
 }
 @font-face {
   font-family: "PretendardRegularUI";
-  src: url("/public/fonts/Pretendard-Regular.subset.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Regular.subset.woff2") format("woff2");
   font-display: swap;
 }
 @font-face {
   font-family: "PretendardBoldUI";
-  src: url("/public/fonts/Pretendard-Bold.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Bold.woff2") format("woff2");
   font-display: swap;
 }
 @font-face {
   font-family: "PretendardRegularUI";
-  src: url("/public/fonts/Pretendard-Regular.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Regular.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "Jalnan2";
-  src: url("/public/fonts/Jalnan2TTF.ttf") format("truetype");
+  src: url("@/assets/fonts/Jalnan2TTF.ttf") format("truetype");
 }
 
 html,

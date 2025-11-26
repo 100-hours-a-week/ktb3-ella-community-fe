@@ -1,10 +1,10 @@
 import React from "react";
-import LoginPage from "./features/auth/routes/login-page";
+import AppRoutes from "@/routes";
 
 function App() {
   return (
     <div style={{ height: "100%" }}>
-      <LoginPage />
+      <AppRoutes />
     </div>
   );
 }
