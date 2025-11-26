@@ -6,14 +6,14 @@ export {
   setAccessToken,
   toQueryString,
   unwrapData,
-} from "@/services/http-client.js";
+} from "@/features/auth/api/http-client.js";
 
 export {
   requestLogin,
   requestLogout,
   requestRefresh,
   requestSignup,
-} from "./auth-service.js";
+} from "../services/auth-service.js";
 
 export {
   fetchMe,
@@ -21,7 +21,7 @@ export {
   deleteCurrentUser,
   updateUserPassword,
   updateUserProfile,
-} from "../js/services/user-service.js";
+} from "../../users/services/user-service.js";
 
 export {
   createComment,
@@ -35,6 +35,6 @@ export {
   unlikePost,
   updateComment,
   updatePost,
-} from "../js/services/post-service.js";
+} from "../../posts/services/post-service.js";
 
-export { requestPresignedUploadUrl } from "../js/services/upload-service.js";
+export { requestPresignedUploadUrl } from "../../posts/services/upload-service.js";

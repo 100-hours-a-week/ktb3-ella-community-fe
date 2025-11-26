@@ -4,8 +4,8 @@ import {
   createComment as createCommentApi,
   updateComment as updateCommentApi,
   deleteComment as deleteCommentApi,
-} from "../services/api.js";
-import { getStoredUser } from "../utils/user.js";
+} from "../../features/posts/services/api.js";
+import { getStoredUser } from "../../features/users/store/user.js";
 
 const ensureAuthUser = () => {
   const user = getStoredUser();
@@ -182,7 +182,9 @@ export const initCommentsSection = ({
       listContainer.replaceChildren(empty);
       return;
     }
-    const commentElements = comments.map(comment => createCommentElement(comment));
+    const commentElements = comments.map((comment) =>
+      createCommentElement(comment)
+    );
     listContainer.replaceChildren(...commentElements);
   };
 
@@ -190,7 +192,7 @@ export const initCommentsSection = ({
     if (!paginationEl) return;
 
     if (state.totalPages <= 1) {
-      paginationEl.replaceChildren(); 
+      paginationEl.replaceChildren();
       return;
     }
 
@@ -210,7 +212,7 @@ export const initCommentsSection = ({
       }
       return btn;
     };
-    
+
     const buttons = [];
 
     buttons.push(

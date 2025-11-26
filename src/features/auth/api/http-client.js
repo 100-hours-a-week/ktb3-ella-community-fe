@@ -2,8 +2,8 @@ import {
   buildAuthAndCsrfHeaders,
   getCsrfToken,
   isAuthRequired,
-} from "../js/utils/auth.js";
-import { clearStoredUser } from "../js/utils/user.js";
+} from "../services/auth.js";
+import { clearStoredUser } from "../../users/store/user.js";
 
 const DEFAULT_HEADERS = {
   Accept: "*/*",
@@ -22,8 +22,7 @@ export const setAccessToken = (token) => {
     } else {
       sessionStorage.removeItem(ACCESS_TOKEN_KEY);
     }
-  } catch (_) {
-  }
+  } catch (_) {}
 };
 
 export const getAccessToken = () => _accessToken;
@@ -35,8 +34,7 @@ export const hydrateAccessToken = () => {
     if (stored) {
       _accessToken = stored;
     }
-  } catch (_) {
-  }
+  } catch (_) {}
   return _accessToken;
 };
 

@@ -2,7 +2,7 @@ import {
   apiRequest,
   toQueryString,
   unwrapData,
-} from "@/services/http-client.js";
+} from "@/features/auth/api/http-client.js";
 
 const UPLOADS_ENDPOINT = "/api/uploads";
 

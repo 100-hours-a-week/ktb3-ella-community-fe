@@ -6,8 +6,12 @@ import "@/styles/pages/login.css";
 
 import { validateEmail, validatePassword } from "@/utils/validation";
 
-import { saveStoredUser } from "@/js/utils/user.js";
-import { fetchMe, requestLogin, setAccessToken } from "@/services/api.js";
+import { saveStoredUser } from "@/features/users/store/user.js";
+import {
+  fetchMe,
+  requestLogin,
+  setAccessToken,
+} from "@/features/auth/api/api.js";
 
 /**
  * useState를 사용하여 사용자가 입력한 이메일과 비밀번호를 실시간으로 저장
