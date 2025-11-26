@@ -98,12 +98,12 @@ const LoginPage = () => {
     } catch (error) {
       console.error(error);
 
-      if (error.status === "USER_NOT_FOUND") {
+      if (error.code === "USER_NOT_FOUND") {
         setErrors((prev) => ({
           ...prev,
           password: "*아이디와 비밀번호를 다시 확인해주세요.",
         }));
-      } else if (error.status === "INVALID_INPUT_VALUE") {
+      } else if (error.code === "INVALID_INPUT_VALUE") {
         setErrors({
           email: "",
           password: "*아이디와 비밀번호 값이 올바르지 않습니다.",
