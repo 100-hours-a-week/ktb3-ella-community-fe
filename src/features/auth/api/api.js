@@ -21,6 +21,7 @@ export {
   deleteCurrentUser,
   updateUserPassword,
   updateUserProfile,
+  uploadProfileImage,
 } from "../../users/services/user-service.js";
 
 export {
