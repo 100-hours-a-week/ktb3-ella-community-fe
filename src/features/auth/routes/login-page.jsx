@@ -13,6 +13,9 @@ import {
   requestLogin,
   setAccessToken,
 } from "@/features/auth/api/api.js";
+import { MdEmail, MdLockOutline, MdLogin } from "react-icons/md";
+import Input from "@/components/common/input.jsx";
+import Button from "@/components/common/button.jsx";
 
 /**
  * useState를 사용하여 사용자가 입력한 이메일과 비밀번호를 실시간으로 저장
@@ -123,7 +126,7 @@ const LoginPage = () => {
         <div className="auth">
           <div className="auth-info-wrapper">
             <img
-              src="/src/assets/images/logo.svg"
+              src="@/assets/images/logo.svg"
               alt="KTB3 커뮤니티 로고"
               className="logo-image"
             />
@@ -133,75 +136,38 @@ const LoginPage = () => {
 
           <form className="auth-form" noValidate onSubmit={handleSubmit}>
             {/* 이메일 입력 필드 */}
-            <div className="field">
-              <div className="field-label-wrapper">
-                <img
-                  src="/src/assets/images/email.svg"
-                  alt="email icon"
-                  className="logo-email"
-                />
-                <label htmlFor="email" className="field-label">
-                  이메일
-                </label>
-              </div>
-              <input
-                id="email"
-                name="email" // 이 name 속성이 handleChange의 e.target.name이 됨
-                type="email"
-                className="field-input"
-                placeholder="이메일을 입력하세요"
-                value={formData.email} // 리액트 상태와 인풋 값을 동기화
-                onChange={handleChange} // 키를 누를 때마다 상태 업데이트
-                onBlur={handleBlur} // 포커스가 벗어날 때 유효성 검사 실행
-              />
-              <p className="error-text" id="email-error">
-                {errors.email}
-              </p>
-            </div>
-
+            <Input
+              label="이메일"
+              Icon={MdEmail}
+              name="email"
+              type="email"
+              placeholder="이메일을 입력하세요"
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur} // 포커스가 벗어날 때 유효성 검사 실행
+              error={errors.email}
+            />
             {/* 비밀번호 입력 필드 */}
-            <div className="field">
-              <div className="field-label-wrapper">
-                <img
-                  src="/src/assets/images/password.svg"
-                  alt="password icon"
-                  className="logo-password"
-                />
-                <label htmlFor="password" className="field-label">
-                  비밀번호
-                </label>
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                className="field-input"
-                placeholder="비밀번호를 입력하세요"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                onBlur={handleBlur} // 포커스가 벗어날 때 유효성 검사 실행
-              />
-              <p className="error-text" id="password-error">
-                {errors.password}
-              </p>
-            </div>
-
-            <button
+            <Input
+              label="비밀번호"
+              Icon={MdLockOutline}
+              name="password"
+              type="password"
+              placeholder="비밀번호를 입력하세요"
+              value={formData.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={errors.password}
+            />
+            <Button
               type="submit"
-              className={`btn-login btn-form-primary ${
-                isButtonActive ? "active" : ""
-              }`}
+              className="btn-login"
+              disabled={!isButtonActive}
+              Icon={MdLogin}
             >
-              <img
-                src="/src/assets/images/login.svg"
-                alt="login icon"
-                className="logo-login"
-              />
               로그인
-            </button>
+            </Button>
           </form>
-
           <Link to="/signup" className="link-signup">
             회원가입
           </Link>
