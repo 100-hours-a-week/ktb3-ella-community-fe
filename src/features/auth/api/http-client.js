@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   buildAuthAndCsrfHeaders,
   getCsrfToken,
@@ -5,12 +6,9 @@ import {
 } from "../services/auth.js";
 import { clearStoredUser } from "../../users/store/user.js";
 
-const DEFAULT_HEADERS = {
-  Accept: "*/*",
-};
-const MAX_RETRY_COUNT = 1;
 const ACCESS_TOKEN_KEY = "ktb3-community:accessToken";
 
+// 토큰 상태 관리 
 let _accessToken = null;
 let refreshHandler = null;
 
@@ -42,6 +40,7 @@ export const registerRefreshHandler = (handler) => {
   refreshHandler = handler;
 };
 
+// 커스텀 에러 클래스 
 export class ApiError extends Error {
   constructor(message, { status, code, data } = {}) {
     super(message);
@@ -52,57 +51,82 @@ export class ApiError extends Error {
   }
 }
 
-const buildRequestOptions = ({
-  method = "GET",
-  headers = {},
-  body,
-  credentials = "include",
-} = {}) => {
-  const mergedHeaders = { ...DEFAULT_HEADERS, ...headers };
-  const options = {
-    method,
-    headers: mergedHeaders,
-    credentials,
-  };
+const apiClient = axios.create({
+  baseURL: "", 
+  headers: {
+    Accept: "application/json",
+  },
+  withCredentials: true, 
+});
 
-  if (body !== undefined && body !== null) {
-    const isFormData = body instanceof FormData;
-    const isBlob = typeof Blob !== "undefined" && body instanceof Blob;
-    const isJsonBody = !isFormData && !isBlob && typeof body !== "string";
+apiClient.interceptors.request.use(
+  (config) => {
+    const csrfToken = getCsrfToken();
+    const authHeaders = buildAuthAndCsrfHeaders(
+      config.url,
+      csrfToken,
+      _accessToken
+    );
 
-    if (isJsonBody) {
-      options.body = JSON.stringify(body);
-      if (!mergedHeaders["Content-Type"]) {
-        options.headers["Content-Type"] = "application/json";
+    // 헤더 병합
+    config.headers = {
+      ...config.headers, 
+      ...authHeaders, 
+    };
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    const { response } = error;
+
+    if (
+      response?.status === 401 &&
+      isAuthRequired(originalRequest.url) &&
+      !originalRequest._retry &&
+      refreshHandler
+    ) {
+      originalRequest._retry = true; 
+      console.log("🔒 어세스 토큰 만료, 리프레시 시도...");
+
+      try {
+        const refreshed = await refreshHandler();
+        if (refreshed?.accessToken) {
+          setAccessToken(refreshed.accessToken);
+          originalRequest.headers.Authorization = `Bearer ${refreshed.accessToken}`;
+          return apiClient(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error("리프레시 실패, 로그아웃 처리", refreshError);
+        clearStoredUser();
+        setAccessToken(null);
+        if (!window.location.href.includes("/login")) {
+        }
+        return Promise.reject(refreshError);
       }
-    } else {
-      options.body = body;
     }
-  }
 
-  return options;
-};
-
-const parseJsonBody = async (
-  response,
-  { expectJson, parseErrorMessage } = {}
-) => {
-  if (!expectJson) return null;
-  if (response.status === 204 || response.status === 205) return null;
-
-  const contentType = response.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    return null;
-  }
-
-  try {
-    return await response.json();
-  } catch (error) {
-    throw new ApiError(parseErrorMessage || "서버 응답을 처리할 수 없습니다.", {
-      status: response.status,
+    // (2) 일반 에러 처리 (ApiError 형식으로 변환)
+    const message =
+      response?.data?.message ||
+      error.message ||
+      "요청 처리 중 오류가 발생했습니다.";
+    const apiError = new ApiError(message, {
+      status: response?.status || 500,
+      code: response?.data?.code,
+      data: response?.data,
     });
+
+    return Promise.reject(apiError);
   }
-};
+);
 
 export const unwrapData = (result) => {
   if (result && typeof result === "object" && "data" in result) {
@@ -110,82 +134,28 @@ export const unwrapData = (result) => {
   }
   return result;
 };
-
-export const toQueryString = (params = {}) => {
-  const query = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      query.append(key, value);
-    }
-  });
-  return query.toString();
-};
-
-export const apiRequest = async (endpoint, options = {}, retryCount = 0) => {
+export const apiRequest = async (endpoint, options = {}) => {
   const {
     defaultErrorMessage,
-    expectJson = true,
-    parseErrorMessage,
     method = "GET",
-    ...fetchOptions
+    body, 
+    params,
+    ...customConfig
   } = options;
-  const normalizedMethod = (method || "GET").toUpperCase();
 
-  const csrfToken = getCsrfToken();
-  const authHeaders = buildAuthAndCsrfHeaders(
-    endpoint,
-    csrfToken,
-    _accessToken
-  );
-
-  const mergedHeaders = {
-    ...authHeaders,
-    ...fetchOptions.headers,
-  };
-
-  const currentOptions = {
-    ...fetchOptions,
-    method: normalizedMethod,
-    headers: mergedHeaders,
-  };
-
-  const response = await fetch(endpoint, buildRequestOptions(currentOptions));
-  const data = await parseJsonBody(response, { expectJson, parseErrorMessage });
-
-  if (!response.ok) {
-    const isTokenExpired =
-      response.status === 401 &&
-      isAuthRequired(endpoint) &&
-      retryCount < MAX_RETRY_COUNT;
-
-    if (isTokenExpired && refreshHandler) {
-      console.log("어세스 토큰 만료, 리프레시 시도 중...");
-      try {
-        const refreshed = await refreshHandler();
-        if (refreshed?.accessToken) {
-          setAccessToken(refreshed.accessToken);
-        }
-        return apiRequest(endpoint, options, retryCount + 1);
-      } catch (refreshError) {
-        console.error("리프레시 실패", refreshError);
-        clearStoredUser();
-        if (!window.location.href.includes("login.html")) {
-          window.location.href = "/login.html";
-        }
-        throw refreshError;
-      }
-    }
-
-    const message =
-      data?.message ||
-      defaultErrorMessage ||
-      "요청 처리 중 오류가 발생했습니다.";
-    throw new ApiError(message, {
-      status: response.status,
-      code: data?.code,
-      data,
+  try {
+    const response = await apiClient({
+      url: endpoint,
+      method,
+      data: body, 
+      params: params,
+      ...customConfig,
     });
-  }
 
-  return data;
+    return response.data; 
+  } catch (error) {
+    if (defaultErrorMessage && error instanceof ApiError) {
+    }
+    throw error;
+  }
 };
