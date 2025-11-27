@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import "@/styles/global.css";
 import "@/styles/header.css";
 import "@/styles/pages/login.css";
-import "@/styles/pages/login.css";
 
 import { validateEmail, validatePassword } from "@/utils/validation";
 
