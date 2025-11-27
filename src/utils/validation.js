@@ -5,6 +5,8 @@ const EMAIL_PATTERN =
 const PASSWORD_PATTERN =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,20}$/;
 
+const NICKNAME_PATTERN = /^[a-zA-Z0-9가-힣]{2,10}$/;
+
 const trimValue = (value) => (value ?? "").trim();
 
 export const validateEmail = (value) => {
@@ -26,9 +28,16 @@ export const validatePassword = (value) => {
 export const validateConfirmPassword = (value, original) => {
   const trimmed = trimValue(value);
   if (!trimmed) return "*비밀번호를 한번 더 입력해주세요.";
-  if (trimmed !== trimValue(original))
-    return "*비밀번호가 일치하지 않습니다.";
+  if (trimmed !== trimValue(original)) return "*비밀번호가 일치하지 않습니다.";
   return "";
 };
 
-export { EMAIL_PATTERN, PASSWORD_PATTERN };
+export const validateNickname = (value) => {
+  const trimmed = trimValue(value);
+  if (!trimmed) return "*닉네임을 입력해주세요.";
+  if (!NICKNAME_PATTERN.test(trimmed))
+    return "*닉네임은 2~10자, 공백과 특수문자 없이 입력해야 합니다.";
+  return "";
+};
+
+export { EMAIL_PATTERN, PASSWORD_PATTERN, NICKNAME_PATTERN };
