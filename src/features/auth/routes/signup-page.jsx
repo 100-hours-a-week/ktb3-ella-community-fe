@@ -137,9 +137,13 @@ const SignUpPage = () => {
 
       // 에러 처리 로직
       if (error.code === "INVALID_INPUT_VALUE") {
-        alert("입력값을 다시 확인해주세요.");
+        setErrors((prev) => ({
+          ...prev,
+          password: "입력값을 다시 확인해주세요.",
+        }));
       } else {
-        alert(error.message || "회원가입에 실패했습니다.");
+        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+        console.error(error.message);
       }
     }
   };
