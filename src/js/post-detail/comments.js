@@ -5,7 +5,7 @@ import {
   updateComment as updateCommentApi,
   deleteComment as deleteCommentApi,
 } from "../../features/posts/services/api.js";
-import { getStoredUser } from "../../features/users/store/user.js";
+import { getStoredUser } from "../../features/users/stores/user.js";
 
 const ensureAuthUser = () => {
   const user = getStoredUser();

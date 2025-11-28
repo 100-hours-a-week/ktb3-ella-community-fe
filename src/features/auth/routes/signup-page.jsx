@@ -23,7 +23,7 @@ import {
   setAccessToken,
 } from "@/features/auth/api/api.js";
 
-import { saveStoredUser } from "@/features/users/store/user";
+import { saveStoredUser } from "@/features/users/stores/user";
 import { useImageUpload } from "@/shared/hooks/use-image-upload.js";
 import ProfileImageUploader from "@/components/common/profile-image-uploader.jsx";
 

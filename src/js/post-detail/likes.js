@@ -1,5 +1,5 @@
 import { formatCount } from "../utils/format.js";
-import { getStoredUser } from "../../features/users/store/user.js";
+import { getStoredUser } from "../../features/users/stores/user.js";
 import { likePost, unlikePost } from "../../features/posts/services/api.js";
 
 const ensureAuthUser = () => {

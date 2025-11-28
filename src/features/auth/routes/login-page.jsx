@@ -6,7 +6,7 @@ import "@/styles/pages/login.css";
 
 import { validateEmail, validatePassword } from "@/utils/validation";
 
-import { saveStoredUser } from "@/features/users/store/user.js";
+import { saveStoredUser } from "@/features/users/stores/user.js";
 import {
   fetchMe,
   requestLogin,

@@ -4,11 +4,11 @@ import {
   getCsrfToken,
   isAuthRequired,
 } from "../services/auth.js";
-import { clearStoredUser } from "../../users/store/user.js";
+import { clearStoredUser } from "../../users/stores/user.js";
 
 const ACCESS_TOKEN_KEY = "ktb3-community:accessToken";
 
-// 토큰 상태 관리 
+// 토큰 상태 관리
 let _accessToken = null;
 let refreshHandler = null;
 
@@ -40,7 +40,7 @@ export const registerRefreshHandler = (handler) => {
   refreshHandler = handler;
 };
 
-// 커스텀 에러 클래스 
+// 커스텀 에러 클래스
 export class ApiError extends Error {
   constructor(message, { status, code, data } = {}) {
     super(message);
@@ -52,11 +52,11 @@ export class ApiError extends Error {
 }
 
 const apiClient = axios.create({
-  baseURL: "", 
+  baseURL: "",
   headers: {
     Accept: "application/json",
   },
-  withCredentials: true, 
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use(
@@ -70,8 +70,8 @@ apiClient.interceptors.request.use(
 
     // 헤더 병합
     config.headers = {
-      ...config.headers, 
-      ...authHeaders, 
+      ...config.headers,
+      ...authHeaders,
     };
 
     return config;
@@ -93,7 +93,7 @@ apiClient.interceptors.response.use(
       !originalRequest._retry &&
       refreshHandler
     ) {
-      originalRequest._retry = true; 
+      originalRequest._retry = true;
       console.log("🔒 어세스 토큰 만료, 리프레시 시도...");
 
       try {
@@ -138,7 +138,7 @@ export const apiRequest = async (endpoint, options = {}) => {
   const {
     defaultErrorMessage,
     method = "GET",
-    body, 
+    body,
     params,
     ...customConfig
   } = options;
@@ -147,12 +147,12 @@ export const apiRequest = async (endpoint, options = {}) => {
     const response = await apiClient({
       url: endpoint,
       method,
-      data: body, 
+      data: body,
       params: params,
       ...customConfig,
     });
 
-    return response.data; 
+    return response.data;
   } catch (error) {
     if (defaultErrorMessage && error instanceof ApiError) {
     }
