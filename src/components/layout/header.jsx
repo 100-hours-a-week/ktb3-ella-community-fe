@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPencil } from "react-icons/fa6";
+import { FaUserCircle } from "react-icons/fa";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 import logoImg from "@/assets/images/logo.svg";
 
@@ -38,7 +39,10 @@ const Header = () => {
             </Link>
           </button>
 
-          <div className="profile-dropdown">
+          <div
+            className={`profile-dropdown ${isProfileOpen ? "open" : ""}`}
+            onBlur={() => setIsProfileOpen(false)}
+          >
             <button
               type="button"
               className="profile-dropdown-toggle"
@@ -79,6 +83,7 @@ const Header = () => {
                   type="button"
                   className="profile-dropdown-item profile-dropdown-logout"
                   role="menuitem"
+                  onClick={handleLogout}
                 >
                   로그아웃
                 </button>
