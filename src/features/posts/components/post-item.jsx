@@ -42,10 +42,7 @@ const PostItem = ({ post }) => {
   ];
 
   return (
-    <Link
-      to={`./post-detail.html?postId=${postId}`}
-      className="post-list-content"
-    >
+    <Link to={`/posts/${postId}`} className="post-list-content">
       <div className="post-list-content-container">
         <div className="post-tags">
           {tags.map((tag, index) => (
