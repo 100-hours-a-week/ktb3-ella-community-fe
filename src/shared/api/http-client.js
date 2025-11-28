@@ -53,7 +53,7 @@ apiClient.interceptors.response.use(
     if (
       response?.status === 401 &&
       isAuthRequired(originalRequest.url) &&
-      !originalRequest._retry // 무한 루프 방지
+      !originalRequest._retry
     ) {
       originalRequest._retry = true;
       console.log("어세스 토큰 만료, 리프레시 시도 중...");
@@ -65,30 +65,26 @@ apiClient.interceptors.response.use(
           { withCredentials: true }
         );
 
-        const newAccessToken = data?.accessToken;
+        const newAccessToken = data?.data?.accessToken || data?.accessToken;
 
         if (newAccessToken) {
           // 스토어 업데이트
           const currentUser = useAuthStore.getState().user;
           useAuthStore.getState().login(currentUser, newAccessToken);
 
-          console.log("토큰 갱신 성공!");
+          console.log("토큰 갱신 성공 재요청합니다.");
 
-          // 실패했던 요청의 헤더를 새 토큰으로 교체
+          // 재요청 헤더 교체
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-          // 실패했던 요청 재시도
           return apiClient(originalRequest);
+        } else {
+          console.error(" 리프레시 응답에 accessToken이 없습니다", data);
+          useAuthStore.getState().logout();
         }
       } catch (refreshError) {
-        console.error("리프레시 실패, 로그아웃 처리", refreshError);
-
-        // 스토어 비우기
+        console.error("리프레시 요청 실패", refreshError);
         useAuthStore.getState().logout();
-
-        // 로그인 페이지로 이동
-        window.location.href = "/login";
-
         return Promise.reject(refreshError);
       }
     }
