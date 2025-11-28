@@ -27,7 +27,7 @@ export const getPost = async (postId) => {
   return unwrapData(result);
 };
 
-export const createPost = async ({ title, content, tagNames }) => {
+export const createPost = async ({ title, content, postImageUrl }) => {
   const result = await apiRequest(POSTS_ENDPOINT, {
     method: "POST",
     data: { title, content, postImageUrl },
