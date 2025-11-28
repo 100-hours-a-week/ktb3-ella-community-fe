@@ -7,6 +7,8 @@ import PasswordEditRoute from "./profile/password-edit";
 import SignUpPage from "@/features/auth/routes/signup-page";
 import PostList from "@/features/posts/routes/post-list";
 import PostDetail from "@/features/posts/routes/post-detail";
+import PostCreate from "@/features/posts/routes/post-create";
+import PostUpdate from "@/features/posts/routes/post-update";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +20,8 @@ const AppRoutes = () => {
         <Route element={<Layout />}>
           <Route path="/posts" element={<PostList />} />
           <Route path="/posts/:postId" element={<PostDetail />} />
+          <Route path="/post-create" element={<PostCreate />} />
+          <Route path="/posts/:postId/edit" element={<PostUpdate />} />
         </Route>
         <Route path="/profile/edit" element={<ProfileEditRoute />} />
         <Route path="/profile/password" element={<PasswordEditRoute />} />
