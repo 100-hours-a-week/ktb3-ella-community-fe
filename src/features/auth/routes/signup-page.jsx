@@ -16,10 +16,7 @@ import {
   validateNickname,
 } from "@/shared/utils/validation";
 
-import {
-  fetchMe,
-  checkAvailability,
-} from "@/features/users/services/user-service";
+import { fetchMe, checkAvailability } from "@/features/users/api/user-api";
 import { requestSignup } from "@/features/auth/api/auth-api.js";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 

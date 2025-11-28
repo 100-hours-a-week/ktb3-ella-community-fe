@@ -4,8 +4,8 @@ import { ApiError } from "@/shared/utils/api-error.js";
 const AVAILABILITY_ENDPOINT = "/api/users/availability";
 const USERS_ENDPOINT = "/api/users";
 const PASSWORD_ENDPOINT = "/api/users/me/password";
+const PROFILE_IMAGE_UPLOAD_ENDPOINT = "/api/users/upload-image";
 
-// 1. 내 정보 가져오기 (거의 그대로)
 export const fetchMe = async () => {
   const result = await apiRequest(`${USERS_ENDPOINT}/me`, {
     method: "GET",
@@ -33,7 +33,7 @@ export const checkAvailability = async (params) => {
 export const updateUserProfile = async ({ nickname, profileImageUrl }) => {
   const result = await apiRequest(`${USERS_ENDPOINT}/me`, {
     method: "PATCH",
-    body: { nickname, profileImageUrl }, // apiRequest 래퍼가 body를 data로 변환해줍니다.
+    data: { nickname, profileImageUrl },
     defaultErrorMessage: "회원정보 수정에 실패했습니다.",
   });
   return unwrapData(result);
@@ -42,7 +42,6 @@ export const updateUserProfile = async ({ nickname, profileImageUrl }) => {
 export const deleteCurrentUser = async () => {
   await apiRequest(`${USERS_ENDPOINT}/me`, {
     method: "DELETE",
-    // expectJson: false, // Axios는 응답이 없어도(204) 에러 안 나므로 삭제해도 됨
     defaultErrorMessage: "회원 탈퇴에 실패했습니다.",
   });
 };
@@ -50,7 +49,7 @@ export const deleteCurrentUser = async () => {
 export const updateUserPassword = async ({ newPassword }) => {
   await apiRequest(PASSWORD_ENDPOINT, {
     method: "POST",
-    body: { newPassword },
+    data: { newPassword },
     defaultErrorMessage: "비밀번호 수정에 실패했습니다.",
   });
 };
@@ -59,10 +58,10 @@ export const uploadProfileImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file);
 
-  const result = await apiRequest("/api/users/upload-image", {
+  const result = await apiRequest(PROFILE_IMAGE_UPLOAD_ENDPOINT, {
     method: "POST",
-    body: formData,
-    defaultErrorMessage: "이미지 업로드 실패",
+    data: formData,
+    defaultErrorMessage: "이미지 업로드에 실패했습니다.",
   });
   return unwrapData(result);
 };

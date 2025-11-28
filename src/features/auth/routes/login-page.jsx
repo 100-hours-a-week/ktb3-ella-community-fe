@@ -10,7 +10,7 @@ import { MdEmail, MdLockOutline, MdLogin } from "react-icons/md";
 import Input from "@/components/common/input.jsx";
 import Button from "@/components/common/button.jsx";
 
-import { fetchMe } from "@/features/users/services/user-service";
+import { fetchMe } from "@/features/users/api/user-api";
 import { requestLogin } from "@/features/auth/api/auth-api.js";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 

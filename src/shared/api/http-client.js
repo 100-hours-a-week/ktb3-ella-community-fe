@@ -111,13 +111,13 @@ export const unwrapData = (result) => {
 };
 
 export const apiRequest = async (endpoint, options = {}) => {
-  const { method = "GET", params, body, ...customConfig } = options;
+  const { method = "GET", params, data, ...customConfig } = options;
   try {
     const response = await apiClient({
       url: endpoint,
       method,
       params,
-      data: body,
+      data,
       ...customConfig,
     });
     return response.data;
