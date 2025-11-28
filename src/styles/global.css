@@ -308,7 +308,7 @@ label {
   font-family: var(--font-ui-bold);
 }
 
-.modal-submessage {
+.modal-sub-message {
   font-family: var(--font-ui);
   font-size: var(--fs-modal-body);
 }
