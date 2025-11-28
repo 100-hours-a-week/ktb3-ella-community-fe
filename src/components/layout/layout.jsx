@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Header from "./Header"; 
-import Footer from "./Footer"; 
+import Header from "./header";
+import Footer from "./footer";
 
 const Layout = () => {
   return (
@@ -17,15 +17,15 @@ const Layout = () => {
 };
 
 const layoutStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  minHeight: '100vh', 
+  display: "flex",
+  flexDirection: "column",
+  minHeight: "100vh",
 };
 
 const mainStyle = {
-  flex: 1, 
-  display: 'flex', 
-  flexDirection: 'column',
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
 };
 
 export default Layout;

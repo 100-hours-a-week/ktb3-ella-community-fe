@@ -1,25 +1,33 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaPencil } from "react-icons/fa6";
+import { useAuthStore } from "@/shared/stores/use-auth-store";
+import logoImg from "@/assets/images/logo.svg";
 
+import "@/styles/global.css";
 import "@/styles/header.css";
 
 const Header = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const { user, logout } = useAuthStore();
 
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsProfileOpen(false);
+    navigate("/login");
   };
 
   return (
     <header className="header">
       <div className="header-block">
         <div className="header-front">
-          <img
-            src="/public/images/logo.svg"
-            alt="KTB3 커뮤니티 로고"
-            className="logo-image"
-          />
+          <img src={logoImg} alt="로고 이미지" className="logo-image" />
           <h1 className="title-xl">D'velop</h1>
         </div>
         <div className="header-back">
@@ -38,12 +46,17 @@ const Header = () => {
               aria-expanded={isProfileOpen}
               onClick={toggleProfileMenu}
             >
-              <img
-                src="/public/images/userProfile.png"
-                width="30"
-                height="30"
-                alt="프로필 메뉴"
-              />
+              {user?.profileImageUrl ? (
+                <img
+                  src={user.profileImageUrl}
+                  width="30"
+                  height="30"
+                  alt="프로필"
+                  style={{ borderRadius: "50%", objectFit: "cover" }}
+                />
+              ) : (
+                <FaUserCircle size={30} color="#d1d5db" />
+              )}
             </button>
 
             {isProfileOpen && (
