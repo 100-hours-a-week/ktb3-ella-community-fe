@@ -10,6 +10,8 @@ import {
 
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 
+const REFRESH_ENDPOINT = "/api/auth/refresh";
+
 const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",

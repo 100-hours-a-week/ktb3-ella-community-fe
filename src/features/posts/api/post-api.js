@@ -2,7 +2,7 @@ import { apiRequest, unwrapData } from "@/shared/api/http-client.js";
 
 const POSTS_ENDPOINT = "/api/posts";
 
-export const getPosts = async ({ page, size, sort, keyword }) => {
+export const getPosts = async ({ page, size, sort }) => {
   const params = {
     page,
     size,
