@@ -76,20 +76,12 @@ const Header = () => {
 
             {isProfileOpen && (
               <div className="profile-dropdown-menu" role="menu">
-                <a
-                  href="./user-info-update.html"
-                  className="profile-dropdown-item"
-                  role="menuitem"
-                >
+                <Link to="/profile/edit" className="profile-dropdown-item">
                   회원정보 수정
-                </a>
-                <a
-                  href="./user-password-update.html"
-                  className="profile-dropdown-item"
-                  role="menuitem"
-                >
+                </Link>
+                <Link to="/profile/password" className="profile-dropdown-item">
                   비밀번호 수정
-                </a>
+                </Link>
                 <button
                   type="button"
                   className="profile-dropdown-item profile-dropdown-logout"
