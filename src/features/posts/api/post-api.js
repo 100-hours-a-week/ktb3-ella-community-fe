@@ -2,6 +2,7 @@ import { apiRequest, unwrapData } from "@/shared/api/http-client.js";
 
 const POSTS_ENDPOINT = "/api/posts";
 
+// 게시글 목록 조회
 export const getPosts = async ({ page, size, sort }) => {
   const params = {
     page,
@@ -18,6 +19,7 @@ export const getPosts = async ({ page, size, sort }) => {
   return unwrapData(result);
 };
 
+// 게시글 상세 조회
 export const getPost = async (postId) => {
   const result = await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
     method: "GET",
@@ -27,6 +29,7 @@ export const getPost = async (postId) => {
   return unwrapData(result);
 };
 
+// 게시글 작성
 export const createPost = async ({ title, content, postImageUrl }) => {
   const result = await apiRequest(POSTS_ENDPOINT, {
     method: "POST",
@@ -37,6 +40,7 @@ export const createPost = async ({ title, content, postImageUrl }) => {
   return unwrapData(result);
 };
 
+// 게시글 수정
 export const updatePost = async (postId, { title, content, postImageUrl }) => {
   const result = await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
     method: "PUT",
@@ -47,6 +51,7 @@ export const updatePost = async (postId, { title, content, postImageUrl }) => {
   return unwrapData(result);
 };
 
+// 게시글 삭제
 export const deletePost = async ({ postId }) => {
   await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
     method: "DELETE",

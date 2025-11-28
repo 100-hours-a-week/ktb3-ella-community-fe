@@ -4,11 +4,20 @@ import { useNavigate } from "react-router-dom";
 import PostForm from "@/features/posts/components/post-form.jsx";
 import { createPost } from "@/features/posts/api/post-api";
 import { useImageUpload } from "@/shared/hooks/use-image-upload.js";
+import { useAuthStore } from "@/shared/stores/use-auth-store";
 
 const PostCreate = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   const { previewUrl, handleFileChange, upload } = useImageUpload("");
+
+  useEffect(() => {
+    if (!user) {
+      alert("로그인이 필요한 서비스입니다.");
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   const handleCreateSubmit = async ({ title, content }) => {
     try {

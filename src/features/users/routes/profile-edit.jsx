@@ -5,6 +5,7 @@ import { FaEnvelope, FaUser } from "react-icons/fa6";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 import { useImageUpload } from "@/shared/hooks/use-image-upload.js";
 import { validateNickname } from "@/shared/utils/validation";
+
 import {
   checkAvailability,
   updateUserProfile,
@@ -15,74 +16,58 @@ import Input from "@/components/common/input";
 import Button from "@/components/common/button";
 import Modal from "@/components/common/modal";
 import ProfileImageUploader from "@/components/common/profile-image-uploader";
-import { fetchMe } from "@/features/users/api/user-api";
 
 const ProfileEdit = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user, logout, updateUser } = useAuthStore();
 
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState(user?.nickname || "");
   const [errors, setErrors] = useState({ nickname: "" });
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  // 이미지 업로드 훅 초기화
   const { previewUrl, handleFileChange, upload } = useImageUpload(
     user?.profileImageUrl || ""
   );
 
-  // 초기 데이터 세팅
   useEffect(() => {
-    const ensureUser = async () => {
-      if (!user) {
-        try {
-          await fetchMe();
-        } catch (e) {
-          // 유저 정보를 못 불러오면 로그인 화면으로 보낸다.
-          navigate("/login");
-        }
-      }
-    };
-
-    ensureUser();
-
-    if (user) setNickname(user.nickname || "");
-  }, [user, fetchMe, navigate]);
-
-  // --- 핸들러 ---
+    if (!user) {
+      alert("로그인이 필요한 서비스입니다.");
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   // 닉네임 변경
   const handleNicknameChange = (e) => {
     const value = e.target.value;
     setNickname(value);
-    setErrors((prev) => ({ ...prev, nickname: "" })); // 입력 중엔 에러 초기화
+    setErrors((prev) => ({ ...prev, nickname: "" }));
   };
 
-  // 닉네임 포커스 아웃 시 검증 (유효성 + 중복 체크)
   const handleNicknameBlur = async () => {
     const trimmed = nickname.trim();
 
-    // 1. 기본 유효성 검사
     const basicError = validateNickname(trimmed);
     if (basicError) {
       setErrors((prev) => ({ ...prev, nickname: basicError }));
       return false;
     }
 
-    // 2. 기존 닉네임과 같으면 중복 체크 스킵
     if (trimmed === user.nickname) {
       return true;
     }
 
-    // 3. 중복 체크
     setIsCheckingNickname(true);
     try {
       const { nicknameAvailable } = await checkAvailability({
         nickname: trimmed,
       });
       if (!nicknameAvailable) {
-        setErrors((prev) => ({ ...prev, nickname: "*중복된 닉네임입니다." }));
+        setErrors((prev) => ({
+          ...prev,
+          nickname: "*이미 사용중인 닉네임입니다.",
+        }));
         return false;
       }
       return true;
@@ -95,6 +80,7 @@ const ProfileEdit = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (!user) return null;
     e.preventDefault();
 
     const isValid = await handleNicknameBlur();
@@ -103,19 +89,21 @@ const ProfileEdit = () => {
     try {
       const uploadedUrl = await upload();
 
-      await updateUserProfile({
+      const newUserData = {
         nickname: nickname.trim(),
-        profileImageUrl: uploadedUrl,
-      });
+        profileImageUrl: uploadedUrl || user.profileImageUrl,
+      };
 
-      // 스토어 정보 갱신
-      await fetchMe();
+      await updateUserProfile(newUserData);
+
+      updateUser({ ...user, ...newUserData });
 
       // 토스트 메시지
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
     } catch (error) {
-      alert(error.message || "회원정보 수정 실패");
+      console.error(error);
+      alert("회원정보 수정에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -127,7 +115,7 @@ const ProfileEdit = () => {
       alert("회원 탈퇴가 완료되었습니다.");
       navigate("/login");
     } catch (error) {
-      alert("회원 탈퇴 실패: " + error.message);
+      alert("회원 탈퇴 실패. 다시 시도해주세요.");
     } finally {
       setIsDeleteModalOpen(false);
     }
@@ -172,7 +160,7 @@ const ProfileEdit = () => {
             </p>
           </div>
 
-          {/* 닉네임 입력 */}
+          {/* 닉네임 */}
           <Input
             label="닉네임*"
             name="nickname"

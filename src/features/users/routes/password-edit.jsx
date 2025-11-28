@@ -14,40 +14,38 @@ import Button from "@/components/common/button";
 const PasswordEdit = () => {
   const { user } = useAuthStore();
 
-  // --- 상태 관리 ---
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ password: "", confirmPassword: "" });
   const [showToast, setShowToast] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // --- 핸들러 ---
+  useEffect(() => {
+    if (!user) {
+      alert("로그인이 필요한 서비스입니다.");
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
-  // 비밀번호 검증
   const handlePasswordBlur = () => {
     const msg = validatePassword(password);
     setErrors((prev) => ({ ...prev, password: msg }));
   };
 
-  // 비밀번호 확인 검증
   const handleConfirmBlur = () => {
     const msg = validateConfirmPassword(confirmPassword, password);
     setErrors((prev) => ({ ...prev, confirmPassword: msg }));
   };
 
-  // 입력 시 에러 초기화 및 상태 업데이트
   const handleChange = (setter, field) => (e) => {
     setter(e.target.value);
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
-
-  // 폼 제출
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 최종 검증
     const pwMsg = validatePassword(password);
     const cfMsg = validateConfirmPassword(confirmPassword, password);
 
@@ -59,11 +57,9 @@ const PasswordEdit = () => {
     try {
       await updateUserPassword({ newPassword: password });
 
-      // 성공 처리
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
 
-      // 입력창 초기화
       setPassword("");
       setConfirmPassword("");
     } catch (error) {
@@ -120,7 +116,7 @@ const PasswordEdit = () => {
         </form>
       </div>
 
-      {/* 토스트 메시지 */}
+      {/* 토스트 */}
       <div className={`toast ${showToast ? "show" : ""}`}>수정 완료</div>
     </div>
   );

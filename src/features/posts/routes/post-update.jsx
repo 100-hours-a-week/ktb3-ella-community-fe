@@ -2,11 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PostForm from "@/features/posts/components/post-form";
 import { getPost, updatePost } from "@/features/posts/api/post-api";
-
+import { useAuthStore } from "@/shared/stores/use-auth-store";
 import { useImageUpload } from "@/shared/hooks/use-image-upload.js";
 
 const PostUpdateContainer = ({ postId, initialData }) => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (!user) {
+      alert("로그인이 필요한 서비스입니다.");
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   // 훅 초기화
   const { previewUrl, handleFileChange, upload } = useImageUpload(
