@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { FaFilter, FaFire } from "react-icons/fa6";
 
 import PostItem from "@/features/posts/components/post-item";
@@ -24,6 +24,7 @@ const POPULAR_TAGS = [
 const ICON_COLOR = "#2563EB";
 
 const PostList = () => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);

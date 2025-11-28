@@ -6,6 +6,7 @@ import "@/styles/pages/login.css";
 import { validateEmail, validatePassword } from "@/shared/utils/validation";
 
 import { MdEmail, MdLockOutline, MdLogin } from "react-icons/md";
+import logoImg from "@/assets/images/logo.svg";
 import Input from "@/components/common/input.jsx";
 import Button from "@/components/common/button.jsx";
 
@@ -125,11 +126,7 @@ const LoginPage = () => {
       <div className="auth-lg">
         <div className="auth">
           <div className="auth-info-wrapper">
-            <img
-              src="@/assets/images/logo.svg"
-              alt="KTB3 커뮤니티 로고"
-              className="logo-image"
-            />
+            <img src={logoImg} alt="로고 이미지" className="logo-image" />
             <h1 className="auth-title">D'velop</h1>
             <span className="logo-text">로그인하여 커뮤니티에 참여하세요</span>
           </div>

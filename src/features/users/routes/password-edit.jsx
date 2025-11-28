@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaLock } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 import {
@@ -12,6 +13,7 @@ import Input from "@/components/common/input";
 import Button from "@/components/common/button";
 
 const PasswordEdit = () => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const [password, setPassword] = useState("");
