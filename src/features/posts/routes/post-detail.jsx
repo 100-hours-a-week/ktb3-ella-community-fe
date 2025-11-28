@@ -32,6 +32,7 @@ const PostDetail = () => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   // 게시글 데이터 로드
   useEffect(() => {
@@ -70,13 +71,14 @@ const PostDetail = () => {
   };
 
   // 삭제 핸들러
-  const handleDeleteBtnClick = () => {
+  const handleDeleteBtnClick = (postId) => {
+    setPendingDeleteId(postId);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
     try {
-      await deletePost(postId);
+      await deletePost({ postId: pendingDeleteId });
       navigate("/posts");
     } catch (error) {
       if (error.status === 403) {
@@ -127,7 +129,7 @@ const PostDetail = () => {
                 <button
                   type="button"
                   className="btn-delete"
-                  onClick={handleDeleteBtnClick}
+                  onClick={() => handleDeleteBtnClick(post.postId)}
                 >
                   <FaTrash size={14} style={{ marginRight: 4 }} />
                   삭제

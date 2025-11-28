@@ -47,7 +47,7 @@ export const updatePost = async (postId, { title, content, tagNames }) => {
   return unwrapData(result);
 };
 
-export const deletePost = async (postId) => {
+export const deletePost = async ({ postId }) => {
   await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
     method: "DELETE",
     defaultErrorMessage: "게시글 삭제에 실패했습니다.",
