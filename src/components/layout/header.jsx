@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { FaPencil } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
@@ -13,6 +13,10 @@ const Header = () => {
   const navigate = useNavigate();
 
   const { user, logout } = useAuthStore();
+
+  const location = useLocation();
+
+  const isPostDetail = matchPath("/posts/:postId", location.pathname);
 
   const toggleProfileMenu = () => {
     setIsProfileOpen(!isProfileOpen);
@@ -30,6 +34,13 @@ const Header = () => {
         <div className="header-front">
           <img src={logoImg} alt="로고 이미지" className="logo-image" />
           <h1 className="title-xl">D'velop</h1>
+          {isPostDetail && (
+            <div className="header-link">
+              <Link to="/posts" className="link-post-list">
+                게시글 목록
+              </Link>
+            </div>
+          )}
         </div>
         <div className="header-back">
           <button type="button" className="post-create-button">
