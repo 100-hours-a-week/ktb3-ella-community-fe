@@ -3,6 +3,7 @@ import axios from "axios";
 import { ApiError } from "@/shared/utils/api-error";
 
 import {
+  isAuthRequired,
   buildAuthAndCsrfHeaders,
   getCsrfToken,
 } from "@/features/auth/utils/auth-utils.js";
