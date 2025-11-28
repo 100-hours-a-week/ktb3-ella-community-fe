@@ -30,17 +30,17 @@ export const getPost = async (postId) => {
 export const createPost = async ({ title, content, tagNames }) => {
   const result = await apiRequest(POSTS_ENDPOINT, {
     method: "POST",
-    data: { title, content, tagNames },
+    data: { title, content, postImageUrl },
     defaultErrorMessage: "게시글 작성에 실패했습니다.",
   });
 
   return unwrapData(result);
 };
 
-export const updatePost = async (postId, { title, content, tagNames }) => {
+export const updatePost = async (postId, { title, content, postImageUrl }) => {
   const result = await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
     method: "PUT",
-    data: { title, content, tagNames },
+    data: { title, content, postImageUrl },
     defaultErrorMessage: "게시글 수정에 실패했습니다.",
   });
 
