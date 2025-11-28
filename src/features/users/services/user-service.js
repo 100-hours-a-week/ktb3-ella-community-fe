@@ -1,8 +1,5 @@
-import {
-  apiRequest,
-  unwrapData,
-  ApiError,
-} from "@/features/auth/api/http-client.js";
+import { apiRequest, unwrapData } from "@/shared/api/http-client.js";
+import { ApiError } from "@/shared/utils/api-error.js";
 
 const AVAILABILITY_ENDPOINT = "/api/users/availability";
 const USERS_ENDPOINT = "/api/users";

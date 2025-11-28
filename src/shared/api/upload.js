@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiRequest, unwrapData } from "@/features/auth/api/http-client";
+import { apiRequest, unwrapData } from "@/shared/api/http-client";
 
 export const requestPresignedUpload = async ({ file }) => {
   const result = await apiRequest("/api/uploads/presigned-url", {
