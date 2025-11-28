@@ -22,9 +22,9 @@ const AppRoutes = () => {
           <Route path="/posts/:postId" element={<PostDetail />} />
           <Route path="/post-create" element={<PostCreate />} />
           <Route path="/posts/:postId/edit" element={<PostUpdate />} />
+          <Route path="/profile/edit" element={<ProfileEdit />} />
+          <Route path="/profile/password" element={<PasswordEdit />} />
         </Route>
-        <Route path="/profile/edit" element={<ProfileEdit />} />
-        <Route path="/profile/password" element={<PasswordEdit />} />
       </Routes>
     </BrowserRouter>
   );

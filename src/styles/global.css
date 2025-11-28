@@ -22,6 +22,8 @@
   /* 컴포넌트 토큰 */
   --auth-card-width: 448px;
   --auth-radius: 4px;
+  --layout-header-height: 100px;
+  --layout-footer-height: 60px;
 
   /* 기본 폰트 크기 시스템 */
   --fs-title-xl: 26px; /* 페이지 주요 제목 */
@@ -129,6 +131,9 @@ label {
 }
 
 .auth-lg {
+  min-height: calc(
+    100vh - var(--layout-header-height) - var(--layout-footer-height)
+  );
   height: 100%;
   width: 100%;
   justify-content: center;

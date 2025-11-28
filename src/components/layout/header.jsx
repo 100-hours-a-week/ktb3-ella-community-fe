@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { FaPencil } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
+import { requestLogout } from "@/features/auth/api/auth-api.js";
 import logoImg from "@/assets/images/logo.svg";
 
 import "@/styles/global.css";
@@ -22,10 +23,16 @@ const Header = () => {
     setIsProfileOpen(!isProfileOpen);
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsProfileOpen(false);
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await requestLogout();
+    } catch (error) {
+      console.error("로그아웃 요청 실패:", error);
+    } finally {
+      logout();
+      setIsProfileOpen(false);
+      navigate("/login");
+    }
   };
 
   return (
@@ -50,10 +57,7 @@ const Header = () => {
             </Link>
           </button>
 
-          <div
-            className={`profile-dropdown ${isProfileOpen ? "open" : ""}`}
-            onBlur={() => setIsProfileOpen(false)}
-          >
+          <div className={`profile-dropdown ${isProfileOpen ? "open" : ""}`}>
             <button
               type="button"
               className="profile-dropdown-toggle"
@@ -75,22 +79,49 @@ const Header = () => {
             </button>
 
             {isProfileOpen && (
-              <div className="profile-dropdown-menu" role="menu">
-                <Link to="/profile/edit" className="profile-dropdown-item">
-                  회원정보 수정
-                </Link>
-                <Link to="/profile/password" className="profile-dropdown-item">
-                  비밀번호 수정
-                </Link>
-                <button
-                  type="button"
-                  className="profile-dropdown-item profile-dropdown-logout"
-                  role="menuitem"
-                  onClick={handleLogout}
+              <>
+                {/* 배경 클릭 시 닫기 */}
+                <div
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    zIndex: 10,
+                    cursor: "default",
+                  }}
+                  onClick={() => setIsProfileOpen(false)}
+                />
+                <div
+                  className="profile-dropdown-menu"
+                  role="menu"
+                  style={{ zIndex: 11, position: "absolute" }}
                 >
-                  로그아웃
-                </button>
-              </div>
+                  <Link
+                    to="/profile/edit"
+                    className="profile-dropdown-item"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    회원정보 수정
+                  </Link>
+                  <Link
+                    to="/profile/password"
+                    className="profile-dropdown-item"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    비밀번호 수정
+                  </Link>
+                  <button
+                    type="button"
+                    className="profile-dropdown-item profile-dropdown-logout"
+                    role="menuitem"
+                    onClick={handleLogout}
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
