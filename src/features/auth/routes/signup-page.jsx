@@ -14,21 +14,22 @@ import {
   validateEmail,
   validatePassword,
   validateNickname,
-} from "@/utils/validation";
+} from "@/shared/utils/validation";
 
 import {
-  requestSignup,
-  checkAvailability,
   fetchMe,
-  setAccessToken,
-} from "@/features/auth/api/api.js";
+  checkAvailability,
+} from "@/features/users/services/user-service";
+import { requestSignup } from "@/features/auth/api/auth-api.js";
+import { useAuthStore } from "@/shared/stores/use-auth-store";
 
-import { saveStoredUser } from "@/features/users/stores/user";
 import { useImageUpload } from "@/shared/hooks/use-image-upload.js";
 import ProfileImageUploader from "@/components/common/profile-image-uploader.jsx";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+
   const { previewUrl, handleFileChange, upload } = useImageUpload();
 
   const [formData, setFormData] = useState({
@@ -125,10 +126,11 @@ const SignUpPage = () => {
         profileImageUrl: uploadedProfileUrl,
       });
 
-      // 로그인 처리
-      setAccessToken(accessToken);
+      useAuthStore.getState().login(null, accessToken);
+
       const userData = await fetchMe();
-      saveStoredUser(userData);
+
+      login(userData, accessToken);
 
       alert("회원가입이 완료되었습니다!");
       navigate("/posts");

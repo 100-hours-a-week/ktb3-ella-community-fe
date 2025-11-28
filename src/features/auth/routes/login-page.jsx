@@ -4,17 +4,15 @@ import "@/styles/global.css";
 import "@/styles/header.css";
 import "@/styles/pages/login.css";
 
-import { validateEmail, validatePassword } from "@/utils/validation";
+import { validateEmail, validatePassword } from "@/shared/utils/validation";
 
-import { saveStoredUser } from "@/features/users/stores/user.js";
-import {
-  fetchMe,
-  requestLogin,
-  setAccessToken,
-} from "@/features/auth/api/api.js";
 import { MdEmail, MdLockOutline, MdLogin } from "react-icons/md";
 import Input from "@/components/common/input.jsx";
 import Button from "@/components/common/button.jsx";
+
+import { fetchMe } from "@/features/users/services/user-service";
+import { requestLogin } from "@/features/auth/api/auth-api.js";
+import { useAuthStore } from "@/shared/stores/use-auth-store";
 
 /**
  * useState를 사용하여 사용자가 입력한 이메일과 비밀번호를 실시간으로 저장
@@ -24,6 +22,8 @@ import Button from "@/components/common/button.jsx";
  */
 const LoginPage = () => {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+
   const [formData, setFormData] = useState({
     email: "", // 초기값: 빈 문자열
     password: "",
@@ -90,10 +90,11 @@ const LoginPage = () => {
         password: formData.password.trim(),
       });
 
-      // 토큰 저장 및 유저 정보 조회
-      setAccessToken(accessToken);
+      useAuthStore.getState().login(null, accessToken);
+
       const userData = await fetchMe();
-      saveStoredUser(userData);
+
+      login(userData, accessToken);
 
       // 페이지 이동
       navigate("/posts");
