@@ -1,100 +1,113 @@
 import React, { useState } from "react";
-import { formatDateTime } from "@/shared/utils/format";
 import {
   getComments,
   createComment,
   updateComment,
   deleteComment,
 } from "@/features/posts/api/comment-api.js";
-import { FaPen, FaTrash, FaCommentDots } from "react-icons/fa6";
 import Button from "@/components/common/button";
 import Modal from "@/components/common/modal";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
+import CommentItem from "./comment-item";
+import { FaCommentDots } from "react-icons/fa6";
 
-const CommentSection = ({
-  postId,
-  initialComments = [],
-  initialPage = 1,
-  initialTotalPages = 1,
-}) => {
-  const [comments, setComments] = useState(initialComments);
-  const [page, setPage] = useState(initialPage);
-  const [totalPages, setTotalPages] = useState(initialTotalPages);
+const CommentSection = ({ postId }) => {
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
   const [commentInput, setCommentInput] = useState("");
-  const [editingId, setEditingId] = useState(null);
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  // 댓글 불러오기
-  const loadComments = async (pageNum) => {
-    try {
-      const data = await getComments({ postId, page: pageNum });
-      setComments(data.content || []);
-      setPage(data.page);
-      setTotalPages(data.totalPages ?? 1);
-    } catch (error) {
-      console.error("댓글 로딩 실패", error);
-    }
-  };
+  // 댓글 목록 조회
+  const { data, isLoading } = useQuery({
+    queryKey: ["comments", postId, page],
+    queryFn: () => getComments({ postId, page }),
+    placeholderData: keepPreviousData,
+  });
 
+  const comments = data?.content || [];
+  const totalPages = data?.totalPages || 1;
+
+  // 댓글 등록
+  const createMutation = useMutation({
+    mutationFn: (content) => createComment({ postId, content }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["comments", postId]);
+      setCommentInput(""); // 입력창 초기화
+      setPage(1); // 첫 페이지로 이동해서 내 댓글 확인
+    },
+    onError: () => alert("댓글 등록에 실패했습니다."),
+  });
+
+  // 댓글 수정
+  const updateMutation = useMutation({
+    mutationFn: ({ commentId, content }) =>
+      updateComment({ commentId, content }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["comments", postId]);
+    },
+    onError: (error) => {
+      if (error.status === 403) alert("수정 권한이 없습니다.");
+      else alert("댓글 수정 실패");
+    },
+  });
+
+  // 댓글 삭제
+  const deleteMutation = useMutation({
+    mutationFn: (commentId) => deleteComment({ commentId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["comments", postId]);
+      setIsDeleteModalOpen(false);
+    },
+    onError: (error) => {
+      if (error.status === 403) alert("삭제 권한이 없습니다.");
+      else alert("댓글 삭제 실패");
+    },
+  });
+
+  // 핸들러 함수
   const handlePageChange = (targetPage) => {
-    if (targetPage === page) return;
-    loadComments(targetPage);
+    if (targetPage !== page) setPage(targetPage);
   };
 
-  // 댓글 등록/수정
-  const handleSubmit = async (e) => {
+  // 등록 핸들러
+  const handleCreateSubmit = (e) => {
     e.preventDefault();
     if (!commentInput.trim()) return;
-
-    try {
-      if (editingId) {
-        await updateComment({ commentId: editingId, content: commentInput });
-        setEditingId(null);
-      } else {
-        await createComment({ postId, content: commentInput });
-      }
-      setCommentInput("");
-      loadComments(1);
-    } catch (error) {
-      if (error.status === 403) {
-        alert("해당 댓글에 대한 수정 권한이 없습니다.");
-      } else {
-        alert("댓글 저장을 실패했습니다. 다시 시도해주세요.");
-      }
-    }
+    createMutation.mutate(commentInput);
   };
 
-  // 삭제 핸들러
-  const handleDeleteBtnClick = (commentId) => {
+  // 수정 핸들러
+  const handleUpdateComment = (commentId, content) => {
+    updateMutation.mutate({ commentId, content });
+  };
+
+  // 삭제 버튼 클릭 핸들러
+  const handleDeleteClick = (commentId) => {
     setPendingDeleteId(commentId);
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteComment({ commentId: pendingDeleteId });
-      loadComments(1);
-    } catch (error) {
-      if (error.status === 403) {
-        alert("해당 댓글에 대한 삭제 권한이 없습니다.");
-      } else {
-        alert("삭제에 실패했습니다. 다시 시도해주세요.");
-      }
-    } finally {
-      setIsDeleteModalOpen(false);
+  // 삭제 모달 확인 핸들러
+  const handleConfirmDelete = () => {
+    if (pendingDeleteId) {
+      deleteMutation.mutate(pendingDeleteId);
     }
-  };
-
-  // 수정 모드 진입
-  const startEdit = (comment) => {
-    setEditingId(comment.commentId);
-    setCommentInput(comment.content);
   };
 
   return (
     <div className="post-comments-section">
       {/* 댓글 입력 폼 */}
-      <form className="post-comment-input-container" onSubmit={handleSubmit}>
+      <form
+        className="post-comment-input-container"
+        onSubmit={handleCreateSubmit}
+      >
         <div className="post-comment-input-label">
           <FaCommentDots size={24} color="#2563EB" />
           <label htmlFor="post-comment-input" className="field_label">
@@ -114,88 +127,50 @@ const CommentSection = ({
           <Button
             type="submit"
             className="btn-comment-submit"
-            disabled={!commentInput.trim()}
+            disabled={!commentInput.trim() || createMutation.isPending}
           >
-            {editingId ? "댓글 수정" : "댓글 등록"}
+            {createMutation.isPending ? "등록 중..." : "댓글 등록"}
           </Button>
         </div>
       </form>
 
-      {/* 댓글 목록 */}
+      {/* 댓글 목록 리스트 */}
       <div className="post-comments-list-container">
-        {comments.length === 0 ? (
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            댓글을 불러오는 중입니다...
+          </div>
+        ) : comments.length === 0 ? (
           <p style={{ textAlign: "center", padding: "20px", color: "#888" }}>
             첫 댓글을 남겨보세요!
           </p>
         ) : (
           comments.map((comment) => (
-            <div key={comment.commentId} className="post-comment-list">
-              <div className="post-comment-list-info">
-                <div className="post-comment-info-container">
-                  <div className="profile-img">
-                    {comment.author?.profileImageUrl ? (
-                      <img
-                        src={comment.author.profileImageUrl}
-                        width="62"
-                        height="62"
-                        alt="작성자"
-                      />
-                    ) : (
-                      <FaUserCircle size={30} color="#d1d5db" />
-                    )}
-                  </div>
-                  <div className="post-comment-content">
-                    <div className="post-comment-detail-top">
-                      <p className="post-author-name">
-                        {comment.author?.nickname || "익명"}
-                      </p>
-                      <p className="post-created-at">
-                        {formatDateTime(comment.createdAt)}
-                      </p>
-
-                      <div className="post-comment-actions">
-                        <button
-                          type="button"
-                          className="btn-comment-edit"
-                          onClick={() => startEdit(comment)}
-                        >
-                          <FaPen size={12} color="#9CA3AF" /> <span>수정</span>
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-comment-delete"
-                          onClick={() =>
-                            handleDeleteBtnClick(comment.commentId)
-                          }
-                        >
-                          <FaTrash size={12} color="#9CA3AF" />{" "}
-                          <span>삭제</span>
-                        </button>
-                      </div>
-                    </div>
-                    <div className="post-comment-text-container">
-                      <p className="post-comment-text">{comment.content}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <CommentItem
+              key={comment.commentId}
+              comment={comment}
+              onUpdate={handleUpdateComment}
+              onDelete={handleDeleteClick}
+            />
           ))
         )}
       </div>
 
-      {/* 페이징 */}
+      {/* 페이지네이션 */}
       <div className="comments-pagination">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
           <button
             key={p}
             className={`comments-page-btn ${p === page ? "active" : ""}`}
             onClick={() => handlePageChange(p)}
+            disabled={isLoading}
           >
             {p}
           </button>
         ))}
       </div>
+
+      {/* 삭제 모달 */}
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}

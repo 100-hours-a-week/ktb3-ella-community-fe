@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaLock } from "react-icons/fa6";
+import { useMutation } from "@tanstack/react-query";
 import {
   validatePassword,
   validateConfirmPassword,
@@ -14,7 +15,24 @@ const PasswordEdit = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ password: "", confirmPassword: "" });
   const [showToast, setShowToast] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const passwordMutation = useMutation({
+    mutationFn: (newPassword) => updateUserPassword({ newPassword }),
+
+    onSuccess: () => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+
+      setPassword("");
+      setConfirmPassword("");
+      setErrors({ password: "", confirmPassword: "" });
+    },
+
+    onError: (error) => {
+      console.error(error);
+      alert("비밀번호 수정 실패했습니다. 다시 시도해주세요.");
+    },
+  });
 
   const handlePasswordBlur = () => {
     const msg = validatePassword(password);
@@ -42,24 +60,13 @@ const PasswordEdit = () => {
 
     if (pwMsg || cfMsg) return;
 
-    setIsSubmitting(true);
-    try {
-      await updateUserPassword({ newPassword: password });
-
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
-
-      setPassword("");
-      setConfirmPassword("");
-    } catch (error) {
-      alert(error.message || "비밀번호 수정 실패");
-    } finally {
-      setIsSubmitting(false);
-    }
+    passwordMutation.mutate(password);
   };
 
   const isValid =
     password && confirmPassword && !errors.password && !errors.confirmPassword;
+
+  const isSubmitting = passwordMutation.isPending;
 
   return (
     <div className="auth-lg">

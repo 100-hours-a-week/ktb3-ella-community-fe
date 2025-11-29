@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { FaFilter, FaFire } from "react-icons/fa6";
 
 import PostItem from "@/features/posts/components/post-item";
@@ -22,99 +23,75 @@ const POPULAR_TAGS = [
 const ICON_COLOR = "#2563EB";
 
 const PostList = () => {
-  const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-
   // 필터 및 검색 상태
   const [sortOption, setSortOption] = useState("NEW");
   const [keyword, setKeyword] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const isLoadingRef = useRef(false); // 함수 재생성 방지 및 중복 호출 차단
-  const observerTarget = useRef(null); // 무한 스크롤 감지 타겟
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage, // 다음 페이지 로딩 중인지 여부
+    status,
+  } = useInfiniteQuery({
+    // queryKey에 검색조건을 포함시키면, 조건이 바뀔 때 알아서 리셋하고 다시 불러옴
+    queryKey: ["posts", sortOption, searchQuery],
 
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-
-  const loadPosts = useCallback(
-    async (pageNum) => {
-      // 로딩 중이거나 다음 페이지가 없으면 중단
-      if (isLoadingRef.current || !hasNextPage) return;
-
-      isLoadingRef.current = true;
-      setIsLoading(true);
-
-      try {
-        const data = await getPosts({
-          page: pageNum,
-          size: 10,
-          sort: sortOption,
-        });
-
-        const newPosts = data?.content || [];
-        const totalPages = data?.totalPages ?? 1;
-
-        setPosts((prev) => (pageNum === 1 ? newPosts : [...prev, ...newPosts]));
-        setHasNextPage(pageNum < totalPages);
-
-        if (pageNum < totalPages) {
-          setPage(pageNum + 1);
-        }
-      } catch (error) {
-        console.error("게시글 로딩 실패:", error);
-        // 에러 발생 시 다음 페이지 로딩 중단
-        setHasNextPage(false);
-      } finally {
-        isLoadingRef.current = false;
-        setIsLoading(false);
-        setIsInitialLoading(false);
-      }
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await getPosts({
+        page: pageParam,
+        size: 10,
+        sort: sortOption,
+      });
+      return response;
     },
-    [sortOption, hasNextPage, searchQuery]
-  );
+    getNextPageParam: (lastPage, allPages) => {
+      const currentPage = lastPage.page ?? allPages.length;
+      const totalPages = lastPage.totalPages ?? 1;
 
-  // 필터 바뀌면 리스트 초기화 후 첫 페이지 로드
+      // 현재 페이지가 전체 페이지보다 작으면 다음 페이지 번호 반환, 아니면 종료
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+
+    staleTime: 1000 * 60,
+  });
+
+  const observerTarget = useRef(null);
+
   useEffect(() => {
-    setPosts([]);
-    setPage(1);
-    setHasNextPage(true);
-    isLoadingRef.current = false;
-    loadPosts(1);
-  }, [sortOption, searchQuery]);
-
-  // Intersection Observer
-  useEffect(() => {
-    if (!observerTarget.current || !hasNextPage) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoadingRef.current) {
-          loadPosts(page);
+        // 타겟이 보이고 && 다음 페이지가 있고 && 현재 로딩중이 아닐 때
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
       },
       { threshold: 1.0 }
     );
 
-    observer.observe(observerTarget.current);
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
 
     return () => observer.disconnect();
-  }, [hasNextPage, page, loadPosts]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleSortChange = (e) => {
-    setSortOption(e.target.value);
-  };
+  // 이벤트 핸들러
+  const handleSortChange = (e) => setSortOption(e.target.value);
 
   const handleSearchKeyDown = (e) => {
-    if (e.key === "Enter") {
-      setSearchQuery(keyword);
-    }
+    if (e.key === "Enter") setSearchQuery(keyword);
   };
 
   const handleTagClick = (tag) => {
     setKeyword(tag);
     setSearchQuery(tag);
   };
+
+  const allPosts = data?.pages.flatMap((page) => page.content) || [];
+
+  const isLoading = status === "pending";
 
   return (
     <div
@@ -185,32 +162,38 @@ const PostList = () => {
               onKeyDown={handleSearchKeyDown}
             />
           </div>
-
           <div className="post-list-content-wrapper">
-            {posts.length > 0
-              ? posts.map((post) => <PostItem key={post.postId} post={post} />)
-              : !isInitialLoading &&
-                !isLoading && (
-                  <p
-                    className="no-posts-message"
-                    style={{
-                      textAlign: "center",
-                      padding: "20px",
-                      color: "#6b7280",
-                    }}
-                  >
-                    등록된 게시글이 없습니다.
-                  </p>
-                )}
+            {isLoading ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>
+                로딩 중...
+              </div>
+            ) : allPosts.length > 0 ? (
+              allPosts.map((post) => <PostItem key={post.postId} post={post} />)
+            ) : (
+              <p
+                className="no-posts-message"
+                style={{
+                  textAlign: "center",
+                  padding: "20px",
+                  color: "#6b7280",
+                }}
+              >
+                등록된 게시글이 없습니다.
+              </p>
+            )}
           </div>
-
-          {hasNextPage && (
+          {!isLoading && hasNextPage && (
             <div
               ref={observerTarget}
               className="post-list-sentinel"
-              style={{ height: "20px", textAlign: "center", clear: "both" }}
+              style={{
+                height: "40px",
+                textAlign: "center",
+                clear: "both",
+                padding: "10px",
+              }}
             >
-              {isLoading && <p>로딩 중...</p>}
+              {isFetchingNextPage && <p>데이터를 더 불러오는 중...</p>}
             </div>
           )}
         </section>

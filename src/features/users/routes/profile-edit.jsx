@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaUser } from "react-icons/fa6";
+import { useMutation } from "@tanstack/react-query";
 
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 import { useImageUpload } from "@/shared/hooks/use-image-upload.js";
@@ -30,6 +31,44 @@ const ProfileEdit = () => {
   const { previewUrl, handleFileChange, upload } = useImageUpload(
     user?.profileImageUrl || ""
   );
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async () => {
+      const uploadedUrl = await upload();
+
+      const newUserData = {
+        nickname: nickname.trim(),
+        profileImageUrl: uploadedUrl || user.profileImageUrl,
+      };
+      await updateUserProfile(newUserData);
+
+      return newUserData;
+    },
+    onSuccess: (newUserData) => {
+      updateUser({ ...user, ...newUserData });
+
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    },
+    onError: (error) => {
+      console.error(error);
+      alert("회원정보 수정에 실패했습니다. 다시 시도해주세요.");
+    },
+  });
+
+  // 회원 탈퇴
+  const deleteUserMutation = useMutation({
+    mutationFn: deleteCurrentUser,
+    onSuccess: () => {
+      logout();
+      alert("회원 탈퇴가 완료되었습니다.");
+      navigate("/login");
+    },
+    onError: () => {
+      alert("회원 탈퇴 실패. 다시 시도해주세요.");
+      setIsDeleteModalOpen(false);
+    },
+  });
 
   // 닉네임 변경
   const handleNicknameChange = (e) => {
@@ -79,39 +118,12 @@ const ProfileEdit = () => {
     const isValid = await handleNicknameBlur();
     if (!isValid) return;
 
-    try {
-      const uploadedUrl = await upload();
-
-      const newUserData = {
-        nickname: nickname.trim(),
-        profileImageUrl: uploadedUrl || user.profileImageUrl,
-      };
-
-      await updateUserProfile(newUserData);
-
-      updateUser({ ...user, ...newUserData });
-
-      // 토스트 메시지
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
-    } catch (error) {
-      console.error(error);
-      alert("회원정보 수정에 실패했습니다. 다시 시도해주세요.");
-    }
+    updateProfileMutation.mutate();
   };
 
   // 회원 탈퇴
-  const handleWithdraw = async () => {
-    try {
-      await deleteCurrentUser();
-      logout();
-      alert("회원 탈퇴가 완료되었습니다.");
-      navigate("/login");
-    } catch (error) {
-      alert("회원 탈퇴 실패. 다시 시도해주세요.");
-    } finally {
-      setIsDeleteModalOpen(false);
-    }
+  const handleWithdraw = () => {
+    deleteUserMutation.mutate();
   };
 
   if (!user) return null;
@@ -168,10 +180,13 @@ const ProfileEdit = () => {
           <Button
             type="submit"
             disabled={
-              !!errors.nickname || isCheckingNickname || !nickname.trim()
+              !!errors.nickname ||
+              isCheckingNickname ||
+              !nickname.trim() ||
+              updateProfileMutation.isPending
             }
           >
-            수정하기
+            {updateProfileMutation.isPending ? "수정 중..." : "수정하기"}
           </Button>
         </form>
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import "@/styles/global.css";
 import "@/styles/pages/login.css";
 
@@ -31,6 +32,50 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: async (inputData) => {
+      // 로그인 API 요청
+      const { accessToken } = await requestLogin({
+        email: inputData.email.trim(),
+        password: inputData.password.trim(),
+      });
+
+      // 큰 우선 저장 (fetchMe가 토큰을 필요로 하므로)
+      useAuthStore.getState().login(null, accessToken);
+
+      // 내 정보 조회
+      const userData = await fetchMe();
+
+      return { userData, accessToken };
+    },
+
+    onSuccess: ({ userData, accessToken }) => {
+      login(userData, accessToken);
+      navigate("/posts");
+    },
+
+    onError: (error) => {
+      console.error(error);
+
+      if (error.code === "USER_NOT_FOUND" || error.status === 404) {
+        setErrors((prev) => ({
+          ...prev,
+          password: "*아이디와 비밀번호를 다시 확인해주세요.",
+        }));
+      } else if (error.code === "INVALID_INPUT_VALUE") {
+        setErrors({
+          email: "",
+          password: "*아이디와 비밀번호 값이 올바르지 않습니다.",
+        });
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          password: "로그인에 실패했습니다. 다시 시도해주세요.",
+        }));
+      }
+    },
   });
 
   /**
@@ -83,42 +128,7 @@ const LoginPage = () => {
       return;
     }
 
-    try {
-      // 로그인 API 요청
-      const { accessToken } = await requestLogin({
-        email: formData.email.trim(),
-        password: formData.password.trim(),
-      });
-
-      useAuthStore.getState().login(null, accessToken);
-
-      const userData = await fetchMe();
-
-      login(userData, accessToken);
-
-      // 페이지 이동
-      navigate("/posts");
-    } catch (error) {
-      console.error(error);
-
-      if (error.code === "USER_NOT_FOUND") {
-        setErrors((prev) => ({
-          ...prev,
-          password: "*아이디와 비밀번호를 다시 확인해주세요.",
-        }));
-      } else if (error.code === "INVALID_INPUT_VALUE") {
-        setErrors({
-          email: "",
-          password: "*아이디와 비밀번호 값이 올바르지 않습니다.",
-        });
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          password: "로그인에 실패했습니다. 다시 시도해주세요.",
-          console: error.message,
-        }));
-      }
-    }
+    loginMutation.mutate(formData);
   };
 
   return (
@@ -159,7 +169,7 @@ const LoginPage = () => {
             <Button
               type="submit"
               className="btn-login"
-              disabled={!isButtonActive}
+              disabled={!isButtonActive || loginMutation.isPending}
               Icon={MdLogin}
             >
               로그인

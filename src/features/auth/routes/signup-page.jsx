@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 
 import "@/styles/global.css";
 import "@/styles/pages/signup.css";
@@ -41,6 +42,46 @@ const SignUpPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  const signupMutation = useMutation({
+    mutationFn: async (inputData) => {
+      // 이미지 업로드
+      const uploadedProfileUrl = await upload();
+
+      // 회원가입 요청
+      const { accessToken } = await requestSignup({
+        email: inputData.email.trim(),
+        password: inputData.password.trim(),
+        nickname: inputData.nickname.trim(),
+        profileImageUrl: uploadedProfileUrl,
+      });
+
+      // 토큰 저장
+      useAuthStore.getState().login(null, accessToken);
+
+      //내 정보 조회
+      const userData = await fetchMe();
+
+      return { userData, accessToken };
+    },
+
+    onSuccess: ({ userData, accessToken }) => {
+      login(userData, accessToken);
+      navigate("/posts");
+    },
+
+    onError: (error) => {
+      console.error(error);
+      if (error.code === "INVALID_INPUT_VALUE") {
+        setErrors((prev) => ({
+          ...prev,
+          password: "입력값을 다시 확인해주세요.",
+        }));
+      } else {
+        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
+    },
+  });
 
   const handleProfileChange = (e) => {
     handleFileChange(e);
@@ -115,40 +156,7 @@ const SignUpPage = () => {
 
     if (!isButtonActive) return;
 
-    try {
-      // 이미지 업로드
-      const uploadedProfileUrl = await upload();
-
-      // 회원가입 요청
-      const { accessToken } = await requestSignup({
-        email: formData.email.trim(),
-        password: formData.password.trim(),
-        nickname: formData.nickname.trim(),
-        profileImageUrl: uploadedProfileUrl,
-      });
-
-      useAuthStore.getState().login(null, accessToken);
-
-      const userData = await fetchMe();
-
-      login(userData, accessToken);
-
-      alert("회원가입이 완료되었습니다!");
-      navigate("/posts");
-    } catch (error) {
-      console.error(error);
-
-      // 에러 처리 로직
-      if (error.code === "INVALID_INPUT_VALUE") {
-        setErrors((prev) => ({
-          ...prev,
-          password: "입력값을 다시 확인해주세요.",
-        }));
-      } else {
-        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
-        console.error(error.message);
-      }
-    }
+    signupMutation.mutate(formData);
   };
 
   return (
@@ -231,7 +239,7 @@ const SignUpPage = () => {
 
             <Button
               type="submit"
-              disabled={!isButtonActive}
+              disabled={!isButtonActive || signupMutation.isPending}
               className="btn-login"
               Icon={MdLogin}
             >

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   FaHeart,
   FaRegHeart,
@@ -28,31 +29,36 @@ const PostDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  // 게시글 데이터 로드
+  const {
+    data: post,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["post", postId], // 이 키가 같으면 중복 요청을 자동으로 제거함
+    queryFn: () => getPost(postId),
+    staleTime: 1000 * 60, // 1분 동안은 다시 조회해도 서버 요청 안 함 (캐시)
+  });
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getPost(postId);
-        setPost(data);
-        setLiked(data.liked);
-        setLikeCount(data.likeCount);
-      } catch (error) {
-        alert("게시글을 불러올 수 없습니다. 다시 시도해주세요.");
-        console.error(error.message);
-        navigate("/posts");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [postId, navigate]);
+    if (post) {
+      setLiked(post.liked);
+      setLikeCount(post.likeCount);
+    }
+  }, [post]);
+
+  if (isError) {
+    alert("게시글을 불러올 수 없습니다. 다시 시도해주세요.");
+    navigate("/posts");
+    return null;
+  }
+
+  if (isLoading) return <div className="loading">Loading...</div>;
+  if (!post) return null;
 
   // 좋아요 토글
   const handleLikeToggle = async () => {
@@ -104,9 +110,6 @@ const PostDetail = () => {
       console.error(err.message);
     }
   };
-
-  if (loading) return <div className="loading">Loading...</div>;
-  if (!post) return null;
 
   const isAuthor = user?.userId === post.author?.userId;
 

@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import "@/styles/components/post-form.css";
 
-const PostForm = ({ 
-  initialData = null, 
-  onSubmit, 
+const PostForm = ({
+  initialData = null,
+  onSubmit,
   isEditMode = false,
-  previewUrl, 
-  onImageChange 
+  previewUrl,
+  onImageChange,
+  isLoading = false,
 }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -30,24 +29,23 @@ const PostForm = ({
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      await onSubmit({ title, content });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    onSubmit({ title, content });
   };
 
   return (
-    <form className={isEditMode ? "post-update" : "post-create"} onSubmit={handleSubmit} noValidate>
+    <form
+      className={isEditMode ? "post-update" : "post-create"}
+      onSubmit={handleSubmit}
+      noValidate
+    >
       <h1 className={isEditMode ? "post-update-text" : "post-create-text"}>
         {isEditMode ? "게시글 수정" : "게시글 작성"}
       </h1>
 
       {/* 제목 */}
-      <div className="post-label"><h2 className="post-label-text">제목*</h2></div>
+      <div className="post-label">
+        <h2 className="post-label-text">제목*</h2>
+      </div>
       <div className="horizontal-spacer-sm"></div>
       <input
         type="text"
@@ -62,7 +60,9 @@ const PostForm = ({
       <div className="horizontal-spacer-sm"></div>
 
       {/* 내용 */}
-      <div className="post-label"><h2 className="post-label-text">내용*</h2></div>
+      <div className="post-label">
+        <h2 className="post-label-text">내용*</h2>
+      </div>
       <div className="horizontal-spacer-sm"></div>
       <textarea
         className="post-content-input"
@@ -76,16 +76,13 @@ const PostForm = ({
       <p className="error-text">{errorMsg}</p>
 
       {/* 이미지 업로드 영역 */}
-      <div className="post-label"><h2 className="post-label-text">이미지</h2></div>
+      <div className="post-label">
+        <h2 className="post-label-text">이미지</h2>
+      </div>
       <div className="post-image-input-container">
         <label className="btn-image-upload">
           파일 선택
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={onImageChange} 
-          />
+          <input type="file" accept="image/*" hidden onChange={onImageChange} />
         </label>
         <p className="post-image-input-text">
           {previewUrl ? "이미지가 선택되었습니다." : "파일을 선택해주세요."}
@@ -93,24 +90,24 @@ const PostForm = ({
 
         {/* 미리보기 이미지 */}
         {previewUrl ? (
-           <img
-             src={previewUrl} 
-             className="post-image-preview"
-             alt="미리보기"
-             style={{ display: 'block' }}
-           />
+          <img
+            src={previewUrl}
+            className="post-image-preview"
+            alt="미리보기"
+            style={{ display: "block" }}
+          />
         ) : (
-          <div className="post-image-preview" style={{ display: 'none' }} />
+          <div className="post-image-preview" style={{ display: "none" }} />
         )}
       </div>
 
       <div className="btn-post-submit-div">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className={`btn-post-submit ${isValid ? "active" : ""}`}
-          disabled={isSubmitting || !isValid}
+          disabled={isLoading || !isValid}
         >
-          {isSubmitting ? "처리 중..." : (isEditMode ? "수정하기" : "등록하기")}
+          {isLoading ? "처리 중..." : isEditMode ? "수정하기" : "등록하기"}
         </button>
       </div>
     </form>
