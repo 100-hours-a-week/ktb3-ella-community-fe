@@ -6,8 +6,11 @@
     <link rel="stylesheet" href="../src/styles/global.css" />
     <link rel="stylesheet" href="../src/styles/header.css" />
     <link rel="stylesheet" href="../src/styles/pages/signup.css" />
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/signup.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/signup.js";
+      bootstrapApp(initPage);
+    </script>
     <title>회원가입</title>
   </head>
   <body class="page-signup">
@@ -19,7 +22,7 @@
             alt="KTB3 커뮤니티 로고"
             class="logo-image"
           />
-          <h1 class="auth-title">아무말대잔치</h1>
+          <h1 class="auth-title">D'velop</h1>
           <span class="logo-text">회원가입하여 커뮤니티에 참여하세요</span>
         </div>
         <form class="auth-form" novalidate>

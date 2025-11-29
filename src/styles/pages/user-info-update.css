@@ -43,6 +43,12 @@
   object-fit: cover;
   border-radius: 50%;
   display: block;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.profile-img-update img.is-loaded {
+  opacity: 1;
 }
 
 .profile-img-change {

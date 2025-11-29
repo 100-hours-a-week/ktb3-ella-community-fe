@@ -17,7 +17,7 @@
             alt="KTB3 커뮤니티 로고"
             class="logo-image"
           />
-          <h1 class="title-xl">아무말대잔치</h1>
+          <h1 class="title-xl">D'velop</h1>
           <div class="header-link">
             <a href="./post-list.html" class="link-post-list">게시글 목록</a>
           </div>
@@ -149,6 +149,7 @@
               <div class="post-comment-input-box">
                 <textarea
                   class="post-comment-input"
+                  id="post-comment-input"
                   placeholder="댓글을 남겨주세요!"
                 ></textarea>
               </div>
@@ -241,7 +242,10 @@
         </div>
       </div>
     </div>
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/post-detail.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/post-detail.js";
+      bootstrapApp(initPage);
+    </script>
   </body>
 </html>

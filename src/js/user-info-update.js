@@ -1,7 +1,6 @@
 import {
   getStoredUser,
   saveStoredUser,
-  requireAuthUser,
   clearStoredUser,
 } from "./utils/user.js";
 import {
@@ -9,7 +8,7 @@ import {
   updateUserProfile as updateUserProfileApi,
   deleteCurrentUser,
 } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-upload-controller.js";
 
 const ERROR_REQUIRED = "*닉네임을 입력해주세요.";
 const ERROR_LENGTH = "*닉네임은 최대 11자까지 가능합니다.";
@@ -19,7 +18,7 @@ let originalNickname = "";
 let profileImageUploader = null;
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다. 다시 로그인해주세요.");
     window.location.href = "./login.html";
@@ -68,7 +67,9 @@ const validateAndCheckNickname = async (nicknameInput, nicknameErrorEl) => {
 
   // 중복 체크
   try {
-    const { nicknameAvailable } = await checkAvailability({ nickname: trimmed });
+    const { nicknameAvailable } = await checkAvailability({
+      nickname: trimmed,
+    });
 
     if (!nicknameAvailable) {
       if (nicknameErrorEl) nicknameErrorEl.textContent = ERROR_DUPLICATE;
@@ -86,7 +87,7 @@ const validateAndCheckNickname = async (nicknameInput, nicknameErrorEl) => {
   }
 };
 
-/** PATCH /api/users/me/{userId} 요청 */
+/** PATCH /api/users/me 요청 */
 const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   const user = ensureAuthUser();
   if (!user) {
@@ -96,7 +97,6 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   const normalizedProfileImageUrl = (profileImageUrl || "").trim();
 
   const updated = await updateUserProfileApi({
-    userId: user.id,
     nickname: nickname.trim(),
     profileImageUrl: normalizedProfileImageUrl,
   });
@@ -120,17 +120,17 @@ const requestUserUpdate = async ({ nickname, profileImageUrl }) => {
   return sanitized;
 };
 
-/** 회원탈퇴 DELETE /api/users/me/{userId} */
+/** 회원탈퇴 DELETE /api/users/me */
 const requestUserDelete = async () => {
   const user = ensureAuthUser();
   if (!user) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
-  await deleteCurrentUser({ userId: user.id });
+  await deleteCurrentUser();
 };
 
-// 회원탈퇴 모달 열기/닫기 
+// 회원탈퇴 모달 열기/닫기
 const openUserDeleteModal = (modal) => modal?.classList.add("active");
 const closeUserDeleteModal = (modal) => modal?.classList.remove("active");
 
@@ -150,7 +150,7 @@ const updateSubmitButtonState = ({ nicknameInput, submitBtn }) => {
   }
 };
 
-// 폼 submit 핸들러 
+// 폼 submit 핸들러
 const handleFormSubmit = async ({
   event,
   nicknameInput,
@@ -211,7 +211,7 @@ const handleFormSubmit = async ({
   }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   const user = ensureAuthUser();
   if (!user) return;
 
@@ -248,6 +248,13 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     });
     profileImageUploader.setUploadedUrl(initialUploadedImageUrl);
+
+    profileImageEl.classList.remove("is-loaded");
+    profileImageEl.addEventListener(
+      "load",
+      () => profileImageEl.classList.add("is-loaded"),
+      { once: true }
+    );
 
     profileImageBtn?.addEventListener("click", () =>
       profileImageUploader?.openFilePicker()
@@ -320,4 +327,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-});
+};

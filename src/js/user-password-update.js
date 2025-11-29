@@ -2,11 +2,11 @@ import {
   validatePassword,
   validateConfirmPassword,
 } from "./utils/validation.js";
-import { requireAuthUser } from "./utils/user.js";
+import { getStoredUser } from "./utils/user.js";
 import { updateUserPassword } from "./services/api.js";
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다.");
     window.location.href = "./login.html";
@@ -23,7 +23,7 @@ const showToast = (toastEl) => {
   }, 2000);
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   const user = ensureAuthUser();
   if (!user) return;
 
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pwMsg = validatePassword(passwordInput.value);
     const cfMsg = validateConfirmPassword(
       passwordCheckInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
 
     const isValid = !pwMsg && !cfMsg;
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   passwordCheckInput.addEventListener("blur", () => {
     const msg = validateConfirmPassword(
       passwordCheckInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
     passwordConfirmError.textContent = msg;
     updateSubmitState();
@@ -106,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!current) return;
 
     await updateUserPassword({
-      userId: current.id,
       newPassword: newPassword.trim(),
     });
   };
@@ -118,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pwMsg = validatePassword(passwordInput.value);
     const cfMsg = validateConfirmPassword(
       passwordCheckInput.value,
-      passwordInput.value,
+      passwordInput.value
     );
 
     passwordError.textContent = pwMsg;
@@ -147,4 +146,4 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.classList.remove("active");
     }
   });
-});
+};

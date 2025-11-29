@@ -6,8 +6,11 @@
     <link rel="stylesheet" href="../src/styles/global.css" />
     <link rel="stylesheet" href="../src/styles/header.css" />
     <link rel="stylesheet" href="../src/styles/components/post-form.css" />
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/post-create.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/post-create.js";
+      bootstrapApp(initPage);
+    </script>
     <title>게시글</title>
   </head>
   <body class="page-post-detail page-post-form">
@@ -19,7 +22,7 @@
             alt="KTB3 커뮤니티 로고"
             class="logo-image"
           />
-          <h1 class="title-xl">아무말대잔치</h1>
+          <h1 class="title-xl">D'velop</h1>
           <div class="header-link">
             <a href="./post-list.html" class="link-post-list">게시글 목록</a>
           </div>

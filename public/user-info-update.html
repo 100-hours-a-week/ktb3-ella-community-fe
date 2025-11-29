@@ -17,7 +17,7 @@
             alt="KTB3 커뮤니티 로고"
             class="logo-image"
           />
-          <h1 class="title-xl">아무말대잔치</h1>
+          <h1 class="title-xl">D'velop</h1>
         </div>
         <div class="header-back">
           <button type="button" class="post-create-button">
@@ -138,7 +138,10 @@
       </div>
     </div>
     <div class="toast" id="update-toast">수정 완료</div>
-    <script type="module" src="../src/js/header.js"></script>
-    <script type="module" src="../src/js/user-info-update.js"></script>
+    <script type="module">
+      import { bootstrapApp } from "../src/js/main.js";
+      import { initPage } from "../src/js/user-info-update.js";
+      bootstrapApp(initPage);
+    </script>
   </body>
 </html>

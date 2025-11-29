@@ -1,14 +1,35 @@
-import { clearStoredUser, getStoredUser } from "./utils/user.js";
+import {
+  clearStoredUser,
+  getStoredUser,
+  saveStoredUser,
+} from "./utils/user.js";
+import {
+  fetchMe,
+  getAccessToken,
+  hydrateAccessToken,
+  requestLogout,
+  requestRefresh,
+  setAccessToken,
+} from "./services/api.js";
 
-const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
+import { isAuthRequired } from "./utils/auth.js";
 
 const updateDropdownAvatars = (src) => {
-  const finalSrc = src || DEFAULT_PROFILE_IMAGE;
+  const finalSrc = src;
   document
     .querySelectorAll(".profile-dropdown-toggle img")
     .forEach((avatarImg) => {
-      if (!avatarImg) return;
-      avatarImg.src = finalSrc;
+      if (!avatarImg) {
+        console.error("프로필 이미지 요소를 찾을 수 없습니다.");
+        return;
+      }
+      avatarImg.classList.remove("is-loaded");
+      avatarImg.addEventListener(
+        "load",
+        () => avatarImg.classList.add("is-loaded"),
+        { once: true }
+      );
+      avatarImg.src = finalSrc || "";
     });
 };
 
@@ -49,8 +70,14 @@ const initProfileDropdowns = () => {
       }
     });
 
-    logoutBtn?.addEventListener("click", () => {
-      clearStoredUser();
+    logoutBtn?.addEventListener("click", async (event) => {
+      event.preventDefault();
+      try {
+        await requestLogout(); // 백엔드 쿠키 삭제 요청
+      } catch (e) {
+        console.error("로그아웃 오류", e);
+      }
+      clearStoredUser(); // 로컬 유저 정보 삭제
       window.location.href = "./login.html";
     });
 
@@ -58,20 +85,65 @@ const initProfileDropdowns = () => {
   });
 
   document.addEventListener("click", () => closeAllDropdowns());
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeAllDropdowns();
-    }
-  });
 };
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initProfileDropdowns);
-} else {
+let authInitPromise = null;
+const runAuth = async () => {
+  // 1. 먼저 로컬에 저장된 유저 정보가 있으면 UI 먼저 그림
+  const storedUser = getStoredUser();
+  if (storedUser?.profileImageUrl) {
+    updateDropdownAvatars(storedUser.profileImageUrl);
+  } else {
+    updateDropdownAvatars();
+  }
+
+  // 로그인 페이지나 회원가입 페이지에서는 Refresh 시도 불필요
+  const path = window.location.pathname;
+  if (path.includes("login.html") || path.includes("signup.html")) {
+    return;
+  }
+
+  try {
+    // 세션스토리지에 토큰 있으면 재사용, 없으면 리프레시
+    hydrateAccessToken();
+    let accessToken = getAccessToken();
+    if (!accessToken) {
+      const refreshed = await requestRefresh();
+      accessToken = refreshed?.accessToken;
+      setAccessToken(accessToken);
+    }
+
+    // 로컬 유저가 없을 때만 최신 정보 조회
+    if (!storedUser) {
+      const userData = await fetchMe();
+      saveStoredUser(userData);
+      updateDropdownAvatars(userData.profileImageUrl);
+    }
+  } catch (error) {
+    // 갱신 실패 시 로컬 유저 정보도 삭제
+    clearStoredUser();
+    updateDropdownAvatars();
+
+    if (isAuthRequired(path)) window.location.href = "./login.html";
+  }
+};
+
+export const initAuth = () => {
+  if (!authInitPromise) {
+    authInitPromise = runAuth();
+  }
+  return authInitPromise;
+};
+
+// 헤더 초기화 함수
+export const initHeader = () => {
   initProfileDropdowns();
-}
+  return initAuth();
+};
 
 window.addEventListener("user:profile-updated", (event) => {
   const newUrl = event.detail?.profileImageUrl;
   updateDropdownAvatars(newUrl);
 });
+
+export const getAuthReady = () => authInitPromise || Promise.resolve();

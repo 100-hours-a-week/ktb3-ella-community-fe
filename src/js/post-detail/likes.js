@@ -1,9 +1,9 @@
 import { formatCount } from "../utils/format.js";
-import { requireAuthUser } from "../utils/user.js";
+import { getStoredUser } from "../utils/user.js";
 import { likePost, unlikePost } from "../services/api.js";
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다.");
     window.location.href = "./login.html";
@@ -54,11 +54,11 @@ export const initLikeToggle = ({
     buttonEl.disabled = true;
     try {
       if (!state.liked) {
-        await likePost({ postId, userId: currentUser.id });
+        await likePost({ postId });
         state.liked = true;
         state.count += 1;
       } else {
-        await unlikePost({ postId, userId: currentUser.id });
+        await unlikePost({ postId });
         state.liked = false;
         state.count = Math.max(0, state.count - 1);
       }

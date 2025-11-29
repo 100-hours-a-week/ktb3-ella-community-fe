@@ -1,8 +1,6 @@
 import { formatDateTime, formatCount } from "./utils/format.js";
 import { fetchPostList } from "./services/api.js";
 
-const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
-
 const listContainer = document.querySelector(".post-list-content-wrapper");
 const createButton = document.querySelector(".btn-post-create");
 const sortSelect = document.querySelector(".post-filter-select");
@@ -28,8 +26,9 @@ const createPostElement = (post) => {
     createdAt,
   } = post;
 
-  const wrapper = document.createElement("div");
+  const wrapper = document.createElement("a");
   wrapper.className = "post-list-content";
+  wrapper.href = `./post-detail.html?postId=${postId}`;
 
   const contentContainer = document.createElement("div");
   contentContainer.className = "post-list-content-container";
@@ -50,7 +49,6 @@ const createPostElement = (post) => {
   titleEl.textContent = title;
 
   contentContainer.append(tagsWrapper, titleEl);
-
   const authorBox = document.createElement("div");
   authorBox.className = "author-profile";
 
@@ -74,7 +72,7 @@ const createPostElement = (post) => {
     img.loading = "lazy";
     img.src = profileImageUrl;
   } else {
-    img.src = DEFAULT_PROFILE_IMAGE;
+    console.warn("프로필 이미지가 없습니다.");
   }
 
   profileImgWrap.appendChild(img);
@@ -131,20 +129,22 @@ const createPostElement = (post) => {
 
   wrapper.append(contentContainer, authorBox);
 
-  // 클릭 시 상세 페이지 이동
-  wrapper.addEventListener("click", () => {
-    window.location.href = `./post-detail.html?postId=${postId}`;
-  });
-
   return wrapper;
 };
 
 const appendPosts = (posts) => {
   if (!listContainer || !posts || posts.length === 0) return;
+
+  // 메모리상의 가상 컨테이너 생성
+  const fragment = document.createDocumentFragment();
+
   posts.forEach((post) => {
     const el = createPostElement(post);
-    listContainer.appendChild(el);
+    fragment.appendChild(el); // 가상 컨테이너에 추가
   });
+
+  // 완성된 덩어리를 실제 DOM에 한 번에 이동
+  listContainer.appendChild(fragment);
   ensureSentinel();
 };
 
@@ -178,7 +178,6 @@ const fetchPosts = async (page) => {
   }
 };
 
-// 스크롤 80% 도달 시 다음 페이지 로드
 const setupCreateButton = () => {
   if (!createButton) return;
   createButton.addEventListener("click", () => {
@@ -225,15 +224,14 @@ const setupSortFilter = () => {
     hasNextPage = true;
     isLoading = false;
     listContainer.scrollTop = 0;
-    listContainer.innerHTML = "";
-    ensureSentinel();
+    listContainer.replaceChildren(sentinel);
     fetchPosts(1);
   });
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   setupCreateButton();
   setupSortFilter();
   fetchPosts(1);
   setupObserver();
-});
+};

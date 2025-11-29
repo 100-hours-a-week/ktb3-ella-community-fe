@@ -3,7 +3,7 @@ import {
   fetchPostDetail as requestPostDetail,
   updatePost as updatePostApi,
 } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-upload-controller.js";
 
 const ERROR_MSG = "*제목, 내용을 모두 작성해주세요.";
 
@@ -42,13 +42,10 @@ const updateButtonState = () => {
   }
 };
 
-/** 기존 게시글 조회해서 폼에 채우기: GET /api/posts/{postId}/{userId} */
+/** 기존 게시글 조회해서 폼에 채우기: GET /api/posts/{postId} */
 const loadPostData = async (postId) => {
-  const currentUser = getStoredUser();
-  const userId = currentUser?.id ?? 0;
-
   try {
-    const data = await requestPostDetail({ postId, userId });
+    const data = await requestPostDetail({ postId });
 
     if (titleInput) titleInput.value = data.title || "";
     if (contentInput) contentInput.value = data.content || "";
@@ -69,10 +66,10 @@ const loadPostData = async (postId) => {
   }
 };
 
-/** 수정 요청: PUT /api/posts/{postId}/{userId} */
+/** 수정 요청: PUT /api/posts/{postId} */
 const submitUpdate = async ({ postId, title, content, postImageUrl }) => {
   const currentUser = getStoredUser();
-  if (!currentUser || !currentUser.id) {
+  if (!currentUser) {
     throw new Error("로그인이 필요합니다. 다시 로그인해주세요.");
   }
 
@@ -84,7 +81,6 @@ const submitUpdate = async ({ postId, title, content, postImageUrl }) => {
 
   return updatePostApi({
     postId,
-    userId: currentUser.id,
     payload,
   });
 };
@@ -182,7 +178,7 @@ const setupForm = (postId) => {
 };
 
 /** 초기화 */
-document.addEventListener("DOMContentLoaded", () => {
+export const initPage = () => {
   const postId = getPostIdFromQuery();
 
   if (!postId) {
@@ -195,4 +191,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAutoScrollInputs();
   loadPostData(postId);
   setupForm(postId);
-});
+};

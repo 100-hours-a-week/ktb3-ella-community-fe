@@ -5,7 +5,7 @@ import {
   validateConfirmPassword,
 } from "./utils/validation.js";
 import { checkAvailability, requestSignup } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-uploadController.js";
 
 const form = document.querySelector(".auth-form");
 const emailInput = document.querySelector("#email");
@@ -51,7 +51,6 @@ if (
   console.warn("회원가입 폼 요소를 찾을 수 없습니다.");
 }
 
-
 const validateNickname = (value) => {
   if (!value.trim()) return "닉네임을 입력해주세요.";
   if (/\s/.test(value)) return "*띄어쓰기를 없애주세요.";
@@ -61,14 +60,14 @@ const validateNickname = (value) => {
   return "";
 };
 
-// 전체 검증 & 버튼 활성화 
+// 전체 검증 & 버튼 활성화
 const checkValidation = () => {
   const emailValid = emailInput.dataset.valid === "true";
   const nicknameValid = nicknameInput.dataset.valid === "true";
   const passwordValid = !validatePassword(passwordInput.value);
   const confirmValid = !validateConfirmPassword(
     passwordConfirmInput.value,
-    passwordInput.value,
+    passwordInput.value
   );
 
   if (emailValid && nicknameValid && passwordValid && confirmValid) {
@@ -128,156 +127,166 @@ const setupAutoScrollInputs = () => {
   });
 };
 
-
-// 이메일 blur: 형식 → 중복 체크
-emailInput.addEventListener("blur", async () => {
-  const basicMsg = validateEmail(emailInput.value);
-  emailError.textContent = basicMsg;
-  emailInput.dataset.valid = "false";
-
-  if (basicMsg) {
-    checkValidation();
-    return;
-  }
-
-  try {
-    const { emailAvailable } = await checkAvailability({
-      email: emailInput.value.trim(),
-    });
-
-    if (!emailAvailable) {
-      emailError.textContent = "중복된 이메일입니다.";
-      emailInput.dataset.valid = "false";
-    } else {
-      emailError.textContent = "";
-      emailInput.dataset.valid = "true";
-    }
-  } catch (e) {
-    emailError.textContent = e.message;
-    emailInput.dataset.valid = "false";
-  }
-
-  checkValidation();
-});
-
-// 닉네임 blur: 기본 → 중복 체크
-nicknameInput.addEventListener("blur", async () => {
-  const basicMsg = validateNickname(nicknameInput.value);
-  nicknameError.textContent = basicMsg;
-  nicknameInput.dataset.valid = "false";
-
-  if (basicMsg) {
-    checkValidation();
-    return;
-  }
-
-  try {
-    const { nicknameAvailable } = await checkAvailability({
-      nickname: nicknameInput.value.trim(),
-    });
-
-    if (!nicknameAvailable) {
-      nicknameError.textContent = "중복된 닉네임입니다.";
-      nicknameInput.dataset.valid = "false";
-    } else {
-      nicknameError.textContent = "";
-      nicknameInput.dataset.valid = "true";
-    }
-  } catch (e) {
-    nicknameError.textContent = e.message;
-    nicknameInput.dataset.valid = "false";
-  }
-
-  checkValidation();
-});
-
-// 비밀번호 blur
-passwordInput.addEventListener("blur", () => {
-  const msg = validatePassword(passwordInput.value);
-  passwordError.textContent = msg;
-  checkValidation();
-});
-
-// 비밀번호 확인 blur
-passwordConfirmInput.addEventListener("blur", () => {
-  const msg = validateConfirmPassword(
-    passwordConfirmInput.value,
-    passwordInput.value,
-  );
-  passwordConfirmError.textContent = msg;
-  checkValidation();
-});
-
-//  폼 제출 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const emailMsg = validateEmail(emailInput.value);
-  const pwMsg = validatePassword(passwordInput.value);
-    const confirmMsg = validateConfirmPassword(
-      passwordConfirmInput.value,
-      passwordInput.value,
-    );
-  const nickMsg = validateNickname(nicknameInput.value);
-
-  emailError.textContent = emailMsg;
-  passwordError.textContent = pwMsg;
-  passwordConfirmError.textContent = confirmMsg;
-  nicknameError.textContent = nickMsg;
-
-  if (emailMsg || pwMsg || confirmMsg || nickMsg) {
-    return;
-  }
-
+export const initPage = () => {
   if (
-    emailInput.dataset.valid !== "true" ||
-    nicknameInput.dataset.valid !== "true"
+    !form ||
+    !emailInput ||
+    !passwordInput ||
+    !passwordConfirmInput ||
+    !nicknameInput ||
+    !emailError ||
+    !passwordError ||
+    !passwordConfirmError ||
+    !nicknameError ||
+    !submitButton
   ) {
+    console.warn("회원가입 폼 요소를 찾을 수 없습니다.");
     return;
   }
 
-  submitButton.disabled = true;
-  submitButton.classList.add("is-loading");
+  emailInput.addEventListener("blur", async () => {
+    const basicMsg = validateEmail(emailInput.value);
+    emailError.textContent = basicMsg;
+    emailInput.dataset.valid = "false";
 
-  let profileImageUrl = "";
-
-  if (profileImageUploader) {
-    try {
-      const uploadedUrl = await profileImageUploader.ensureUploaded();
-      if (uploadedUrl) {
-        profileImageUrl = uploadedUrl;
-      }
-    } catch (uploadError) {
-      if (profileImageError) {
-        profileImageError.textContent =
-          uploadError?.message || "프로필 이미지를 업로드할 수 없습니다.";
-      }
-      submitButton.disabled = false;
-      submitButton.classList.remove("is-loading");
+    if (basicMsg) {
+      checkValidation();
       return;
     }
-  }
 
-  const payload = {
-    email: emailInput.value.trim(),
-    password: passwordInput.value.trim(),
-    nickname: nicknameInput.value.trim(),
-    profileImageUrl,
-  };
+    try {
+      const { emailAvailable } = await checkAvailability({
+        email: emailInput.value.trim(),
+      });
 
-  try {
-    const data = await requestSignup(payload);
-    saveStoredUser(data);
+      if (!emailAvailable) {
+        emailError.textContent = "중복된 이메일입니다.";
+        emailInput.dataset.valid = "false";
+      } else {
+        emailError.textContent = "";
+        emailInput.dataset.valid = "true";
+      }
+    } catch (e) {
+      emailError.textContent = e.message;
+      emailInput.dataset.valid = "false";
+    }
 
-    // 성공 시 페이지 이동 
-    window.location.href = "./login.html";
-  } catch (error) {
-    passwordError.textContent = error.message;
-  } finally {
-    submitButton.disabled = false;
-    submitButton.classList.remove("is-loading");
-  }
-});
+    checkValidation();
+  });
 
-setupProfileImageUploader();
-setupAutoScrollInputs();
+  nicknameInput.addEventListener("blur", async () => {
+    const basicMsg = validateNickname(nicknameInput.value);
+    nicknameError.textContent = basicMsg;
+    nicknameInput.dataset.valid = "false";
+
+    if (basicMsg) {
+      checkValidation();
+      return;
+    }
+
+    try {
+      const { nicknameAvailable } = await checkAvailability({
+        nickname: nicknameInput.value.trim(),
+      });
+
+      if (!nicknameAvailable) {
+        nicknameError.textContent = "중복된 닉네임입니다.";
+        nicknameInput.dataset.valid = "false";
+      } else {
+        nicknameError.textContent = "";
+        nicknameInput.dataset.valid = "true";
+      }
+    } catch (e) {
+      nicknameError.textContent = e.message;
+      nicknameInput.dataset.valid = "false";
+    }
+
+    checkValidation();
+  });
+
+  passwordInput.addEventListener("blur", () => {
+    const msg = validatePassword(passwordInput.value);
+    passwordError.textContent = msg;
+    checkValidation();
+  });
+
+  passwordConfirmInput.addEventListener("blur", () => {
+    const msg = validateConfirmPassword(
+      passwordConfirmInput.value,
+      passwordInput.value
+    );
+    passwordConfirmError.textContent = msg;
+    checkValidation();
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const emailMsg = validateEmail(emailInput.value);
+    const pwMsg = validatePassword(passwordInput.value);
+    const confirmMsg = validateConfirmPassword(
+      passwordConfirmInput.value,
+      passwordInput.value
+    );
+    const nickMsg = validateNickname(nicknameInput.value);
+
+    emailError.textContent = emailMsg;
+    passwordError.textContent = pwMsg;
+    passwordConfirmError.textContent = confirmMsg;
+    nicknameError.textContent = nickMsg;
+
+    if (emailMsg || pwMsg || confirmMsg || nickMsg) {
+      return;
+    }
+
+    if (
+      emailInput.dataset.valid !== "true" ||
+      nicknameInput.dataset.valid !== "true"
+    ) {
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.classList.add("is-loading");
+
+    let profileImageUrl = "";
+
+    if (profileImageUploader) {
+      try {
+        const uploadedUrl = await profileImageUploader.ensureUploaded();
+        if (uploadedUrl) {
+          profileImageUrl = uploadedUrl;
+        }
+      } catch (uploadError) {
+        if (profileImageError) {
+          profileImageError.textContent =
+            uploadError?.message || "프로필 이미지를 업로드할 수 없습니다.";
+        }
+        submitButton.disabled = false;
+        submitButton.classList.remove("is-loading");
+        return;
+      }
+    }
+
+    const payload = {
+      email: emailInput.value.trim(),
+      password: passwordInput.value.trim(),
+      nickname: nicknameInput.value.trim(),
+      profileImageUrl,
+    };
+
+    try {
+      const data = await requestSignup(payload);
+      saveStoredUser(data);
+      window.location.href = "./post-list.html";
+    } catch (error) {
+      passwordError.textContent = error.message;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.classList.remove("is-loading");
+    }
+  });
+
+  setupProfileImageUploader();
+  setupAutoScrollInputs();
+};

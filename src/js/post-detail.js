@@ -1,4 +1,4 @@
-import { getStoredUser, requireAuthUser } from "./utils/user.js";
+import { getStoredUser } from "./utils/user.js";
 import { formatDateTime, formatCount } from "./utils/format.js";
 import {
   fetchPostDetail as requestPostDetail,
@@ -7,7 +7,32 @@ import {
 import { initLikeToggle } from "./post-detail/likes.js";
 import { initCommentsSection } from "./post-detail/comments.js";
 
-const DEFAULT_PROFILE_IMAGE = "/public/images/userProfile.png";
+const escapeHtml = (value = "") =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+const renderSimpleMarkdown = (value = "") => {
+  if (!value) return "";
+  return value
+    .split(/\n/)
+    .map((line) => {
+      const trimmed = line.trim();
+      const escaped = escapeHtml(line).replace(
+        /\*\*(.+?)\*\*/g,
+        "<strong>$1</strong>"
+      );
+
+      if (!trimmed) return "<br />";
+      if (/^##\s+/.test(trimmed)) {
+        return `<h2>${escaped.replace(/^##\s+/, "")}</h2>`;
+      }
+      return `<p>${escaped}</p>`;
+    })
+    .join("");
+};
 
 const getPostIdFromQuery = () => {
   const params = new URLSearchParams(window.location.search);
@@ -15,7 +40,7 @@ const getPostIdFromQuery = () => {
 };
 
 const ensureAuthUser = () => {
-  const user = requireAuthUser();
+  const user = getStoredUser();
   if (!user) {
     alert("로그인이 필요합니다.");
     window.location.href = "./login.html";
@@ -35,11 +60,7 @@ const updateCountElements = (elements, value = 0) => {
   });
 };
 
-const fetchPostData = (postId) => {
-  const currentUser = getStoredUser();
-  const userId = currentUser?.id ?? 0;
-  return requestPostDetail({ postId, userId });
-};
+const fetchPostData = (postId) => requestPostDetail({ postId });
 
 const renderPostDetail = (post) => {
   const titleEl = document.querySelector(".post-detail-title");
@@ -63,12 +84,12 @@ const renderPostDetail = (post) => {
     el.textContent = formatDateTime(post.createdAt);
   });
   authorProfileImgs.forEach((img) => {
-    const src = post.author?.profileImageUrl || img.dataset.placeholder || DEFAULT_PROFILE_IMAGE;
-    img.addEventListener(
-      "load",
-      () => img.classList.add("is-loaded"),
-      { once: true }
-    );
+    const src =
+      post.author?.profileImageUrl ||
+      img.dataset.placeholder;
+    img.addEventListener("load", () => img.classList.add("is-loaded"), {
+      once: true,
+    });
     img.src = src;
   });
 
@@ -88,7 +109,7 @@ const renderPostDetail = (post) => {
     }
   }
   if (contentEl) {
-    contentEl.textContent = post.content || "";
+    contentEl.innerHTML = renderSimpleMarkdown(post.content || "");
   }
 
   const likeCountEls = selectAll(".post-like-count-value");
@@ -125,7 +146,9 @@ const setupAuthorSidebar = (post) => {
     sidebarBioEl.textContent = post.author?.bio || "열정적인 커뮤니티 멤버";
   }
   if (sidebarImageEl) {
-    const src = post.author?.profileImageUrl || sidebarImageEl.dataset.placeholder || DEFAULT_PROFILE_IMAGE;
+    const src =
+      post.author?.profileImageUrl ||
+      sidebarImageEl.dataset.placeholder;
     sidebarImageEl.addEventListener(
       "load",
       () => sidebarImageEl.classList.add("is-loaded"),
@@ -179,13 +202,13 @@ const setupPostDeleteModal = (postId) => {
   });
 
   confirmBtn?.addEventListener("click", async () => {
-    const currentUser = ensureAuthUser();
-    if (!currentUser) {
+    const user = ensureAuthUser();
+    if (!user) {
       closeModal();
       return;
     }
     try {
-      await deletePostApi({ postId, userId: currentUser.id });
+      await deletePostApi({ postId });
       window.location.href = "./post-list.html";
     } catch (error) {
       alert(error?.message || "게시글 삭제 중 오류가 발생했습니다.");
@@ -195,7 +218,7 @@ const setupPostDeleteModal = (postId) => {
   });
 };
 
-const initializePage = async () => {
+export const initPage = async () => {
   const postId = getPostIdFromQuery();
   if (!postId) {
     alert("잘못된 접근입니다.");
@@ -231,5 +254,3 @@ const initializePage = async () => {
     window.location.href = "./post-list.html";
   }
 };
-
-document.addEventListener("DOMContentLoaded", initializePage);

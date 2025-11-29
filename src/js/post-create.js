@@ -1,8 +1,16 @@
 import { getStoredUser } from "./utils/user.js";
 import { createPost } from "./services/api.js";
-import { createImageUploadController } from "./utils/imageUploadController.js";
+import { createImageUploadController } from "./utils/image-upload-controller.js";
 
-const getCurrentUser = () => getStoredUser();
+const ensureAuthUser = () => {
+  const user = getStoredUser();
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "./login.html";
+    return null;
+  }
+  return user;
+};
 
 const form = document.querySelector(".post-create");
 const titleInput = document.querySelector("#post-title");
@@ -78,12 +86,21 @@ const getImageUrl = async () => {
   return imageUploader.ensureUploaded();
 };
 
-const handleSubmit = async ({ title, content }) => {
-  const user = getCurrentUser();
-  if (!user || !user.id) {
-    throw new Error("*로그인 정보가 없습니다. 다시 로그인해주세요.");
-  }
+const setupAutoScrollInputs = () => {
+  const inputs = [titleInput, contentInput];
+  inputs
+    .filter((input) => input)
+    .forEach((input) => {
+      input.addEventListener("focus", () => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+};
 
+const handleSubmit = async ({ title, content }) => {
+  const user = ensureAuthUser();
+  if (!user) return;
+  
   let postImageUrl = "";
   try {
     postImageUrl = await getImageUrl();
@@ -96,42 +113,33 @@ const handleSubmit = async ({ title, content }) => {
     content: content.trim(),
     postImageUrl: postImageUrl || undefined,
   };
-  return createPost({ userId: user.id, payload });
+  return createPost({ payload });
 };
 
-form?.addEventListener("submit", async (event) => {
-  event.preventDefault();
+export const initPage = () => {
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  // 버튼 클릭했을 때만 검증
-  const msg = validateForm();
-  if (msg) {
-    if (contentError) contentError.textContent = msg;
-    updateButtonState();
-    return;
-  }
+    const msg = validateForm();
+    if (msg) {
+      if (contentError) contentError.textContent = msg;
+      updateButtonState();
+      return;
+    }
 
-  try {
-    await handleSubmit({
-      title: titleInput.value,
-      content: contentInput.value,
-    });
-    window.location.href = "./post-list.html";
-  } catch (error) {
-    if (contentError) contentError.textContent = error.message;
-  }
-});
-
-attachFieldEvents();
-updateButtonState();
-setupImageUploader();
-const setupAutoScrollInputs = () => {
-  const inputs = [titleInput, contentInput];
-  inputs
-    .filter((input) => input)
-    .forEach((input) => {
-      input.addEventListener("focus", () => {
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
+    try {
+      await handleSubmit({
+        title: titleInput.value,
+        content: contentInput.value,
       });
-    });
+      window.location.href = "./post-list.html";
+    } catch (error) {
+      if (contentError) contentError.textContent = error.message;
+    }
+  });
+
+  attachFieldEvents();
+  updateButtonState();
+  setupImageUploader();
+  setupAutoScrollInputs();
 };
-setupAutoScrollInputs();
