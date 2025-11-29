@@ -10,18 +10,25 @@ export const useImageUpload = (initialUrl = "") => {
   const [previewUrl, setPreviewUrl] = useState(initialUrl);
   const [isUploading, setIsUploading] = useState(false);
 
+  useEffect(() => {
+    if (!file && initialUrl) {
+      setPreviewUrl(initialUrl);
+    }
+  }, [initialUrl, file]);
+
   // 파일 선택 핸들러
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
 
     if (!selectedFile) return;
-
     // 이전 미리보기 url 있다면 메모리 해제
-    if (file) {
+    if (previewUrl && previewUrl.startsWith("blob:")) {
       URL.revokeObjectURL(previewUrl);
     }
 
     setFile(selectedFile);
+
     // 미리보기 url 생성
     const objectUrl = URL.createObjectURL(selectedFile);
     setPreviewUrl(objectUrl);
