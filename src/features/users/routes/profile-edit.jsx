@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaUser } from "react-icons/fa6";
 
@@ -30,13 +30,6 @@ const ProfileEdit = () => {
   const { previewUrl, handleFileChange, upload } = useImageUpload(
     user?.profileImageUrl || ""
   );
-
-  useEffect(() => {
-    if (!user) {
-      alert("로그인이 필요한 서비스입니다.");
-      navigate("/login");
-    }
-  }, [user, navigate]);
 
   // 닉네임 변경
   const handleNicknameChange = (e) => {

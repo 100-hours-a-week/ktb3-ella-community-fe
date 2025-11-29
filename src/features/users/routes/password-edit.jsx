@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FaLock } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
-
-import { useAuthStore } from "@/shared/stores/use-auth-store";
 import {
   validatePassword,
   validateConfirmPassword,
@@ -13,21 +10,11 @@ import Input from "@/components/common/input";
 import Button from "@/components/common/button";
 
 const PasswordEdit = () => {
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
-
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ password: "", confirmPassword: "" });
   const [showToast, setShowToast] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!user) {
-      alert("로그인이 필요한 서비스입니다.");
-      navigate("/login");
-    }
-  }, [user, navigate]);
 
   const handlePasswordBlur = () => {
     const msg = validatePassword(password);
@@ -70,8 +57,6 @@ const PasswordEdit = () => {
       setIsSubmitting(false);
     }
   };
-
-  if (!user) return null;
 
   const isValid =
     password && confirmPassword && !errors.password && !errors.confirmPassword;

@@ -35,13 +35,6 @@ const PostDetail = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  useEffect(() => {
-    if (!user) {
-      alert("로그인이 필요한 서비스입니다.");
-      navigate("/login");
-    }
-  }, [user, navigate]);
-
   // 게시글 데이터 로드
   useEffect(() => {
     const fetchData = async () => {

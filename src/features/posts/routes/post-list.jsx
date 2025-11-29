@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { FaFilter, FaFire } from "react-icons/fa6";
 
 import PostItem from "@/features/posts/components/post-item";
 import { getPosts } from "@/features/posts/api/post-api";
-import { useAuthStore } from "@/shared/stores/use-auth-store";
 
 import "@/styles/global.css";
 import "@/styles/components/post-form.css";
@@ -24,8 +22,6 @@ const POPULAR_TAGS = [
 const ICON_COLOR = "#2563EB";
 
 const PostList = () => {
-  const navigate = useNavigate();
-  const { user } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
@@ -40,13 +36,6 @@ const PostList = () => {
   const observerTarget = useRef(null); // 무한 스크롤 감지 타겟
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user) {
-      alert("로그인이 필요한 서비스입니다.");
-      navigate("/login");
-    }
-  }, [user, navigate]);
 
   const loadPosts = useCallback(
     async (pageNum) => {
