@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { formatDateTime } from "@/shared/utils/format";
 import { FaPen, FaTrash } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
@@ -125,4 +125,4 @@ const CommentItem = ({ comment, onUpdate, onDelete, isOwner }) => {
   );
 };
 
-export default CommentItem;
+export default memo(CommentItem);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   getComments,
   createComment,
@@ -84,15 +84,15 @@ const CommentSection = ({ postId }) => {
   };
 
   // 수정 핸들러
-  const handleUpdateComment = (commentId, content) => {
+  const handleUpdateComment = useCallback((commentId, content) => {
     updateMutation.mutate({ commentId, content });
-  };
+  }, [updateMutation]);
 
   // 삭제 버튼 클릭 핸들러
-  const handleDeleteClick = (commentId) => {
+  const handleDeleteClick = useCallback((commentId) => {
     setPendingDeleteId(commentId);
     setIsDeleteModalOpen(true);
-  };
+  }, []);
 
   // 삭제 모달 확인 핸들러
   const handleConfirmDelete = () => {
