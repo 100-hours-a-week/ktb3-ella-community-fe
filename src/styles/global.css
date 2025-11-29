@@ -22,6 +22,8 @@
   /* 컴포넌트 토큰 */
   --auth-card-width: 448px;
   --auth-radius: 4px;
+  --layout-header-height: 100px;
+  --layout-footer-height: 60px;
 
   /* 기본 폰트 크기 시스템 */
   --fs-title-xl: 26px; /* 페이지 주요 제목 */
@@ -33,28 +35,28 @@
 /* 웹폰트 */
 @font-face {
   font-family: "PretendardBoldUI";
-  src: url("/public/fonts/Pretendard-Bold.subset.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Bold.subset.woff2") format("woff2");
   font-display: swap;
 }
 @font-face {
   font-family: "PretendardRegularUI";
-  src: url("/public/fonts/Pretendard-Regular.subset.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Regular.subset.woff2") format("woff2");
   font-display: swap;
 }
 @font-face {
   font-family: "PretendardBoldUI";
-  src: url("/public/fonts/Pretendard-Bold.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Bold.woff2") format("woff2");
   font-display: swap;
 }
 @font-face {
   font-family: "PretendardRegularUI";
-  src: url("/public/fonts/Pretendard-Regular.woff2") format("woff2");
+  src: url("@/assets/fonts/Pretendard-Regular.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "Jalnan2";
-  src: url("/public/fonts/Jalnan2TTF.ttf") format("truetype");
+  src: url("@/assets/fonts/Jalnan2TTF.ttf") format("truetype");
 }
 
 html,
@@ -129,6 +131,9 @@ label {
 }
 
 .auth-lg {
+  min-height: calc(
+    100vh - var(--layout-header-height) - var(--layout-footer-height)
+  );
   height: 100%;
   width: 100%;
   justify-content: center;
@@ -211,13 +216,13 @@ label {
   gap: 8px;
 }
 
-.field_label {
+.field-label {
   font-family: var(--font-ui);
   font-size: var(--fs-body);
   font-weight: 400;
 }
 
-.field_input {
+.field-input {
   width: 100%;
   padding: 18px 16px;
   font-size: var(--fs-body);
@@ -228,7 +233,7 @@ label {
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.field_input:focus-visible {
+.field-input:focus-visible {
   outline: none;
   border-color: #818cf8;
   box-shadow: 0 10px 25px rgba(129, 140, 248, 0.2);
@@ -249,8 +254,7 @@ label {
   border: 0 solid #e5e7eb;
   background: #84aafd;
   box-shadow: 0 4px 20px 0 rgba(37, 99, 235, 0.2);
-  transition: transform 0.25s ease, box-shadow 0.25s ease,
-    background 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
 }
 
 .error-text {
@@ -309,7 +313,7 @@ label {
   font-family: var(--font-ui-bold);
 }
 
-.modal-submessage {
+.modal-sub-message {
   font-family: var(--font-ui);
   font-size: var(--fs-modal-body);
 }

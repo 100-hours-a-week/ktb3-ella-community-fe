@@ -113,19 +113,13 @@ hr {
 }
 
 .profile-dropdown-toggle img {
-  background-color: #000;
+  background-color: #fff;
   border: 1px solid #dbeafe;
   width: 36px;
   height: 36px;
   object-fit: cover;
   border-radius: 50%;
   box-sizing: border-box;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.profile-dropdown-toggle img.is-loaded {
-  opacity: 1;
 }
 
 .profile-dropdown-menu {
