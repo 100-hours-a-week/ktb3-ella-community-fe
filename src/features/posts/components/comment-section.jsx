@@ -1,140 +1,81 @@
-import React, { useState, useCallback } from "react";
-import {
-  getComments,
-  createComment,
-  updateComment,
-  deleteComment,
-} from "@/features/posts/api/comment-api.js";
-import Button from "@/components/common/button";
+import React, { useCallback, useState } from "react";
 import Modal from "@/components/common/modal";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  keepPreviousData,
-} from "@tanstack/react-query";
+import { useComments } from "@/features/posts/hooks/use-comments.js";
+import CommentForm from "./comment-form";
 import CommentItem from "./comment-item";
-import { FaCommentDots } from "react-icons/fa6";
+import CommentPagination from "./comment-pagination";
 
 const CommentSection = ({ postId }) => {
-  const queryClient = useQueryClient();
-  const [page, setPage] = useState(1);
-  const [commentInput, setCommentInput] = useState("");
+  const {
+    page,
+    setPage,
+    comments,
+    totalPages,
+    isLoading,
+    createComment,
+    isCreating,
+    updateComment,
+    deleteComment,
+  } = useComments(postId);
 
+  const [commentInput, setCommentInput] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  // 댓글 목록 조회
-  const { data, isLoading } = useQuery({
-    queryKey: ["comments", postId, page],
-    queryFn: () => getComments({ postId, page }),
-    placeholderData: keepPreviousData,
-  });
-
-  const comments = data?.content || [];
-  const totalPages = data?.totalPages || 1;
-
-  // 댓글 등록
-  const createMutation = useMutation({
-    mutationFn: (content) => createComment({ postId, content }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["comments", postId]);
-      setCommentInput(""); // 입력창 초기화
-      setPage(1); // 첫 페이지로 이동해서 내 댓글 확인
+  const handlePageChange = useCallback(
+    (targetPage) => {
+      if (targetPage !== page) setPage(targetPage);
     },
-    onError: () => alert("댓글 등록에 실패했습니다."),
-  });
+    [page, setPage]
+  );
 
-  // 댓글 수정
-  const updateMutation = useMutation({
-    mutationFn: ({ commentId, content }) =>
-      updateComment({ commentId, content }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["comments", postId]);
+  const handleCreateSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!commentInput.trim()) return;
+      createComment(commentInput, {
+        onSuccess: () => setCommentInput(""),
+      });
     },
-    onError: (error) => {
-      if (error.status === 403) alert("수정 권한이 없습니다.");
-      else alert("댓글 수정 실패");
+    [commentInput, createComment]
+  );
+
+  const handleUpdateComment = useCallback(
+    (commentId, content) => {
+      updateComment({ commentId, content });
     },
-  });
+    [updateComment]
+  );
 
-  // 댓글 삭제
-  const deleteMutation = useMutation({
-    mutationFn: (commentId) => deleteComment({ commentId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["comments", postId]);
-      setIsDeleteModalOpen(false);
-    },
-    onError: (error) => {
-      if (error.status === 403) alert("삭제 권한이 없습니다.");
-      else alert("댓글 삭제 실패");
-    },
-  });
-
-  // 핸들러 함수
-  const handlePageChange = (targetPage) => {
-    if (targetPage !== page) setPage(targetPage);
-  };
-
-  // 등록 핸들러
-  const handleCreateSubmit = (e) => {
-    e.preventDefault();
-    if (!commentInput.trim()) return;
-    createMutation.mutate(commentInput);
-  };
-
-  // 수정 핸들러
-  const handleUpdateComment = useCallback((commentId, content) => {
-    updateMutation.mutate({ commentId, content });
-  }, [updateMutation]);
-
-  // 삭제 버튼 클릭 핸들러
   const handleDeleteClick = useCallback((commentId) => {
     setPendingDeleteId(commentId);
     setIsDeleteModalOpen(true);
   }, []);
 
-  // 삭제 모달 확인 핸들러
-  const handleConfirmDelete = () => {
-    if (pendingDeleteId) {
-      deleteMutation.mutate(pendingDeleteId);
-    }
-  };
+  const handleConfirmDelete = useCallback(() => {
+    if (!pendingDeleteId) return;
+    deleteComment(pendingDeleteId, {
+      onSuccess: () => {
+        setIsDeleteModalOpen(false);
+        setPendingDeleteId(null);
+      },
+    });
+  }, [deleteComment, pendingDeleteId]);
+
+  const handleDeleteModalClose = useCallback(() => {
+    setIsDeleteModalOpen(false);
+    setPendingDeleteId(null);
+  }, []);
 
   return (
     <div className="post-comments-section">
-      {/* 댓글 입력 폼 */}
-      <form
-        className="post-comment-input-container"
+      <CommentForm
+        value={commentInput}
+        onChange={(e) => setCommentInput(e.target.value)}
         onSubmit={handleCreateSubmit}
-      >
-        <div className="post-comment-input-label">
-          <FaCommentDots size={24} color="#2563EB" />
-          <label htmlFor="post-comment-input" className="field_label">
-            댓글
-          </label>
-        </div>
-        <div className="post-comment-input-box">
-          <textarea
-            className="post-comment-input"
-            id="post-comment-input"
-            placeholder="댓글을 남겨주세요!"
-            value={commentInput}
-            onChange={(e) => setCommentInput(e.target.value)}
-          ></textarea>
-        </div>
-        <div className="post-comment-btn">
-          <Button
-            type="submit"
-            className="btn-comment-submit"
-            disabled={!commentInput.trim() || createMutation.isPending}
-          >
-            {createMutation.isPending ? "등록 중..." : "댓글 등록"}
-          </Button>
-        </div>
-      </form>
+        isSubmitting={isCreating}
+      />
 
-      {/* 댓글 목록 리스트 */}
       <div className="post-comments-list-container">
         {isLoading ? (
           <div style={{ textAlign: "center", padding: "20px" }}>
@@ -156,24 +97,16 @@ const CommentSection = ({ postId }) => {
         )}
       </div>
 
-      {/* 페이지네이션 */}
-      <div className="comments-pagination">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-          <button
-            key={p}
-            className={`comments-page-btn ${p === page ? "active" : ""}`}
-            onClick={() => handlePageChange(p)}
-            disabled={isLoading}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
+      <CommentPagination
+        totalPages={totalPages}
+        currentPage={page}
+        onPageChange={handlePageChange}
+        disabled={isLoading}
+      />
 
-      {/* 삭제 모달 */}
       <Modal
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={handleDeleteModalClose}
         onConfirm={handleConfirmDelete}
         title="댓글을 삭제하시겠습니까?"
         description="삭제된 내용은 복구할 수 없습니다."
