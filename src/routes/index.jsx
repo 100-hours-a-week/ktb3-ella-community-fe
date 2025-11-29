@@ -9,6 +9,7 @@ import PostCreate from "@/features/posts/routes/post-create";
 import PostUpdate from "@/features/posts/routes/post-update";
 import ProfileEdit from "@/features/users/routes/profile-edit.jsx";
 import PasswordEdit from "@/features/users/routes/password-edit.jsx";
+import ProtectedRoute from "@/components/protected-route.jsx";
 
 const AppRoutes = () => {
   return (
@@ -17,13 +18,15 @@ const AppRoutes = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route element={<Layout />}>
-          <Route path="/posts" element={<PostList />} />
-          <Route path="/posts/:postId" element={<PostDetail />} />
-          <Route path="/post-create" element={<PostCreate />} />
-          <Route path="/posts/:postId/edit" element={<PostUpdate />} />
-          <Route path="/profile/edit" element={<ProfileEdit />} />
-          <Route path="/profile/password" element={<PasswordEdit />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/posts" element={<PostList />} />
+            <Route path="/posts/:postId" element={<PostDetail />} />
+            <Route path="/post-create" element={<PostCreate />} />
+            <Route path="/posts/:postId/edit" element={<PostUpdate />} />
+            <Route path="/profile/edit" element={<ProfileEdit />} />
+            <Route path="/profile/password" element={<PasswordEdit />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
