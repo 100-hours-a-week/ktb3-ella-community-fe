@@ -9,6 +9,7 @@ import {
   FaPen,
   FaTrash,
 } from "react-icons/fa6";
+import { FaUserCircle } from "react-icons/fa";
 
 import { likePost, unlikePost } from "@/features/posts/api/like-api";
 
@@ -217,7 +218,12 @@ const PostDetail = () => {
             </div>
 
             {/* 댓글 섹션 컴포넌트 */}
-            <CommentSection postId={postId} initialCount={post.commentCount} />
+            <CommentSection
+              postId={postId}
+              initialComments={post.comments?.content || []}
+              initialPage={post.comments?.page ?? 1}
+              initialTotalPages={post.comments?.totalPages ?? 1}
+            />
           </div>
         </div>
 

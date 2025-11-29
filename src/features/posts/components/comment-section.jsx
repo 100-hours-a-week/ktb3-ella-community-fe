@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { formatDateTime } from "@/shared/utils/format";
 import {
   getComments,
@@ -10,10 +10,15 @@ import { FaPen, FaTrash, FaCommentDots } from "react-icons/fa6";
 import Button from "@/components/common/button";
 import Modal from "@/components/common/modal";
 
-const CommentSection = ({ postId, initialCount }) => {
-  const [comments, setComments] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+const CommentSection = ({
+  postId,
+  initialComments = [],
+  initialPage = 1,
+  initialTotalPages = 1,
+}) => {
+  const [comments, setComments] = useState(initialComments);
+  const [page, setPage] = useState(initialPage);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [commentInput, setCommentInput] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -31,9 +36,10 @@ const CommentSection = ({ postId, initialCount }) => {
     }
   };
 
-  useEffect(() => {
-    loadComments(1);
-  }, [postId]);
+  const handlePageChange = (targetPage) => {
+    if (targetPage === page) return;
+    loadComments(targetPage);
+  };
 
   // 댓글 등록/수정
   const handleSubmit = async (e) => {
@@ -184,7 +190,7 @@ const CommentSection = ({ postId, initialCount }) => {
           <button
             key={p}
             className={`comments-page-btn ${p === page ? "active" : ""}`}
-            onClick={() => loadComments(p)}
+            onClick={() => handlePageChange(p)}
           >
             {p}
           </button>
