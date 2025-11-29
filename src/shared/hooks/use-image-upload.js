@@ -11,9 +11,14 @@ export const useImageUpload = (initialUrl = "") => {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    if (!file && initialUrl) {
-      setPreviewUrl(initialUrl);
-    }
+    if (file) return;
+
+    setPreviewUrl((prev) => {
+      if (prev && prev.startsWith("blob:")) {
+        URL.revokeObjectURL(prev);
+      }
+      return initialUrl || "";
+    });
   }, [initialUrl, file]);
 
   // 파일 선택 핸들러
@@ -48,6 +53,12 @@ export const useImageUpload = (initialUrl = "") => {
         presignedData,
       });
 
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setFile(null);
+      setPreviewUrl(url);
+
       return url;
     } catch (error) {
       console.error("이미지 업로드 실패:", error);
@@ -55,7 +66,7 @@ export const useImageUpload = (initialUrl = "") => {
     } finally {
       setIsUploading(false);
     }
-  }, [file, initialUrl]);
+  }, [file, initialUrl, previewUrl]);
 
   // 컴포넌트가 사라질 때 미리보기 URL 메모리 해제
   useEffect(() => {

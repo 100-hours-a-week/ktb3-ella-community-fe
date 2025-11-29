@@ -17,6 +17,7 @@ import Input from "@/components/common/input";
 import Button from "@/components/common/button";
 import Modal from "@/components/common/modal";
 import ProfileImageUploader from "@/components/common/profile-image-uploader";
+import { useTimeout } from "@/shared/hooks/use-timeout.js";
 
 const ProfileEdit = () => {
   const navigate = useNavigate();
@@ -27,6 +28,11 @@ const ProfileEdit = () => {
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [lastCheckedNickname, setLastCheckedNickname] = useState(
+    user?.nickname || ""
+  );
+  const [isNicknameAvailable, setIsNicknameAvailable] = useState(true);
+  const { set: setTimer } = useTimeout();
 
   const { previewUrl, handleFileChange, upload } = useImageUpload(
     user?.profileImageUrl || ""
@@ -48,7 +54,7 @@ const ProfileEdit = () => {
       updateUser({ ...user, ...newUserData });
 
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
+      setTimer(() => setShowToast(false), 2000);
     },
     onError: (error) => {
       console.error(error);
@@ -87,7 +93,19 @@ const ProfileEdit = () => {
     }
 
     if (trimmed === user.nickname) {
+      setLastCheckedNickname(trimmed);
+      setIsNicknameAvailable(true);
       return true;
+    }
+
+    if (trimmed === lastCheckedNickname) {
+      if (!isNicknameAvailable) {
+        setErrors((prev) => ({
+          ...prev,
+          nickname: "*이미 사용중인 닉네임입니다.",
+        }));
+      }
+      return isNicknameAvailable;
     }
 
     setIsCheckingNickname(true);
@@ -95,6 +113,9 @@ const ProfileEdit = () => {
       const { nicknameAvailable } = await checkAvailability({
         nickname: trimmed,
       });
+      setLastCheckedNickname(trimmed);
+      setIsNicknameAvailable(nicknameAvailable);
+
       if (!nicknameAvailable) {
         setErrors((prev) => ({
           ...prev,

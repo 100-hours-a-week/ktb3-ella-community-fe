@@ -15,13 +15,14 @@ const PasswordEdit = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ password: "", confirmPassword: "" });
   const [showToast, setShowToast] = useState(false);
+  const { set: setTimer } = useTimeout();
 
   const passwordMutation = useMutation({
     mutationFn: (newPassword) => updateUserPassword({ newPassword }),
 
     onSuccess: () => {
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
+      setTimer(() => setShowToast(false), 2000);
 
       setPassword("");
       setConfirmPassword("");

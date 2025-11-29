@@ -10,12 +10,14 @@ const CommentItem = ({ comment, onUpdate, onDelete, isOwner }) => {
 
   // 수정 버튼 클릭 시
   const handleEditClick = () => {
+    if (!isOwner) return;
     setIsEditing(true);
     setEditContent(comment.content);
   };
 
   // 수정 완료
   const handleSaveClick = () => {
+    if (!isOwner) return;
     if (editContent.trim() === "") return;
     onUpdate(comment.commentId, editContent); // 부모에게 데이터 전달
     setIsEditing(false);
@@ -62,7 +64,7 @@ const CommentItem = ({ comment, onUpdate, onDelete, isOwner }) => {
               <p className="post-created-at">
                 {formatDateTime(comment.createdAt)}
               </p>
-              {!isEditing && (
+              {isOwner && !isEditing && (
                 <div className="post-comment-actions">
                   <button
                     type="button"
