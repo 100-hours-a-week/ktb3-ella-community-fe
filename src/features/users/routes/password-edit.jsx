@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FaLock } from "react-icons/fa6";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -6,27 +6,26 @@ import {
   validateConfirmPassword,
 } from "@/shared/utils/validation";
 import { updateUserPassword } from "@/features/users/api/user-api";
+import { useTransientToast } from "@/shared/hooks/use-transient-toast.js";
 
 import Input from "@/components/common/input";
 import Button from "@/components/common/button";
+import Toast from "@/components/common/toast";
 
 const PasswordEdit = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ password: "", confirmPassword: "" });
-  const [showToast, setShowToast] = useState(false);
-  const { set: setTimer } = useTimeout();
+  const { isVisible: isToastOpen, show: showToast } = useTransientToast();
 
   const passwordMutation = useMutation({
     mutationFn: (newPassword) => updateUserPassword({ newPassword }),
 
     onSuccess: () => {
-      setShowToast(true);
-      setTimer(() => setShowToast(false), 2000);
-
       setPassword("");
       setConfirmPassword("");
       setErrors({ password: "", confirmPassword: "" });
+      showToast("수정 완료");
     },
 
     onError: (error) => {
@@ -45,12 +44,16 @@ const PasswordEdit = () => {
     setErrors((prev) => ({ ...prev, confirmPassword: msg }));
   };
 
-  const handleChange = (setter, field) => (e) => {
-    setter(e.target.value);
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
+  const handleChange = useCallback(
+    (setter, field) => (e) => {
+      setter(e.target.value);
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: "" }));
+      }
+    },
+    [errors]
+  );
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -66,7 +69,6 @@ const PasswordEdit = () => {
 
   const isValid =
     password && confirmPassword && !errors.password && !errors.confirmPassword;
-
   const isSubmitting = passwordMutation.isPending;
 
   return (
@@ -111,8 +113,7 @@ const PasswordEdit = () => {
         </form>
       </div>
 
-      {/* 토스트 */}
-      <div className={`toast ${showToast ? "show" : ""}`}>수정 완료</div>
+      <Toast open={isToastOpen} message="수정 완료" />
     </div>
   );
 };

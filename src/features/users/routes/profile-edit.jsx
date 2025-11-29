@@ -12,12 +12,13 @@ import {
   updateUserProfile,
   deleteCurrentUser,
 } from "@/features/users/api/user-api";
+import { useTransientToast } from "@/shared/hooks/use-transient-toast.js";
 
 import Input from "@/components/common/input";
 import Button from "@/components/common/button";
 import Modal from "@/components/common/modal";
 import ProfileImageUploader from "@/components/common/profile-image-uploader";
-import { useTimeout } from "@/shared/hooks/use-timeout.js";
+import Toast from "@/components/common/toast";
 
 const ProfileEdit = () => {
   const navigate = useNavigate();
@@ -27,12 +28,11 @@ const ProfileEdit = () => {
   const [errors, setErrors] = useState({ nickname: "" });
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [showToast, setShowToast] = useState(false);
   const [lastCheckedNickname, setLastCheckedNickname] = useState(
     user?.nickname || ""
   );
   const [isNicknameAvailable, setIsNicknameAvailable] = useState(true);
-  const { set: setTimer } = useTimeout();
+  const { isVisible: isToastOpen, show: showToast } = useTransientToast();
 
   const { previewUrl, handleFileChange, upload } = useImageUpload(
     user?.profileImageUrl || ""
@@ -53,8 +53,7 @@ const ProfileEdit = () => {
     onSuccess: (newUserData) => {
       updateUser({ ...user, ...newUserData });
 
-      setShowToast(true);
-      setTimer(() => setShowToast(false), 2000);
+      showToast("수정 완료");
     },
     onError: (error) => {
       console.error(error);
@@ -238,7 +237,7 @@ const ProfileEdit = () => {
       />
 
       {/* 토스트 메시지 */}
-      <div className={`toast ${showToast ? "show" : ""}`}>수정 완료</div>
+      <Toast open={isToastOpen} message="수정 완료" />
     </div>
   );
 };
