@@ -5,8 +5,8 @@ import {
   updateComment,
   deleteComment,
 } from "@/features/posts/api/comment-api.js";
-import Button from "@/components/common/button";
-import Modal from "@/components/common/modal";
+import Button from "@/shared/components/common/button";
+import Modal from "@/shared/components/common/modal";
 import {
   useQuery,
   useMutation,

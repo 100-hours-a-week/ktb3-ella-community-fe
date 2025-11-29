@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import Layout from "@/components/layout/layout.jsx";
+import Layout from "@/shared/components/layout/layout.jsx";
 import LoginPage from "@/features/auth/routes/login-page.jsx";
 import SignUpPage from "@/features/auth/routes/signup-page";
 import PostList from "@/features/posts/routes/post-list";
@@ -9,7 +9,7 @@ import PostCreate from "@/features/posts/routes/post-create";
 import PostUpdate from "@/features/posts/routes/post-update";
 import ProfileEdit from "@/features/users/routes/profile-edit.jsx";
 import PasswordEdit from "@/features/users/routes/password-edit.jsx";
-import ProtectedRoute from "@/components/protected-route.jsx";
+import ProtectedRoute from "@/shared/components/protected-route.jsx";
 
 const AppRoutes = () => {
   return (

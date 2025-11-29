@@ -14,11 +14,11 @@ import {
 } from "@/features/users/api/user-api";
 import { useTransientToast } from "@/shared/hooks/use-transient-toast.js";
 
-import Input from "@/components/common/input";
-import Button from "@/components/common/button";
-import Modal from "@/components/common/modal";
-import ProfileImageUploader from "@/components/common/profile-image-uploader";
-import Toast from "@/components/common/toast";
+import Input from "@/shared/components/common/input";
+import Button from "@/shared/components/common/button";
+import Modal from "@/shared/components/common/modal";
+import ProfileImageUploader from "@/shared/components/common/profile-image-uploader";
+import Toast from "@/shared/components/common/toast";
 
 const ProfileEdit = () => {
   const navigate = useNavigate();

@@ -8,8 +8,8 @@ import { validateEmail, validatePassword } from "@/shared/utils/validation";
 
 import { MdEmail, MdLockOutline, MdLogin } from "react-icons/md";
 import logoImg from "@/assets/images/logo.svg";
-import Input from "@/components/common/input.jsx";
-import Button from "@/components/common/button.jsx";
+import Input from "@/shared/components/common/input.jsx";
+import Button from "@/shared/components/common/button.jsx";
 
 import { fetchMe } from "@/features/users/api/user-api";
 import { requestLogin } from "@/features/auth/api/auth-api.js";

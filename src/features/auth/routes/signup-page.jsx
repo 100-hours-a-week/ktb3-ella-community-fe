@@ -13,8 +13,8 @@ import {
   MdLogin,
 } from "react-icons/md";
 
-import Input from "@/components/common/input.jsx";
-import Button from "@/components/common/button.jsx";
+import Input from "@/shared/components/common/input.jsx";
+import Button from "@/shared/components/common/button.jsx";
 import {
   validateEmail,
   validatePassword,
@@ -26,7 +26,7 @@ import { requestSignup } from "@/features/auth/api/auth-api.js";
 import { useAuthStore } from "@/shared/stores/use-auth-store";
 
 import { useImageUpload } from "@/shared/hooks/use-image-upload.js";
-import ProfileImageUploader from "@/components/common/profile-image-uploader.jsx";
+import ProfileImageUploader from "@/shared/components/common/profile-image-uploader.jsx";
 
 const SignUpPage = () => {
   const navigate = useNavigate();

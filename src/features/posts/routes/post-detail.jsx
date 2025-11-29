@@ -20,7 +20,7 @@ import { useAuthStore } from "@/shared/stores/use-auth-store";
 
 import MarkdownRenderer from "@/features/posts/components/markdown-renderer";
 import CommentSection from "@/features/posts/components/comment-section";
-import Modal from "@/components/common/modal";
+import Modal from "@/shared/components/common/modal";
 
 import "@/styles/pages/post-detail.css";
 
