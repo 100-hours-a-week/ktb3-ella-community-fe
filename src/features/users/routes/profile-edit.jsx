@@ -26,12 +26,10 @@ const ProfileEdit = () => {
 
   const [nickname, setNickname] = useState(user?.nickname || "");
   const [errors, setErrors] = useState({ nickname: "" });
+  
   const [isCheckingNickname, setIsCheckingNickname] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [lastCheckedNickname, setLastCheckedNickname] = useState(
-    user?.nickname || ""
-  );
-  const [isNicknameAvailable, setIsNicknameAvailable] = useState(true);
+
   const { isVisible: isToastOpen, show: showToast } = useTransientToast();
 
   const { previewUrl, handleFileChange, upload } = useImageUpload(
@@ -52,7 +50,6 @@ const ProfileEdit = () => {
     },
     onSuccess: (newUserData) => {
       updateUser({ ...user, ...newUserData });
-
       showToast("수정 완료");
     },
     onError: (error) => {
@@ -61,7 +58,6 @@ const ProfileEdit = () => {
     },
   });
 
-  // 회원 탈퇴
   const deleteUserMutation = useMutation({
     mutationFn: deleteCurrentUser,
     onSuccess: () => {
@@ -75,73 +71,66 @@ const ProfileEdit = () => {
     },
   });
 
-  // 닉네임 변경
   const handleNicknameChange = (e) => {
-    const value = e.target.value;
-    setNickname(value);
-    setErrors((prev) => ({ ...prev, nickname: "" }));
+    setNickname(e.target.value);
+    if (errors.nickname) {
+      setErrors((prev) => ({ ...prev, nickname: "" }));
+    }
   };
 
-  const handleNicknameBlur = async () => {
-    const trimmed = nickname.trim();
+  /**
+   * 닉네임 유효성 및 중복 검사 통합 함수
+   */
+  const validateAndCheckAvailability = async (targetNickname) => {
+    const trimmed = targetNickname.trim();
 
     const basicError = validateNickname(trimmed);
-    if (basicError) {
-      setErrors((prev) => ({ ...prev, nickname: basicError }));
-      return false;
-    }
+    if (basicError) return basicError;
 
-    if (trimmed === user.nickname) {
-      setLastCheckedNickname(trimmed);
-      setIsNicknameAvailable(true);
-      return true;
-    }
+    if (trimmed === user.nickname) return null;
 
-    if (trimmed === lastCheckedNickname) {
-      if (!isNicknameAvailable) {
-        setErrors((prev) => ({
-          ...prev,
-          nickname: "*이미 사용중인 닉네임입니다.",
-        }));
-      }
-      return isNicknameAvailable;
-    }
-
-    setIsCheckingNickname(true);
     try {
+      setIsCheckingNickname(true);
       const { nicknameAvailable } = await checkAvailability({
         nickname: trimmed,
       });
-      setLastCheckedNickname(trimmed);
-      setIsNicknameAvailable(nicknameAvailable);
-
+      
       if (!nicknameAvailable) {
-        setErrors((prev) => ({
-          ...prev,
-          nickname: "*이미 사용중인 닉네임입니다.",
-        }));
-        return false;
+        return "*이미 사용중인 닉네임입니다.";
       }
-      return true;
+      return null; // 사용 가능
     } catch (error) {
       console.error(error);
-      return false;
+      return "중복 확인 중 오류가 발생했습니다.";
     } finally {
       setIsCheckingNickname(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    if (!user) return null;
-    e.preventDefault();
+  // 포커스가 벗어날 때 검사 수행
+  const handleNicknameBlur = async () => {
+    // 값이 비어있거나 변경사항이 없으면 검사하지 않음 (선택적 최적화)
+    if (!nickname.trim()) return; 
 
-    const isValid = await handleNicknameBlur();
-    if (!isValid) return;
+    const errorMsg = await validateAndCheckAvailability(nickname);
+    setErrors((prev) => ({ ...prev, nickname: errorMsg || "" }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) return;
+
+    // 제출 직전에 한 번 더 검증
+    const errorMsg = await validateAndCheckAvailability(nickname);
+    
+    if (errorMsg) {
+      setErrors((prev) => ({ ...prev, nickname: errorMsg }));
+      return;
+    }
 
     updateProfileMutation.mutate();
   };
 
-  // 회원 탈퇴
   const handleWithdraw = () => {
     deleteUserMutation.mutate();
   };
@@ -156,10 +145,7 @@ const ProfileEdit = () => {
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           {/* 프로필 이미지 */}
           <div className="field">
-            <div
-              className="field-label-wrapper"
-              style={{ marginBottom: "8px" }}
-            >
+            <div className="field-label-wrapper" style={{ marginBottom: "8px" }}>
               <FaUser size={20} color="#2563EB" />
               <label className="field-label">프로필 사진*</label>
             </div>
@@ -176,11 +162,7 @@ const ProfileEdit = () => {
               <FaEnvelope size={20} color="#2563EB" />
               <label className="field-label">이메일*</label>
             </div>
-            <p
-              className="field_value"
-              id="email-value"
-              style={{ padding: "10px 4px" }}
-            >
+            <p className="field_value" id="email-value" style={{ padding: "10px 4px" }}>
               {user.email}
             </p>
           </div>
@@ -200,10 +182,10 @@ const ProfileEdit = () => {
           <Button
             type="submit"
             disabled={
-              !!errors.nickname ||
-              isCheckingNickname ||
-              !nickname.trim() ||
-              updateProfileMutation.isPending
+              !!errors.nickname ||      // 에러가 있거나
+              isCheckingNickname ||     // 중복 확인 중이거나
+              !nickname.trim() ||       // 닉네임이 비었거나
+              updateProfileMutation.isPending // 저장 중일 때
             }
           >
             {updateProfileMutation.isPending ? "수정 중..." : "수정하기"}
@@ -227,7 +209,6 @@ const ProfileEdit = () => {
         </button>
       </div>
 
-      {/* 회원탈퇴 모달 */}
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -236,7 +217,6 @@ const ProfileEdit = () => {
         description="작성된 게시글과 댓글은 삭제됩니다."
       />
 
-      {/* 토스트 메시지 */}
       <Toast open={isToastOpen} message="수정 완료" />
     </div>
   );
