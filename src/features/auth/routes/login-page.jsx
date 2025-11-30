@@ -42,17 +42,14 @@ const LoginPage = () => {
         password: inputData.password.trim(),
       });
 
-      // 큰 우선 저장 (fetchMe가 토큰을 필요로 하므로)
-      useAuthStore.getState().login(null, accessToken);
+      const userData = await fetchMe(accessToken);
 
-      // 내 정보 조회
-      const userData = await fetchMe();
+      login(userData, accessToken);
 
-      return { userData, accessToken };
+      return true
     },
 
-    onSuccess: ({ userData, accessToken }) => {
-      login(userData, accessToken);
+    onSuccess: () => {
       navigate("/posts");
     },
 

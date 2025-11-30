@@ -8,7 +8,10 @@ export const useAuthStore = create(
       accessToken: null,
       isAuthenticated: false,
 
-      // 유저 정보와 어세스 토큰 저장
+      // 액세스 토큰
+      setAccessToken: (token) => set({ accessToken: token }),
+
+      // 유저 정보
       login: (userData, token) =>
         set({
           user: userData,

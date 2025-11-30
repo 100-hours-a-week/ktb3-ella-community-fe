@@ -56,17 +56,13 @@ const SignUpPage = () => {
         profileImageUrl: uploadedProfileUrl,
       });
 
-      // 토큰 저장
-      useAuthStore.getState().login(null, accessToken);
+      const userData = await fetchMe(accessToken);
 
-      //내 정보 조회
-      const userData = await fetchMe();
-
-      return { userData, accessToken };
+      login(userData, accessToken);
+      return true;
     },
 
-    onSuccess: ({ userData, accessToken }) => {
-      login(userData, accessToken);
+    onSuccess: () => {
       navigate("/posts");
     },
 
