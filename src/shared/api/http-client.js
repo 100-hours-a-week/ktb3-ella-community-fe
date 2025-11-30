@@ -12,6 +12,25 @@ import { useAuthStore } from "@/shared/stores/use-auth-store";
 
 const REFRESH_ENDPOINT = "/api/auth/refresh";
 
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+const processRefreshQueue = (error, newAccessToken) => {
+  refreshSubscribers.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+      return;
+    }
+    resolve(newAccessToken);
+  });
+  refreshSubscribers = [];
+};
+
+const enqueueRefreshRequest = () =>
+  new Promise((resolve, reject) => {
+    refreshSubscribers.push({ resolve, reject });
+  });
+
 const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
@@ -56,6 +75,25 @@ apiClient.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
+
+      // 이미 갱신 중이면 큐에 적재
+     if (isRefreshing) {
+        try {
+          const newAccessToken = await new Promise((resolve, reject) => {
+            refreshSubscribers.push({ resolve, reject });
+          });
+          // 새 토큰으로 헤더 교체 후 재요청
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return apiClient(originalRequest);
+        } catch (err) {
+          // 대기 중 에러 발생 시 
+          return Promise.reject(err);
+        }
+      }
+
+      // 갱신 시작
+      originalRequest._retry = true;
+      isRefreshing = true;
       console.log("어세스 토큰 만료, 리프레시 시도 중...");
 
       try {
@@ -67,25 +105,29 @@ apiClient.interceptors.response.use(
 
         const newAccessToken = data?.data?.accessToken || data?.accessToken;
 
-        if (newAccessToken) {
-          // 스토어 업데이트
-          const currentUser = useAuthStore.getState().user;
-          useAuthStore.getState().login(currentUser, newAccessToken);
-
-          console.log("토큰 갱신 성공 재요청합니다.");
-
-          // 재요청 헤더 교체
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-          return apiClient(originalRequest);
-        } else {
-          console.error(" 리프레시 응답에 accessToken이 없습니다", data);
-          useAuthStore.getState().logout();
+        if (!newAccessToken) {
+          throw new Error("리프레시 응답에 accessToken이 없습니다.");
         }
+
+        // 스토어 업데이트
+        const currentUser = useAuthStore.getState().user;
+        useAuthStore.getState().login(currentUser, newAccessToken);
+
+        console.log("토큰 갱신 성공 재요청합니다.");
+
+        processRefreshQueue(null, newAccessToken);
+
+        // 재요청 헤더 교체
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        return apiClient(originalRequest);
       } catch (refreshError) {
         console.error("리프레시 요청 실패", refreshError);
         useAuthStore.getState().logout();
+        processRefreshQueue(refreshError, null);
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
