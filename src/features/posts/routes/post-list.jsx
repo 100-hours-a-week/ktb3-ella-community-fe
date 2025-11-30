@@ -20,6 +20,13 @@ const POPULAR_TAGS = [
   "#TypeScript",
 ];
 
+const SORT_OPTIONS = [
+  { value: "NEW", label: "최신순" },
+  { value: "VIEW", label: "조회순" },
+  { value: "LIKE", label: "좋아요순" },
+  { value: "CMT", label: "댓글순" },
+];
+
 const ICON_COLOR = "#2563EB";
 
 const PostList = () => {
@@ -118,10 +125,11 @@ const PostList = () => {
               value={sortOption}
               onChange={handleSortChange}
             >
-              <option value="NEW">최신순</option>
-              <option value="VIEW">조회순</option>
-              <option value="LIKE">좋아요순</option>
-              <option value="CMT">댓글순</option>
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
