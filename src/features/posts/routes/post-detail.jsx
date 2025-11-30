@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   FaHeart,
   FaRegHeart,
@@ -27,10 +27,10 @@ import "@/styles/pages/post-detail.css";
 const PostDetail = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  // Selector 패턴 사용
+  const user = useAuthStore((state) => state.user);
+  const queryClient = useQueryClient();
 
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
@@ -39,17 +39,49 @@ const PostDetail = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["post", postId], // 이 키가 같으면 중복 요청을 자동으로 제거함
+    queryKey: ["post", postId],
     queryFn: () => getPost(postId),
-    staleTime: 1000 * 60, // 1분 동안은 다시 조회해도 서버 요청 안 함 (캐시)
+    staleTime: 1000 * 60,
   });
 
-  useEffect(() => {
-    if (post) {
-      setLiked(post.liked);
-      setLikeCount(post.likeCount);
-    }
-  }, [post]);
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+      return post.liked ? unlikePost(postId) : likePost(postId);
+    },
+    onMutate: async () => {
+      if (!user) return;
+
+      await queryClient.cancelQueries({ queryKey: ["post", postId] });
+      const previousPost = queryClient.getQueryData(["post", postId]);
+
+      queryClient.setQueryData(["post", postId], (oldPost) => {
+        if (!oldPost) return oldPost;
+        const isLikedNow = !oldPost.liked;
+        return {
+          ...oldPost,
+          liked: isLikedNow,
+          likeCount: isLikedNow
+            ? (oldPost.likeCount || 0) + 1
+            : Math.max(0, (oldPost.likeCount || 0) - 1),
+        };
+      });
+
+      return { previousPost };
+    },
+    onError: (err, context) => {
+      if (context?.previousPost) {
+        queryClient.setQueryData(["post", postId], context.previousPost);
+      }
+      console.error(err);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
+    },
+  });
 
   if (isError) {
     alert("게시글을 불러올 수 없습니다. 다시 시도해주세요.");
@@ -59,23 +91,6 @@ const PostDetail = () => {
 
   if (isLoading) return <div className="loading">Loading...</div>;
   if (!post) return null;
-
-  // 좋아요 토글
-  const handleLikeToggle = async () => {
-    if (!user) return null;
-    try {
-      if (liked) {
-        await unlikePost(postId);
-        setLikeCount((prev) => Math.max(0, prev - 1));
-      } else {
-        await likePost(postId);
-        setLikeCount((prev) => prev + 1);
-      }
-      setLiked(!liked);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   // 삭제 핸들러
   const handleDeleteBtnClick = (postId) => {
@@ -166,16 +181,19 @@ const PostDetail = () => {
 
             <div className="post-count">
               <FaRegHeart size={14} color="#6B7280" />
-              <p className="post-like-count-value">{formatCount(likeCount)}</p>
+              {/* nullish coalescing 적용: ?? 0 */}
+              <p className="post-like-count-value">
+                {formatCount(post.likeCount ?? 0)}
+              </p>
 
               <FaRegCommentDots size={14} color="#6B7280" />
               <p className="post-comment-count-value">
-                {formatCount(post.commentCount)}
+                {formatCount(post.commentCount ?? 0)}
               </p>
 
               <FaRegEye size={14} color="#6B7280" />
               <p className="post-view-count-value">
-                {formatCount(post.viewCount)}
+                {formatCount(post.viewCount ?? 0)}
               </p>
             </div>
           </div>
@@ -197,16 +215,16 @@ const PostDetail = () => {
             <div className="post-btn">
               <button
                 type="button"
-                className={`btn-like ${liked ? "active" : ""}`}
-                onClick={handleLikeToggle}
+                className={`btn-like ${post.liked ? "active" : ""}`}
+                onClick={() => likeMutation.mutate()}
+                disabled={likeMutation.isPending}
               >
-                {liked ? <FaHeart color="#fff" /> : <FaRegHeart />}
+                {post.liked ? <FaHeart color="#fff" /> : <FaRegHeart />}
                 <span className="btn-like-text">좋아요</span>
                 <p className="post-like-count-value">
-                  {formatCount(likeCount)}
+                  {formatCount(post.likeCount ?? 0)}
                 </p>
               </button>
-
               <button type="button" className="btn-share" onClick={handleShare}>
                 <FaShareNodes />
                 <span className="btn-share-text">공유</span>
@@ -227,6 +245,7 @@ const PostDetail = () => {
           <div className="author-profile-image">
             <div className="author-profile-image-border">
               <div className="profile-img">
+                {/* Optional chaining 적용 */}
                 {post.author?.profileImageUrl ? (
                   <img
                     src={post.author.profileImageUrl}
