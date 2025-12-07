@@ -1,0 +1,60 @@
+import { apiRequest, unwrapData } from "@/shared/api/http-client.js";
+
+const POSTS_ENDPOINT = "/api/posts";
+
+// 게시글 목록 조회
+export const getPosts = async ({ page, size, sort }) => {
+  const params = {
+    page,
+    size,
+    sort,
+  };
+
+  const result = await apiRequest(POSTS_ENDPOINT, {
+    method: "GET",
+    params: params,
+    defaultErrorMessage: "게시글 목록을 불러오지 못했습니다.",
+  });
+
+  return unwrapData(result);
+};
+
+// 게시글 상세 조회
+export const getPost = async (postId) => {
+  const result = await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
+    method: "GET",
+    defaultErrorMessage: "게시글 상세 정보를 불러오지 못했습니다.",
+  });
+
+  return unwrapData(result);
+};
+
+// 게시글 작성
+export const createPost = async ({ title, content, postImageUrl }) => {
+  const result = await apiRequest(POSTS_ENDPOINT, {
+    method: "POST",
+    data: { title, content, postImageUrl },
+    defaultErrorMessage: "게시글 작성에 실패했습니다.",
+  });
+
+  return unwrapData(result);
+};
+
+// 게시글 수정
+export const updatePost = async (postId, { title, content, postImageUrl }) => {
+  const result = await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
+    method: "PUT",
+    data: { title, content, postImageUrl },
+    defaultErrorMessage: "게시글 수정에 실패했습니다.",
+  });
+
+  return unwrapData(result);
+};
+
+// 게시글 삭제
+export const deletePost = async ({ postId }) => {
+  await apiRequest(`${POSTS_ENDPOINT}/${postId}`, {
+    method: "DELETE",
+    defaultErrorMessage: "게시글 삭제에 실패했습니다.",
+  });
+};

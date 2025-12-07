@@ -263,7 +263,7 @@
 .post-comment-input-box {
   padding: 24px 24px 0 24px;
   border-radius: 8px;
-  border: 1px solid #1f2937;
+  border: 1px solid #9ca3af;
   background: rgba(0, 0, 0, 0);
 }
 
@@ -288,7 +288,7 @@
   justify-content: end;
   align-items: center;
   width: 100%;
-  padding: 6px 8px;
+  padding: 6px 0px;
 }
 
 .btn-comment-submit {
@@ -322,7 +322,6 @@
 .post-comment-list {
   width: 100%;
   border-bottom: 1px solid #64748b;
-  background: rgba(0, 0, 0, 0);
 }
 
 .post-comment-list-info {
@@ -412,7 +411,7 @@
   min-width: 28px;
   padding: 4px 8px;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #4b5563;
   background-color: #fff;
   font-family: var(--font-ui);
   font-size: 13px;
@@ -420,10 +419,10 @@
 }
 
 .comments-page-btn.active {
-  background-color: var(--primary);
+  background-color: #2563eb;
   color: #fff;
-  border-color: var(--primary);
   font-weight: 600;
+  border: none;
 }
 
 .comments-page-btn.disabled {
@@ -470,12 +469,8 @@
 .author-profile-image-border img {
   width: 64px;
   height: 64px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.author-profile-image-border img.is-loaded {
-  opacity: 1;
+  display: block;
+  object-fit: cover;
 }
 
 .author-name {
