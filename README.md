@@ -19,7 +19,7 @@
 
 ## 🧐 프로젝트 소개
 **D'velop**은 개발자들이 자신의 코드나 이슈를 공유하고 피드백을 주고받을 수 있는 최적의 커뮤니티 환경을 제공합니다.
-별도의 프레임워크 없이 **Vanilla JavaScript**를 기반으로 가볍고 빠르게 구축되었습니다.
+기존 Vanilla JS 프로젝트를 **React**로 마이그레이션하여 컴포넌트 기반의 재사용성과 상태 관리 효율성을 높였습니다.
 
 <br>
 
@@ -27,9 +27,9 @@
 
 | 카테고리 | 상세 기능 |
 |:---:|:---|
-| **인증** | • 회원가입 및 로그인/로그아웃<br>• JWT 기반 Access Token 관리 및 자동 갱신 |
+| **인증** | • 회원가입 및 로그인/로그아웃<br>• **JWT Access Token 관리**<br>• 자동 토큰 갱신 |
 | **사용자** | • 마이페이지 내 정보 조회<br>• 프로필 이미지 업로드 및 정보/비밀번호 수정 |
-| **게시판** | • 게시글 목록(페이지네이션) 및 상세 조회<br>• 게시글 작성, 수정, 삭제 <br>• 이미지 업로드 (S3) |
+| **게시판** | • **게시글 목록**<br>• 카테고리 필터링 및 검색<br>• 게시글 작성, 수정, 삭제 <br>• 이미지 업로드 |
 | **인터랙션** | • 게시글 좋아요 및 취소<br>• 댓글 작성, 수정, 삭제 |
 
 <br>
@@ -48,8 +48,18 @@
 
 ## 🛠 기술 스택 (Tech Stack)
 
-* **Language:** JavaScript (ES6+), HTML5, CSS3
-* **Package Manager:** NPM
+### Core
+* **Framework:** React 18
+* **Build Tool:** Vite
+* **Language:** JavaScript (ES6+)
+
+### State Management & Data Fetching
+* **Client State:** Zustand (Persist Middleware)
+* **Server State:** TanStack Query (React Query) v5
+
+### Network & Routing
+* **HTTP Client:** Axios (Interceptors applied)
+* **Routing:** React Router DOM v6
 
 <br>
 
